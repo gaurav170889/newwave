@@ -1,0 +1,11 @@
+alltables.txt
+trace.txt
+zoho_csv_file.csv
+rate_columns.txt
+Thumbs.db
+.DS_Store
+*.log
+.vscode/
+.idea/
+vendor/
+node_modules/

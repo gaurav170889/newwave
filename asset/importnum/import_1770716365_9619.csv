@@ -1,0 +1,4 @@
+number,fname,lname,type,feedback,scheduled_date,scheduled_time,custom_field_1
+18839122440,John,Doe,Lead,Interested,,14:30,Value1
+19827180054,Jane,Smith,Customer,CallBack,,,DataA
+17869613387,Goga,Mate,Customer,Make it,12-02-2026,14:30,

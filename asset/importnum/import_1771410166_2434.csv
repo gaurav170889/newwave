@@ -1,0 +1,3 @@
+number,fname,lname,type,feedback,custom_field_1,custom_field_2
+1234567890,John,Doe,Lead,Interested,Value1,Value2
+9876543210,Jane,Smith,Customer,CallBack,DataA,DataB

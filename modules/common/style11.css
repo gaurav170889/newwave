@@ -1,0 +1,30 @@
+.scrolltb{ display: block; }
+	/*thead, tbody, tr, td, th */
+	tr:after {
+		content: ' ';
+		display: block;
+		visibility: hidden;
+		clear: both;
+	}
+
+	.scrollth th {
+		height: 30px;
+		text-align: center;
+	}
+
+	.scrolltbody {
+		height: 250px;
+		overflow-y: auto;
+		overflow-x: auto;
+		text-align:center;
+	}
+
+	thead {
+		/* fallback */
+	}
+
+
+	.scrolltbody td, .scrollth th {
+		width: 50%;
+		float: left;
+	}

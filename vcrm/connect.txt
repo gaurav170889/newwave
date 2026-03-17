@@ -1,0 +1,6550 @@
+{
+    "CallLogRows": [
+        {
+            "Id": 2504,
+            "CallTime": "2024-01-25T05:22:46+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2504,
+            "CallTime": "2024-01-25T05:22:46+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2504,
+            "CallTime": "2024-01-25T05:22:46+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2556,
+            "CallTime": "2024-01-25T10:15:51+01:00",
+            "CallerId": "0612147807",
+            "Destination": "0887226600",
+            "Duration": "00:14:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2751,
+            "CallTime": "2024-01-26T09:19:56+01:00",
+            "CallerId": "0113567170",
+            "Destination": "0882021212",
+            "Duration": "00:02:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2785,
+            "CallTime": "2024-01-26T12:17:21+01:00",
+            "CallerId": "0651427971",
+            "Destination": "0707542222",
+            "Duration": "00:02:43",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 2854,
+            "CallTime": "2024-01-26T16:28:44+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "0888686161",
+            "Duration": "00:00:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3344,
+            "CallTime": "2024-01-27T14:47:26+01:00",
+            "CallerId": "0651293498",
+            "Destination": "0885426444",
+            "Duration": "00:00:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3414,
+            "CallTime": "2024-01-29T10:23:57+01:00",
+            "CallerId": "0612147807",
+            "Destination": "0887226666",
+            "Duration": "00:13:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3443,
+            "CallTime": "2024-01-29T15:14:40+01:00",
+            "CallerId": "0655783544",
+            "Destination": "0880552000",
+            "Duration": "00:05:27",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3466,
+            "CallTime": "2024-01-29T16:27:44+01:00",
+            "CallerId": "anonymous",
+            "Destination": "0880552000",
+            "Duration": "00:02:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3480,
+            "CallTime": "2024-01-30T08:05:23+01:00",
+            "CallerId": "0611313700",
+            "Destination": "0302333888",
+            "Duration": "00:08:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3537,
+            "CallTime": "2024-01-30T13:25:31+01:00",
+            "CallerId": "0631529290",
+            "Destination": "0887226600",
+            "Duration": "00:11:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3547,
+            "CallTime": "2024-01-30T14:02:41+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:00:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3547,
+            "CallTime": "2024-01-30T14:02:41+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:00:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3573,
+            "CallTime": "2024-01-30T14:45:21+01:00",
+            "CallerId": "0649088271",
+            "Destination": "09001550",
+            "Duration": "00:13:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3832,
+            "CallTime": "2024-01-31T12:14:19+01:00",
+            "CallerId": "0413211208",
+            "Destination": "0735470555",
+            "Duration": "00:15:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3845,
+            "CallTime": "2024-01-31T14:33:44+01:00",
+            "CallerId": "0620467070",
+            "Destination": "09001884",
+            "Duration": "00:00:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3871,
+            "CallTime": "2024-02-01T09:10:10+01:00",
+            "CallerId": "0612147807",
+            "Destination": "0654500100",
+            "Duration": "00:03:57",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3883,
+            "CallTime": "2024-02-01T10:54:36+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "0134629111",
+            "Duration": "00:00:30",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3903,
+            "CallTime": "2024-02-01T11:02:44+01:00",
+            "CallerId": "0633976247",
+            "Destination": "09001884",
+            "Duration": "00:00:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3915,
+            "CallTime": "2024-02-01T11:03:37+01:00",
+            "CallerId": "0640136440",
+            "Destination": "09001884",
+            "Duration": "00:02:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 3946,
+            "CallTime": "2024-02-01T11:58:54+01:00",
+            "CallerId": "0624619491",
+            "Destination": "0880552000",
+            "Duration": "00:02:45",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4041,
+            "CallTime": "2024-02-02T09:41:49+01:00",
+            "CallerId": "0612147807",
+            "Destination": "0887226600",
+            "Duration": "00:09:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4071,
+            "CallTime": "2024-02-02T13:48:33+01:00",
+            "CallerId": "0485520457",
+            "Destination": "09008490",
+            "Duration": "00:05:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4112,
+            "CallTime": "2024-02-03T12:10:13+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "0207544444",
+            "Duration": "00:00:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4123,
+            "CallTime": "2024-02-03T12:13:17+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "0207544444",
+            "Duration": "00:00:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4139,
+            "CallTime": "2024-02-03T12:16:15+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "0207544444",
+            "Duration": "00:00:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4244,
+            "CallTime": "2024-02-05T10:27:20+01:00",
+            "CallerId": "0616788496",
+            "Destination": "0612001200",
+            "Duration": "00:10:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4339,
+            "CallTime": "2024-02-05T14:53:04+01:00",
+            "CallerId": "0643559099",
+            "Destination": "0887226600",
+            "Duration": "00:03:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4371,
+            "CallTime": "2024-02-06T09:31:30+01:00",
+            "CallerId": "0651293498",
+            "Destination": "0884446622",
+            "Duration": "00:04:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4439,
+            "CallTime": "2024-02-06T14:16:23+01:00",
+            "CallerId": "0647880688",
+            "Destination": "0883314500",
+            "Duration": "00:00:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4461,
+            "CallTime": "2024-02-07T11:13:17+01:00",
+            "CallerId": "0736214132",
+            "Destination": "0202288800",
+            "Duration": "00:01:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4486,
+            "CallTime": "2024-02-07T13:18:23+01:00",
+            "CallerId": "0495492128",
+            "Destination": "0622448485",
+            "Duration": "00:01:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4506,
+            "CallTime": "2024-02-07T14:36:16+01:00",
+            "CallerId": "0619158696",
+            "Destination": "0202288822",
+            "Duration": "00:03:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4516,
+            "CallTime": "2024-02-07T15:15:16+01:00",
+            "CallerId": "0495632225",
+            "Destination": "0495572260",
+            "Duration": "00:01:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4629,
+            "CallTime": "2024-02-08T15:20:43+01:00",
+            "CallerId": "0658701059",
+            "Destination": "0882692888",
+            "Duration": "00:02:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4702,
+            "CallTime": "2024-02-09T08:31:10+01:00",
+            "CallerId": "0610152452",
+            "Destination": "0582345678",
+            "Duration": "00:00:19",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4749,
+            "CallTime": "2024-02-09T14:57:18+01:00",
+            "CallerId": "0639396633",
+            "Destination": "0612001200",
+            "Duration": "00:14:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4777,
+            "CallTime": "2024-02-09T16:33:07+01:00",
+            "CallerId": "0299470475",
+            "Destination": "0612001200",
+            "Duration": "00:11:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4813,
+            "CallTime": "2024-02-09T17:51:11+01:00",
+            "CallerId": "0657050919",
+            "Destination": "0880088112",
+            "Duration": "00:04:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4857,
+            "CallTime": "2024-02-10T13:31:29+01:00",
+            "CallerId": "0306039743",
+            "Destination": "0307606250",
+            "Duration": "00:03:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4928,
+            "CallTime": "2024-02-12T11:04:19+01:00",
+            "CallerId": "0263814080",
+            "Destination": "0888982001",
+            "Duration": "00:04:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4937,
+            "CallTime": "2024-02-12T11:25:34+01:00",
+            "CallerId": "0263814080",
+            "Destination": "0888982001",
+            "Duration": "00:10:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 4955,
+            "CallTime": "2024-02-12T12:52:34+01:00",
+            "CallerId": "0639194962",
+            "Destination": "0880552000",
+            "Duration": "00:01:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5009,
+            "CallTime": "2024-02-12T17:14:55+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "09001884",
+            "Duration": "00:00:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5020,
+            "CallTime": "2024-02-12T17:18:10+01:00",
+            "CallerId": "00971503656828",
+            "Destination": "09001884",
+            "Duration": "00:00:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5066,
+            "CallTime": "2024-02-13T08:23:30+01:00",
+            "CallerId": "0645237432",
+            "Destination": "0548362028",
+            "Duration": "00:00:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5136,
+            "CallTime": "2024-02-13T14:15:03+01:00",
+            "CallerId": "0631529290",
+            "Destination": "0887226600",
+            "Duration": "00:00:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5267,
+            "CallTime": "2024-02-14T18:45:52+01:00",
+            "CallerId": "0433475040",
+            "Destination": "0612001200",
+            "Duration": "00:01:21",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5300,
+            "CallTime": "2024-02-15T12:44:59+01:00",
+            "CallerId": "anonymous",
+            "Destination": "0885426444",
+            "Duration": "00:07:27",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5353,
+            "CallTime": "2024-02-16T12:46:20+01:00",
+            "CallerId": "0242069651",
+            "Destination": "0880561505",
+            "Duration": "00:02:52",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5373,
+            "CallTime": "2024-02-16T13:48:06+01:00",
+            "CallerId": "0578692881",
+            "Destination": "0612001200",
+            "Duration": "00:01:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5551,
+            "CallTime": "2024-02-19T09:28:59+01:00",
+            "CallerId": "0765972017",
+            "Destination": "0736838000",
+            "Duration": "00:09:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 5903,
+            "CallTime": "2024-02-26T11:18:36+01:00",
+            "CallerId": "0634026974",
+            "Destination": "0880552000",
+            "Duration": "00:05:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6412,
+            "CallTime": "2024-03-01T10:25:09+01:00",
+            "CallerId": "0653826977",
+            "Destination": "0880561561",
+            "Duration": "00:01:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6550,
+            "CallTime": "2024-03-01T18:23:07+01:00",
+            "CallerId": "0636541169",
+            "Destination": "0618803984",
+            "Duration": "00:00:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6564,
+            "CallTime": "2024-03-01T18:35:36+01:00",
+            "CallerId": "0636541169",
+            "Destination": "0618803984",
+            "Duration": "00:00:19",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6589,
+            "CallTime": "2024-03-02T14:51:36+01:00",
+            "CallerId": "0654771577",
+            "Destination": "0717200909",
+            "Duration": "00:00:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6601,
+            "CallTime": "2024-03-02T15:28:02+01:00",
+            "CallerId": "0650655940",
+            "Destination": "0612001200",
+            "Duration": "00:00:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6667,
+            "CallTime": "2024-03-04T10:11:37+01:00",
+            "CallerId": "0615326696",
+            "Destination": "0885426444",
+            "Duration": "00:07:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6757,
+            "CallTime": "2024-03-04T15:34:46+01:00",
+            "CallerId": "0616037660",
+            "Destination": "0544371130",
+            "Duration": "00:04:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6767,
+            "CallTime": "2024-03-04T15:45:59+01:00",
+            "CallerId": "0616037660",
+            "Destination": "0544371130",
+            "Duration": "00:02:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6805,
+            "CallTime": "2024-03-05T11:00:01+01:00",
+            "CallerId": "0623409058",
+            "Destination": "0438808088",
+            "Duration": "00:05:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6869,
+            "CallTime": "2024-03-05T18:56:51+01:00",
+            "CallerId": "0306037671",
+            "Destination": "0880552000",
+            "Duration": "00:00:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6910,
+            "CallTime": "2024-03-06T10:11:59+01:00",
+            "CallerId": "0620018089",
+            "Destination": "0880561535",
+            "Duration": "00:06:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 6955,
+            "CallTime": "2024-03-06T14:34:56+01:00",
+            "CallerId": "0594659154",
+            "Destination": "0880306201",
+            "Duration": "00:00:18",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7126,
+            "CallTime": "2024-03-07T13:13:26+01:00",
+            "CallerId": "0657783846",
+            "Destination": "0736155155",
+            "Duration": "00:11:57",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7270,
+            "CallTime": "2024-03-08T09:25:55+01:00",
+            "CallerId": "0651368964",
+            "Destination": "0612001200",
+            "Duration": "00:08:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7357,
+            "CallTime": "2024-03-11T09:09:52+01:00",
+            "CallerId": "0592614802",
+            "Destination": "0612001200",
+            "Duration": "00:00:36",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7458,
+            "CallTime": "2024-03-11T14:27:45+01:00",
+            "CallerId": "0206611518",
+            "Destination": "0880201020",
+            "Duration": "00:05:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7479,
+            "CallTime": "2024-03-11T17:14:24+01:00",
+            "CallerId": "0636114751",
+            "Destination": "09001550",
+            "Duration": "00:09:48",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7554,
+            "CallTime": "2024-03-13T12:40:57+01:00",
+            "CallerId": "0651951627",
+            "Destination": "0887226600",
+            "Duration": "00:00:48",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 7565,
+            "CallTime": "2024-03-13T12:41:42+01:00",
+            "CallerId": "0610953252",
+            "Destination": "09001884",
+            "Duration": "00:04:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8033,
+            "CallTime": "2024-03-19T10:27:38+01:00",
+            "CallerId": "0648657909",
+            "Destination": "0505250539",
+            "Duration": "00:00:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8047,
+            "CallTime": "2024-03-19T12:29:51+01:00",
+            "CallerId": "0348430304",
+            "Destination": "0880129000",
+            "Duration": "00:01:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8058,
+            "CallTime": "2024-03-19T12:26:56+01:00",
+            "CallerId": "0612206599",
+            "Destination": "0880139640",
+            "Duration": "00:09:39",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8117,
+            "CallTime": "2024-03-19T17:01:59+01:00",
+            "CallerId": "0657256945",
+            "Destination": "0880088112",
+            "Duration": "00:02:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8223,
+            "CallTime": "2024-03-20T09:30:57+01:00",
+            "CallerId": "0246773367",
+            "Destination": "0880201010",
+            "Duration": "00:10:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8232,
+            "CallTime": "2024-03-20T09:48:46+01:00",
+            "CallerId": "0313785602",
+            "Destination": "0858885123",
+            "Duration": "00:01:46",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8296,
+            "CallTime": "2024-03-21T09:03:58+01:00",
+            "CallerId": "0416691516",
+            "Destination": "0887226600",
+            "Duration": "00:08:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8341,
+            "CallTime": "2024-03-21T13:37:06+01:00",
+            "CallerId": "0651647744",
+            "Destination": "09001884",
+            "Duration": "00:17:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8431,
+            "CallTime": "2024-03-22T09:10:29+01:00",
+            "CallerId": "0629409934",
+            "Destination": "0885852222",
+            "Duration": "00:10:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8442,
+            "CallTime": "2024-03-22T10:06:16+01:00",
+            "CallerId": "0647997666",
+            "Destination": "09001884",
+            "Duration": "00:09:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8453,
+            "CallTime": "2024-03-22T10:32:03+01:00",
+            "CallerId": "0657344861",
+            "Destination": "09001884",
+            "Duration": "00:04:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8469,
+            "CallTime": "2024-03-22T11:42:35+01:00",
+            "CallerId": "0627164504",
+            "Destination": "09001884",
+            "Duration": "00:05:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8481,
+            "CallTime": "2024-03-22T12:04:16+01:00",
+            "CallerId": "0653767132",
+            "Destination": "09001884",
+            "Duration": "00:04:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8525,
+            "CallTime": "2024-03-22T12:46:58+01:00",
+            "CallerId": "0629495759",
+            "Destination": "0612001200",
+            "Duration": "00:00:21",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8542,
+            "CallTime": "2024-03-22T12:52:13+01:00",
+            "CallerId": "0633787723",
+            "Destination": "0612001200",
+            "Duration": "00:07:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8553,
+            "CallTime": "2024-03-22T13:17:15+01:00",
+            "CallerId": "0642032115",
+            "Destination": "0612001200",
+            "Duration": "00:05:46",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8566,
+            "CallTime": "2024-03-22T13:23:13+01:00",
+            "CallerId": "0681960082",
+            "Destination": "0888686161",
+            "Duration": "00:02:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8588,
+            "CallTime": "2024-03-22T13:16:21+01:00",
+            "CallerId": "0624780587",
+            "Destination": "0612001200",
+            "Duration": "00:12:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8604,
+            "CallTime": "2024-03-22T13:28:56+01:00",
+            "CallerId": "0645773727",
+            "Destination": "0612001200",
+            "Duration": "00:00:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8615,
+            "CallTime": "2024-03-22T13:24:15+01:00",
+            "CallerId": "0620820758",
+            "Destination": "09001884",
+            "Duration": "00:09:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8642,
+            "CallTime": "2024-03-22T13:45:55+01:00",
+            "CallerId": "0628260330",
+            "Destination": "0612001200",
+            "Duration": "00:01:18",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8662,
+            "CallTime": "2024-03-22T15:10:34+01:00",
+            "CallerId": "0651748137",
+            "Destination": "0612001200",
+            "Duration": "00:01:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8673,
+            "CallTime": "2024-03-22T15:11:19+01:00",
+            "CallerId": "0650073922",
+            "Destination": "09001884",
+            "Duration": "00:10:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8685,
+            "CallTime": "2024-03-22T15:23:19+01:00",
+            "CallerId": "0646182368",
+            "Destination": "0612001200",
+            "Duration": "00:06:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8725,
+            "CallTime": "2024-03-22T17:45:58+01:00",
+            "CallerId": "0623246677",
+            "Destination": "0888686161",
+            "Duration": "00:04:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8824,
+            "CallTime": "2024-03-23T09:39:35+01:00",
+            "CallerId": "0627212656",
+            "Destination": "09001884",
+            "Duration": "00:00:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8845,
+            "CallTime": "2024-03-23T10:12:02+01:00",
+            "CallerId": "0682309916",
+            "Destination": "09001884",
+            "Duration": "00:09:46",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8857,
+            "CallTime": "2024-03-23T10:40:43+01:00",
+            "CallerId": "0651997646",
+            "Destination": "0612001200",
+            "Duration": "00:16:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8898,
+            "CallTime": "2024-03-23T11:04:54+01:00",
+            "CallerId": "0682314694",
+            "Destination": "0612001200",
+            "Duration": "00:08:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8925,
+            "CallTime": "2024-03-23T11:37:58+01:00",
+            "CallerId": "0641619730",
+            "Destination": "0888686161",
+            "Duration": "00:00:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8938,
+            "CallTime": "2024-03-23T11:46:01+01:00",
+            "CallerId": "0654776171",
+            "Destination": "0612001200",
+            "Duration": "00:01:40",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8952,
+            "CallTime": "2024-03-23T11:49:57+01:00",
+            "CallerId": "0644962511",
+            "Destination": "0888686161",
+            "Duration": "00:01:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8970,
+            "CallTime": "2024-03-23T12:00:30+01:00",
+            "CallerId": "0612598876",
+            "Destination": "09001884",
+            "Duration": "00:00:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8981,
+            "CallTime": "2024-03-23T12:02:19+01:00",
+            "CallerId": "0644962511",
+            "Destination": "0888686161",
+            "Duration": "00:00:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 8992,
+            "CallTime": "2024-03-23T12:03:08+01:00",
+            "CallerId": "0633796953",
+            "Destination": "0612001200",
+            "Duration": "00:00:18",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9001,
+            "CallTime": "2024-03-23T12:04:28+01:00",
+            "CallerId": "0263233882",
+            "Destination": "0885050330",
+            "Duration": "00:06:45",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9019,
+            "CallTime": "2024-03-23T12:26:07+01:00",
+            "CallerId": "0263233882",
+            "Destination": "0885050330",
+            "Duration": "00:01:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9032,
+            "CallTime": "2024-03-23T12:28:44+01:00",
+            "CallerId": "0487541944",
+            "Destination": "0612001200",
+            "Duration": "00:06:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9043,
+            "CallTime": "2024-03-23T12:30:59+01:00",
+            "CallerId": "0685723716",
+            "Destination": "09001884",
+            "Duration": "00:04:30",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9059,
+            "CallTime": "2024-03-23T13:06:44+01:00",
+            "CallerId": "0626094057",
+            "Destination": "09001884",
+            "Duration": "00:08:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9072,
+            "CallTime": "2024-03-23T13:41:14+01:00",
+            "CallerId": "0686390366",
+            "Destination": "0888686161",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9090,
+            "CallTime": "2024-03-23T13:51:12+01:00",
+            "CallerId": "0615408493",
+            "Destination": "0612001200",
+            "Duration": "00:00:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9105,
+            "CallTime": "2024-03-23T14:09:34+01:00",
+            "CallerId": "0611176265",
+            "Destination": "09001884",
+            "Duration": "00:00:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9160,
+            "CallTime": "2024-03-23T17:24:45+01:00",
+            "CallerId": "0634026751",
+            "Destination": "09001884",
+            "Duration": "00:07:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9201,
+            "CallTime": "2024-03-23T19:20:06+01:00",
+            "CallerId": "0687414912",
+            "Destination": "0612001200",
+            "Duration": "00:01:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9226,
+            "CallTime": "2024-03-25T08:09:38+01:00",
+            "CallerId": "0633594380",
+            "Destination": "09001884",
+            "Duration": "00:12:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9248,
+            "CallTime": "2024-03-25T08:44:40+01:00",
+            "CallerId": "0627050968",
+            "Destination": "0612001200",
+            "Duration": "00:01:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9259,
+            "CallTime": "2024-03-25T08:59:05+01:00",
+            "CallerId": "0624204554",
+            "Destination": "0612001200",
+            "Duration": "00:00:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9269,
+            "CallTime": "2024-03-25T08:47:16+01:00",
+            "CallerId": "0645831003",
+            "Destination": "0889660000",
+            "Duration": "00:15:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9281,
+            "CallTime": "2024-03-25T09:06:12+01:00",
+            "CallerId": "0645042417",
+            "Destination": "0612001200",
+            "Duration": "00:00:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9295,
+            "CallTime": "2024-03-25T08:58:28+01:00",
+            "CallerId": "0657088840",
+            "Destination": "09001884",
+            "Duration": "00:10:45",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9310,
+            "CallTime": "2024-03-25T09:02:26+01:00",
+            "CallerId": "0622384201",
+            "Destination": "0612001200",
+            "Duration": "00:07:52",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9327,
+            "CallTime": "2024-03-25T09:34:10+01:00",
+            "CallerId": "0654635668",
+            "Destination": "0612001200",
+            "Duration": "00:01:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9339,
+            "CallTime": "2024-03-25T09:36:22+01:00",
+            "CallerId": "0642624000",
+            "Destination": "0624001200",
+            "Duration": "00:02:30",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9355,
+            "CallTime": "2024-03-25T09:51:45+01:00",
+            "CallerId": "0629164477",
+            "Destination": "09001884",
+            "Duration": "00:01:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9366,
+            "CallTime": "2024-03-25T09:54:15+01:00",
+            "CallerId": "0650715599",
+            "Destination": "09001884",
+            "Duration": "00:06:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9377,
+            "CallTime": "2024-03-25T10:01:52+01:00",
+            "CallerId": "0644902134",
+            "Destination": "0612001200",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9396,
+            "CallTime": "2024-03-25T09:48:58+01:00",
+            "CallerId": "0683569636",
+            "Destination": "0612001200",
+            "Duration": "00:17:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9409,
+            "CallTime": "2024-03-25T09:55:53+01:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:12:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9422,
+            "CallTime": "2024-03-25T09:53:18+01:00",
+            "CallerId": "0657233867",
+            "Destination": "0612001200",
+            "Duration": "00:15:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9439,
+            "CallTime": "2024-03-25T09:56:35+01:00",
+            "CallerId": "0621853941",
+            "Destination": "0612001200",
+            "Duration": "00:17:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9450,
+            "CallTime": "2024-03-25T10:14:45+01:00",
+            "CallerId": "0639600136",
+            "Destination": "0612001200",
+            "Duration": "00:00:19",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9461,
+            "CallTime": "2024-03-25T10:15:21+01:00",
+            "CallerId": "0612263711",
+            "Destination": "0612001200",
+            "Duration": "00:01:02",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9472,
+            "CallTime": "2024-03-25T10:04:18+01:00",
+            "CallerId": "0624699179",
+            "Destination": "0612001200",
+            "Duration": "00:15:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9484,
+            "CallTime": "2024-03-25T10:13:54+01:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:12:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9495,
+            "CallTime": "2024-03-25T10:11:20+01:00",
+            "CallerId": "0642907034",
+            "Destination": "0612001200",
+            "Duration": "00:18:15",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9506,
+            "CallTime": "2024-03-25T10:32:51+01:00",
+            "CallerId": "0657110064",
+            "Destination": "0612001200",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9528,
+            "CallTime": "2024-03-25T10:34:57+01:00",
+            "CallerId": "0651475416",
+            "Destination": "0612001200",
+            "Duration": "00:09:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9539,
+            "CallTime": "2024-03-25T10:41:55+01:00",
+            "CallerId": "0634420063",
+            "Destination": "0624001200",
+            "Duration": "00:06:52",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9550,
+            "CallTime": "2024-03-25T10:35:53+01:00",
+            "CallerId": "0653182314",
+            "Destination": "0612001200",
+            "Duration": "00:17:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9561,
+            "CallTime": "2024-03-25T10:38:49+01:00",
+            "CallerId": "0653638641",
+            "Destination": "09001884",
+            "Duration": "00:15:56",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9574,
+            "CallTime": "2024-03-25T11:01:03+01:00",
+            "CallerId": "0638435885",
+            "Destination": "0888686161",
+            "Duration": "00:00:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9587,
+            "CallTime": "2024-03-25T11:02:57+01:00",
+            "CallerId": "0629399199",
+            "Destination": "0612001200",
+            "Duration": "00:04:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9600,
+            "CallTime": "2024-03-25T11:00:15+01:00",
+            "CallerId": "0622280992",
+            "Destination": "0612001200",
+            "Duration": "00:13:06",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9616,
+            "CallTime": "2024-03-25T10:58:12+01:00",
+            "CallerId": "0614879717",
+            "Destination": "0612001200",
+            "Duration": "00:15:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9627,
+            "CallTime": "2024-03-25T11:03:48+01:00",
+            "CallerId": "0629153793",
+            "Destination": "0612001200",
+            "Duration": "00:15:19",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9653,
+            "CallTime": "2024-03-25T11:19:50+01:00",
+            "CallerId": "0623237615",
+            "Destination": "0612001200",
+            "Duration": "00:10:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9681,
+            "CallTime": "2024-03-25T11:33:21+01:00",
+            "CallerId": "0682744607",
+            "Destination": "0624001200",
+            "Duration": "00:05:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9702,
+            "CallTime": "2024-03-25T11:30:49+01:00",
+            "CallerId": "0612993736",
+            "Destination": "0612001200",
+            "Duration": "00:15:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9713,
+            "CallTime": "2024-03-25T11:37:09+01:00",
+            "CallerId": "0648124131",
+            "Destination": "09001884",
+            "Duration": "00:09:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9724,
+            "CallTime": "2024-03-25T11:36:18+01:00",
+            "CallerId": "0654683251",
+            "Destination": "0612001200",
+            "Duration": "00:10:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9736,
+            "CallTime": "2024-03-25T11:47:05+01:00",
+            "CallerId": "0622609501",
+            "Destination": "0612001200",
+            "Duration": "00:00:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9748,
+            "CallTime": "2024-03-25T11:35:23+01:00",
+            "CallerId": "0623237615",
+            "Destination": "0612001200",
+            "Duration": "00:12:40",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9760,
+            "CallTime": "2024-03-25T11:45:33+01:00",
+            "CallerId": "0653385490",
+            "Destination": "0612001200",
+            "Duration": "00:08:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9797,
+            "CallTime": "2024-03-25T11:51:44+01:00",
+            "CallerId": "0622609501",
+            "Destination": "0612001200",
+            "Duration": "00:12:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9813,
+            "CallTime": "2024-03-25T11:58:27+01:00",
+            "CallerId": "0620592948",
+            "Destination": "0612001200",
+            "Duration": "00:12:36",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9826,
+            "CallTime": "2024-03-25T12:03:17+01:00",
+            "CallerId": "0621816044",
+            "Destination": "0612001200",
+            "Duration": "00:12:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9840,
+            "CallTime": "2024-03-25T12:14:02+01:00",
+            "CallerId": "0625034456",
+            "Destination": "0612001200",
+            "Duration": "00:13:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9851,
+            "CallTime": "2024-03-25T12:19:27+01:00",
+            "CallerId": "0651293366",
+            "Destination": "0612001200",
+            "Duration": "00:14:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9863,
+            "CallTime": "2024-03-25T12:31:46+01:00",
+            "CallerId": "0649584917",
+            "Destination": "0612001200",
+            "Duration": "00:13:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9878,
+            "CallTime": "2024-03-25T12:50:17+01:00",
+            "CallerId": "0633617777",
+            "Destination": "0612001200",
+            "Duration": "00:00:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9891,
+            "CallTime": "2024-03-25T12:59:01+01:00",
+            "CallerId": "0615070536",
+            "Destination": "0205618711",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9917,
+            "CallTime": "2024-03-25T13:07:32+01:00",
+            "CallerId": "0644851488",
+            "Destination": "09001884",
+            "Duration": "00:02:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9930,
+            "CallTime": "2024-03-25T13:14:05+01:00",
+            "CallerId": "0650957582",
+            "Destination": "0624001200",
+            "Duration": "00:01:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9943,
+            "CallTime": "2024-03-25T13:10:51+01:00",
+            "CallerId": "0355264285",
+            "Destination": "0612001200",
+            "Duration": "00:13:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9954,
+            "CallTime": "2024-03-25T13:12:18+01:00",
+            "CallerId": "0629479163",
+            "Destination": "09001884",
+            "Duration": "00:12:40",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9970,
+            "CallTime": "2024-03-25T13:20:08+01:00",
+            "CallerId": "0618614335",
+            "Destination": "0612001200",
+            "Duration": "00:15:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 9984,
+            "CallTime": "2024-03-25T13:27:50+01:00",
+            "CallerId": "0618172037",
+            "Destination": "0888686161",
+            "Duration": "00:10:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10011,
+            "CallTime": "2024-03-25T13:47:06+01:00",
+            "CallerId": "0618614335",
+            "Destination": "0612001200",
+            "Duration": "00:13:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10027,
+            "CallTime": "2024-03-25T14:06:59+01:00",
+            "CallerId": "0653262248",
+            "Destination": "0206445814",
+            "Duration": "00:01:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10042,
+            "CallTime": "2024-03-25T14:16:38+01:00",
+            "CallerId": "0641642095",
+            "Destination": "0612001200",
+            "Duration": "00:02:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10055,
+            "CallTime": "2024-03-25T14:31:07+01:00",
+            "CallerId": "0653733330",
+            "Destination": "0612001200",
+            "Duration": "00:00:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10067,
+            "CallTime": "2024-03-25T14:36:23+01:00",
+            "CallerId": "0610477744",
+            "Destination": "0612001200",
+            "Duration": "00:00:15",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10080,
+            "CallTime": "2024-03-25T14:32:52+01:00",
+            "CallerId": "0619563444",
+            "Destination": "0612001200",
+            "Duration": "00:11:46",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10094,
+            "CallTime": "2024-03-25T14:43:49+01:00",
+            "CallerId": "0617201766",
+            "Destination": "0612001200",
+            "Duration": "00:08:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10133,
+            "CallTime": "2024-03-25T15:45:37+01:00",
+            "CallerId": "0545474076",
+            "Destination": "0887226600",
+            "Duration": "00:13:21",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10147,
+            "CallTime": "2024-03-25T15:55:59+01:00",
+            "CallerId": "0649976260",
+            "Destination": "0612001200",
+            "Duration": "00:10:15",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10163,
+            "CallTime": "2024-03-25T16:22:01+01:00",
+            "CallerId": "0628087529",
+            "Destination": "0624001200",
+            "Duration": "00:00:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10176,
+            "CallTime": "2024-03-25T16:25:21+01:00",
+            "CallerId": "0640521616",
+            "Destination": "0612001200",
+            "Duration": "00:17:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10189,
+            "CallTime": "2024-03-25T16:36:52+01:00",
+            "CallerId": "0638356532",
+            "Destination": "0612001200",
+            "Duration": "00:15:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10205,
+            "CallTime": "2024-03-25T17:46:17+01:00",
+            "CallerId": "0615212376",
+            "Destination": "0612001200",
+            "Duration": "00:01:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10229,
+            "CallTime": "2024-03-25T18:21:47+01:00",
+            "CallerId": "0642338155",
+            "Destination": "0612001200",
+            "Duration": "00:11:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10241,
+            "CallTime": "2024-03-25T18:36:09+01:00",
+            "CallerId": "0652567785",
+            "Destination": "0612001200",
+            "Duration": "00:00:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10252,
+            "CallTime": "2024-03-25T19:10:53+01:00",
+            "CallerId": "0611011034",
+            "Destination": "09001884",
+            "Duration": "00:04:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10263,
+            "CallTime": "2024-03-25T19:13:49+01:00",
+            "CallerId": "0647960443",
+            "Destination": "09001884",
+            "Duration": "00:02:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10285,
+            "CallTime": "2024-03-25T18:59:53+01:00",
+            "CallerId": "0653964837",
+            "Destination": "09001884",
+            "Duration": "00:17:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10319,
+            "CallTime": "2024-03-26T08:40:52+01:00",
+            "CallerId": "0625702814",
+            "Destination": "09001884",
+            "Duration": "00:00:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10337,
+            "CallTime": "2024-03-26T08:44:47+01:00",
+            "CallerId": "0618916313",
+            "Destination": "09001884",
+            "Duration": "00:17:02",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10348,
+            "CallTime": "2024-03-26T08:47:36+01:00",
+            "CallerId": "0629164477",
+            "Destination": "09001884",
+            "Duration": "00:18:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10359,
+            "CallTime": "2024-03-26T09:06:12+01:00",
+            "CallerId": "0356852520",
+            "Destination": "0888686161",
+            "Duration": "00:06:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10372,
+            "CallTime": "2024-03-26T09:30:17+01:00",
+            "CallerId": "0612284767",
+            "Destination": "0612001200",
+            "Duration": "00:02:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10426,
+            "CallTime": "2024-03-26T09:52:49+01:00",
+            "CallerId": "0655948994",
+            "Destination": "09001884",
+            "Duration": "00:03:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10439,
+            "CallTime": "2024-03-26T09:52:13+01:00",
+            "CallerId": "0615678769",
+            "Destination": "09001884",
+            "Duration": "00:06:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10450,
+            "CallTime": "2024-03-26T09:58:22+01:00",
+            "CallerId": "0644044691",
+            "Destination": "0612001200",
+            "Duration": "00:08:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10461,
+            "CallTime": "2024-03-26T10:07:44+01:00",
+            "CallerId": "0628399165",
+            "Destination": "09001884",
+            "Duration": "00:03:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10472,
+            "CallTime": "2024-03-26T10:11:55+01:00",
+            "CallerId": "0620950189",
+            "Destination": "0612001200",
+            "Duration": "00:00:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10483,
+            "CallTime": "2024-03-26T10:15:16+01:00",
+            "CallerId": "0648926934",
+            "Destination": "0612001200",
+            "Duration": "00:00:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10510,
+            "CallTime": "2024-03-26T10:14:33+01:00",
+            "CallerId": "0620950189",
+            "Destination": "0612001200",
+            "Duration": "00:13:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10521,
+            "CallTime": "2024-03-26T10:33:01+01:00",
+            "CallerId": "0682730168",
+            "Destination": "0612001200",
+            "Duration": "00:00:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10532,
+            "CallTime": "2024-03-26T10:38:52+01:00",
+            "CallerId": "0650819258",
+            "Destination": "0612001200",
+            "Duration": "00:00:18",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10543,
+            "CallTime": "2024-03-26T10:23:56+01:00",
+            "CallerId": "0619088292",
+            "Destination": "0612001200",
+            "Duration": "00:15:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10554,
+            "CallTime": "2024-03-26T10:50:59+01:00",
+            "CallerId": "0652315407",
+            "Destination": "0612001200",
+            "Duration": "00:00:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10565,
+            "CallTime": "2024-03-26T10:47:42+01:00",
+            "CallerId": "0681405678",
+            "Destination": "09001884",
+            "Duration": "00:06:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10576,
+            "CallTime": "2024-03-26T10:57:09+01:00",
+            "CallerId": "0646195160",
+            "Destination": "0612001200",
+            "Duration": "00:00:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10587,
+            "CallTime": "2024-03-26T10:50:00+01:00",
+            "CallerId": "0682730168",
+            "Destination": "09001884",
+            "Duration": "00:09:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10600,
+            "CallTime": "2024-03-26T11:04:04+01:00",
+            "CallerId": "0643468929",
+            "Destination": "0612001200",
+            "Duration": "00:05:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10611,
+            "CallTime": "2024-03-26T11:04:43+01:00",
+            "CallerId": "0614283469",
+            "Destination": "0612001200",
+            "Duration": "00:09:40",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10624,
+            "CallTime": "2024-03-26T11:12:40+01:00",
+            "CallerId": "0654355931",
+            "Destination": "0612001200",
+            "Duration": "00:13:58",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10635,
+            "CallTime": "2024-03-26T11:16:47+01:00",
+            "CallerId": "0627869980",
+            "Destination": "0612001200",
+            "Duration": "00:14:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10646,
+            "CallTime": "2024-03-26T11:33:17+01:00",
+            "CallerId": "0653204143",
+            "Destination": "0612001200",
+            "Duration": "00:02:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10657,
+            "CallTime": "2024-03-26T11:28:13+01:00",
+            "CallerId": "0610637110",
+            "Destination": "0612001200",
+            "Duration": "00:09:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10675,
+            "CallTime": "2024-03-26T11:43:16+01:00",
+            "CallerId": "0641914943",
+            "Destination": "09001884",
+            "Duration": "00:09:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10690,
+            "CallTime": "2024-03-26T11:55:12+01:00",
+            "CallerId": "0636176971",
+            "Destination": "0612001200",
+            "Duration": "00:11:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10701,
+            "CallTime": "2024-03-26T12:06:25+01:00",
+            "CallerId": "0684806201",
+            "Destination": "0612001200",
+            "Duration": "00:00:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10712,
+            "CallTime": "2024-03-26T12:11:11+01:00",
+            "CallerId": "0645108070",
+            "Destination": "09001884",
+            "Duration": "00:01:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10734,
+            "CallTime": "2024-03-26T12:26:32+01:00",
+            "CallerId": "0612041498",
+            "Destination": "09001884",
+            "Duration": "00:01:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10745,
+            "CallTime": "2024-03-26T12:22:22+01:00",
+            "CallerId": "0613618343",
+            "Destination": "09001884",
+            "Duration": "00:07:46",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10767,
+            "CallTime": "2024-03-26T12:45:13+01:00",
+            "CallerId": "0575510975",
+            "Destination": "0612001200",
+            "Duration": "00:09:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10789,
+            "CallTime": "2024-03-26T13:03:28+01:00",
+            "CallerId": "0612597951",
+            "Destination": "0612001200",
+            "Duration": "00:01:40",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10809,
+            "CallTime": "2024-03-26T13:07:37+01:00",
+            "CallerId": "0685674191",
+            "Destination": "09001884",
+            "Duration": "00:14:06",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10820,
+            "CallTime": "2024-03-26T13:30:41+01:00",
+            "CallerId": "0681561378",
+            "Destination": "0888686161",
+            "Duration": "00:01:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10833,
+            "CallTime": "2024-03-26T13:32:54+01:00",
+            "CallerId": "0631385615",
+            "Destination": "0612001200",
+            "Duration": "00:02:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10846,
+            "CallTime": "2024-03-26T13:28:40+01:00",
+            "CallerId": "0619535450",
+            "Destination": "09001884",
+            "Duration": "00:10:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10857,
+            "CallTime": "2024-03-26T13:39:55+01:00",
+            "CallerId": "0628260352",
+            "Destination": "0612001200",
+            "Duration": "00:00:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10917,
+            "CallTime": "2024-03-26T14:04:41+01:00",
+            "CallerId": "0653201404",
+            "Destination": "09001884",
+            "Duration": "00:07:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10930,
+            "CallTime": "2024-03-26T14:06:13+01:00",
+            "CallerId": "0651819128",
+            "Destination": "0612001200",
+            "Duration": "00:14:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10941,
+            "CallTime": "2024-03-26T14:18:33+01:00",
+            "CallerId": "0629344110",
+            "Destination": "0612001200",
+            "Duration": "00:10:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 10975,
+            "CallTime": "2024-03-26T15:22:35+01:00",
+            "CallerId": "0615678769",
+            "Destination": "09001884",
+            "Duration": "00:01:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11079,
+            "CallTime": "2024-03-27T11:24:28+01:00",
+            "CallerId": "0263233882",
+            "Destination": "0880505050",
+            "Duration": "00:02:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11104,
+            "CallTime": "2024-03-27T14:50:34+01:00",
+            "CallerId": "0263611484",
+            "Destination": "09001884",
+            "Duration": "00:12:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11137,
+            "CallTime": "2024-03-27T16:32:17+01:00",
+            "CallerId": "0618614335",
+            "Destination": "0612001200",
+            "Duration": "00:11:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11179,
+            "CallTime": "2024-03-28T12:33:27+01:00",
+            "CallerId": "0765964066",
+            "Destination": "0202288888",
+            "Duration": "00:12:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11271,
+            "CallTime": "2024-03-28T18:38:45+01:00",
+            "CallerId": "0657850405",
+            "Destination": "0887226666",
+            "Duration": "00:00:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11288,
+            "CallTime": "2024-03-28T19:13:42+01:00",
+            "CallerId": "0613755161",
+            "Destination": "0612001200",
+            "Duration": "00:02:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11301,
+            "CallTime": "2024-03-29T08:38:57+01:00",
+            "CallerId": "anonymous",
+            "Destination": "0612001200",
+            "Duration": "00:18:21",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11312,
+            "CallTime": "2024-03-29T10:46:33+01:00",
+            "CallerId": "0685704867",
+            "Destination": "0880552000",
+            "Duration": "00:00:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11331,
+            "CallTime": "2024-03-29T14:49:42+01:00",
+            "CallerId": "0616037660",
+            "Destination": "0880767000",
+            "Duration": "00:04:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11480,
+            "CallTime": "2024-03-30T10:26:46+01:00",
+            "CallerId": "0648085324",
+            "Destination": "09001884",
+            "Duration": "00:10:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11557,
+            "CallTime": "2024-04-01T12:03:02+02:00",
+            "CallerId": "0654139646",
+            "Destination": "0880550415",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11566,
+            "CallTime": "2024-04-01T13:06:23+02:00",
+            "CallerId": "0492536209",
+            "Destination": "0888765151",
+            "Duration": "00:16:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11584,
+            "CallTime": "2024-04-01T13:32:24+02:00",
+            "CallerId": "0626147695",
+            "Destination": "0888765151",
+            "Duration": "00:03:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11696,
+            "CallTime": "2024-04-02T10:51:25+02:00",
+            "CallerId": "0475551928",
+            "Destination": "0887226600",
+            "Duration": "00:08:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11758,
+            "CallTime": "2024-04-02T14:56:33+02:00",
+            "CallerId": "0651257116",
+            "Destination": "0352070000",
+            "Duration": "00:04:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11901,
+            "CallTime": "2024-04-03T16:42:52+02:00",
+            "CallerId": "0617465816",
+            "Destination": "0202288888",
+            "Duration": "00:00:58",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 11917,
+            "CallTime": "2024-04-03T16:59:57+02:00",
+            "CallerId": "0455254541",
+            "Destination": "0202288888",
+            "Duration": "00:00:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12019,
+            "CallTime": "2024-04-05T11:20:47+02:00",
+            "CallerId": "0765032729",
+            "Destination": "0885500113",
+            "Duration": "00:00:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12109,
+            "CallTime": "2024-04-05T16:26:34+02:00",
+            "CallerId": "0616037660",
+            "Destination": "0885054333",
+            "Duration": "00:09:57",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12132,
+            "CallTime": "2024-04-06T10:28:47+02:00",
+            "CallerId": "0515541124",
+            "Destination": "0880552000",
+            "Duration": "00:00:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12295,
+            "CallTime": "2024-04-08T15:26:47+02:00",
+            "CallerId": "0616037660",
+            "Destination": "09000101",
+            "Duration": "00:09:57",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12347,
+            "CallTime": "2024-04-09T11:12:23+02:00",
+            "CallerId": "0736138590",
+            "Destination": "0880561535",
+            "Duration": "00:00:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12535,
+            "CallTime": "2024-04-12T12:01:14+02:00",
+            "CallerId": "0433112101",
+            "Destination": "0306333002",
+            "Duration": "00:06:48",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12665,
+            "CallTime": "2024-04-13T16:39:02+02:00",
+            "CallerId": "0653209512",
+            "Destination": "0654500100",
+            "Duration": "00:05:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12731,
+            "CallTime": "2024-04-15T11:58:15+02:00",
+            "CallerId": "0570784685",
+            "Destination": "0582345678",
+            "Duration": "00:01:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12768,
+            "CallTime": "2024-04-15T13:16:02+02:00",
+            "CallerId": "0622871538",
+            "Destination": "0880505050",
+            "Duration": "00:03:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12779,
+            "CallTime": "2024-04-15T14:20:15+02:00",
+            "CallerId": "0174628078",
+            "Destination": "0880505050",
+            "Duration": "00:06:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12842,
+            "CallTime": "2024-04-15T16:35:54+02:00",
+            "CallerId": "0623878044",
+            "Destination": "0612001200",
+            "Duration": "00:12:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12868,
+            "CallTime": "2024-04-15T17:14:00+02:00",
+            "CallerId": "0616037660",
+            "Destination": "09001450",
+            "Duration": "00:13:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 12931,
+            "CallTime": "2024-04-16T09:58:05+02:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:03:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13023,
+            "CallTime": "2024-04-16T15:27:47+02:00",
+            "CallerId": "0591677747",
+            "Destination": "0437003344",
+            "Duration": "00:03:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13102,
+            "CallTime": "2024-04-17T11:18:28+02:00",
+            "CallerId": "0622129847",
+            "Destination": "0882277700",
+            "Duration": "00:05:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13113,
+            "CallTime": "2024-04-17T11:27:27+02:00",
+            "CallerId": "0622129847",
+            "Destination": "0882277700",
+            "Duration": "00:08:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13122,
+            "CallTime": "2024-04-17T11:58:30+02:00",
+            "CallerId": "0475483443",
+            "Destination": "0882277700",
+            "Duration": "00:17:02",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13162,
+            "CallTime": "2024-04-17T16:12:16+02:00",
+            "CallerId": "0203379813",
+            "Destination": "0888955955",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13191,
+            "CallTime": "2024-04-17T16:25:54+02:00",
+            "CallerId": "0203379813",
+            "Destination": "0202259934",
+            "Duration": "00:00:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13229,
+            "CallTime": "2024-04-18T11:07:27+02:00",
+            "CallerId": "0637442596",
+            "Destination": "0612001200",
+            "Duration": "00:07:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13256,
+            "CallTime": "2024-04-18T11:45:46+02:00",
+            "CallerId": "0416337810",
+            "Destination": "09001884",
+            "Duration": "00:08:58",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13275,
+            "CallTime": "2024-04-18T11:55:33+02:00",
+            "CallerId": "0634536017",
+            "Destination": "0880552000",
+            "Duration": "00:00:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13317,
+            "CallTime": "2024-04-18T15:54:05+02:00",
+            "CallerId": "0653947449",
+            "Destination": "0888248242",
+            "Duration": "00:06:21",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13538,
+            "CallTime": "2024-04-22T16:58:14+02:00",
+            "CallerId": "0621404157",
+            "Destination": "0793632020",
+            "Duration": "00:02:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13586,
+            "CallTime": "2024-04-23T14:39:14+02:00",
+            "CallerId": "0653496063",
+            "Destination": "0786151388",
+            "Duration": "00:10:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13684,
+            "CallTime": "2024-04-24T13:49:38+02:00",
+            "CallerId": "0624454539",
+            "Destination": "09001884",
+            "Duration": "00:10:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13700,
+            "CallTime": "2024-04-24T14:13:46+02:00",
+            "CallerId": "0624347712",
+            "Destination": "09001884",
+            "Duration": "00:15:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13714,
+            "CallTime": "2024-04-24T15:40:23+02:00",
+            "CallerId": "0629238490",
+            "Destination": "0612001200",
+            "Duration": "00:00:12",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13736,
+            "CallTime": "2024-04-24T16:28:37+02:00",
+            "CallerId": "0651078490",
+            "Destination": "09001884",
+            "Duration": "00:05:18",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13752,
+            "CallTime": "2024-04-24T16:22:20+02:00",
+            "CallerId": "0641502340",
+            "Destination": "09001884",
+            "Duration": "00:16:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13763,
+            "CallTime": "2024-04-24T16:29:24+02:00",
+            "CallerId": "0628422989",
+            "Destination": "09001884",
+            "Duration": "00:11:39",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13792,
+            "CallTime": "2024-04-24T16:46:16+02:00",
+            "CallerId": "0725336047",
+            "Destination": "0612001200",
+            "Duration": "00:17:19",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13805,
+            "CallTime": "2024-04-24T16:57:43+02:00",
+            "CallerId": "0625392241",
+            "Destination": "09001884",
+            "Duration": "00:14:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13833,
+            "CallTime": "2024-04-25T09:37:26+02:00",
+            "CallerId": "0683696946",
+            "Destination": "09001884",
+            "Duration": "00:05:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13862,
+            "CallTime": "2024-04-25T09:50:07+02:00",
+            "CallerId": "0618150400",
+            "Destination": "09001884",
+            "Duration": "00:15:39",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13880,
+            "CallTime": "2024-04-25T10:46:01+02:00",
+            "CallerId": "0653480759",
+            "Destination": "0612001200",
+            "Duration": "00:09:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13926,
+            "CallTime": "2024-04-25T12:19:08+02:00",
+            "CallerId": "0685312328",
+            "Destination": "09001884",
+            "Duration": "00:03:51",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13946,
+            "CallTime": "2024-04-25T12:47:34+02:00",
+            "CallerId": "0621364222",
+            "Destination": "09001884",
+            "Duration": "00:07:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13962,
+            "CallTime": "2024-04-25T12:40:21+02:00",
+            "CallerId": "0651227033",
+            "Destination": "0612001200",
+            "Duration": "00:15:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13983,
+            "CallTime": "2024-04-25T13:42:16+02:00",
+            "CallerId": "0653147477",
+            "Destination": "0555220236",
+            "Duration": "00:04:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 13996,
+            "CallTime": "2024-04-25T13:52:31+02:00",
+            "CallerId": "0612445388",
+            "Destination": "09001884",
+            "Duration": "00:06:15",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14012,
+            "CallTime": "2024-04-25T14:29:55+02:00",
+            "CallerId": "0613227504",
+            "Destination": "09001884",
+            "Duration": "00:02:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14033,
+            "CallTime": "2024-04-25T15:21:01+02:00",
+            "CallerId": "0648630544",
+            "Destination": "09001884",
+            "Duration": "00:03:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14045,
+            "CallTime": "2024-04-25T15:35:34+02:00",
+            "CallerId": "0555415693",
+            "Destination": "0880201020",
+            "Duration": "00:05:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14240,
+            "CallTime": "2024-04-25T18:12:16+02:00",
+            "CallerId": "0646919530",
+            "Destination": "09001884",
+            "Duration": "00:10:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14249,
+            "CallTime": "2024-04-25T19:53:51+02:00",
+            "CallerId": "0255577859",
+            "Destination": "0206234755",
+            "Duration": "00:00:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14263,
+            "CallTime": "2024-04-26T10:18:35+02:00",
+            "CallerId": "0623397275",
+            "Destination": "0612001200",
+            "Duration": "00:12:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14283,
+            "CallTime": "2024-04-26T11:25:19+02:00",
+            "CallerId": "0653486517",
+            "Destination": "09001884",
+            "Duration": "00:01:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14321,
+            "CallTime": "2024-04-26T13:18:50+02:00",
+            "CallerId": "0623022186",
+            "Destination": "0612001200",
+            "Duration": "00:05:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14392,
+            "CallTime": "2024-04-26T16:28:22+02:00",
+            "CallerId": "0612482559",
+            "Destination": "0612001200",
+            "Duration": "00:13:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14404,
+            "CallTime": "2024-04-26T18:05:09+02:00",
+            "CallerId": "0616343059",
+            "Destination": "0612001200",
+            "Duration": "00:01:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14487,
+            "CallTime": "2024-04-29T09:18:17+02:00",
+            "CallerId": "0735034134",
+            "Destination": "0355421129",
+            "Duration": "00:01:52",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14513,
+            "CallTime": "2024-04-29T10:59:55+02:00",
+            "CallerId": "0628157683",
+            "Destination": "0880201020",
+            "Duration": "00:02:48",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14624,
+            "CallTime": "2024-04-29T18:43:19+02:00",
+            "CallerId": "0505730012",
+            "Destination": "0641484489",
+            "Duration": "00:10:51",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14691,
+            "CallTime": "2024-04-30T17:02:46+02:00",
+            "CallerId": "0629404507",
+            "Destination": "0880552000",
+            "Duration": "00:06:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14709,
+            "CallTime": "2024-05-01T09:50:59+02:00",
+            "CallerId": "0610636852",
+            "Destination": "09000024",
+            "Duration": "00:13:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14758,
+            "CallTime": "2024-05-01T15:21:11+02:00",
+            "CallerId": "0624267512",
+            "Destination": "0888686161",
+            "Duration": "00:01:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14769,
+            "CallTime": "2024-05-01T16:52:09+02:00",
+            "CallerId": "0639838897",
+            "Destination": "0888686161",
+            "Duration": "00:00:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14780,
+            "CallTime": "2024-05-01T16:55:24+02:00",
+            "CallerId": "0639838897",
+            "Destination": "0888686161",
+            "Duration": "00:00:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14808,
+            "CallTime": "2024-05-02T12:07:05+02:00",
+            "CallerId": "0475551880",
+            "Destination": "0475382219",
+            "Duration": "00:06:15",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14838,
+            "CallTime": "2024-05-02T13:40:33+02:00",
+            "CallerId": "0618136651",
+            "Destination": "0880552000",
+            "Duration": "00:00:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14850,
+            "CallTime": "2024-05-02T13:48:07+02:00",
+            "CallerId": "0618136651",
+            "Destination": "0880552000",
+            "Duration": "00:00:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14938,
+            "CallTime": "2024-05-03T10:50:46+02:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:13:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14978,
+            "CallTime": "2024-05-03T12:52:10+02:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:08:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 14991,
+            "CallTime": "2024-05-03T14:12:43+02:00",
+            "CallerId": "0618136651",
+            "Destination": "0880552000",
+            "Duration": "00:00:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15003,
+            "CallTime": "2024-05-03T14:19:54+02:00",
+            "CallerId": "0651552640",
+            "Destination": "0880201010",
+            "Duration": "00:04:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15054,
+            "CallTime": "2024-05-03T15:58:47+02:00",
+            "CallerId": "0206791461",
+            "Destination": "09000024",
+            "Duration": "00:07:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15118,
+            "CallTime": "2024-05-04T14:01:17+02:00",
+            "CallerId": "0626759232",
+            "Destination": "0612001200",
+            "Duration": "00:00:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15158,
+            "CallTime": "2024-05-04T15:24:23+02:00",
+            "CallerId": "0651257116",
+            "Destination": "0206621022",
+            "Duration": "00:03:06",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15209,
+            "CallTime": "2024-05-04T19:04:49+02:00",
+            "CallerId": "00971503656828",
+            "Destination": "09001884",
+            "Duration": "00:00:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15240,
+            "CallTime": "2024-05-04T19:17:56+02:00",
+            "CallerId": "00971503656828",
+            "Destination": "0620010385",
+            "Duration": "00:00:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15377,
+            "CallTime": "2024-05-06T10:08:48+02:00",
+            "CallerId": "0597563350",
+            "Destination": "0880420420",
+            "Duration": "00:16:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15390,
+            "CallTime": "2024-05-06T10:27:17+02:00",
+            "CallerId": "0651456298",
+            "Destination": "09000650",
+            "Duration": "00:03:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15426,
+            "CallTime": "2024-05-06T12:10:47+02:00",
+            "CallerId": "0620249845",
+            "Destination": "09001884",
+            "Duration": "00:12:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15450,
+            "CallTime": "2024-05-06T14:16:53+02:00",
+            "CallerId": "0503641489",
+            "Destination": "0883637991",
+            "Duration": "00:03:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15483,
+            "CallTime": "2024-05-06T15:17:54+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0416537777",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15498,
+            "CallTime": "2024-05-06T16:38:50+02:00",
+            "CallerId": "0206594586",
+            "Destination": "0880088112",
+            "Duration": "00:01:41",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15521,
+            "CallTime": "2024-05-06T18:49:52+02:00",
+            "CallerId": "0631185584",
+            "Destination": "0880552000",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15557,
+            "CallTime": "2024-05-07T08:59:55+02:00",
+            "CallerId": "0651261511",
+            "Destination": "0612001200",
+            "Duration": "00:01:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15611,
+            "CallTime": "2024-05-07T15:47:55+02:00",
+            "CallerId": "0654294948",
+            "Destination": "0850022222",
+            "Duration": "00:01:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15622,
+            "CallTime": "2024-05-07T15:50:24+02:00",
+            "CallerId": "0614045046",
+            "Destination": "0641819000",
+            "Duration": "00:00:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15743,
+            "CallTime": "2024-05-08T12:07:30+02:00",
+            "CallerId": "0630464008",
+            "Destination": "0880552000",
+            "Duration": "00:00:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15910,
+            "CallTime": "2024-05-08T17:40:20+02:00",
+            "CallerId": "0505717259",
+            "Destination": "0888577000",
+            "Duration": "00:00:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15930,
+            "CallTime": "2024-05-08T18:37:10+02:00",
+            "CallerId": "0657493787",
+            "Destination": "0682072601",
+            "Duration": "00:00:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 15966,
+            "CallTime": "2024-05-09T09:10:38+02:00",
+            "CallerId": "0165324179",
+            "Destination": "0880561525",
+            "Duration": "00:00:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16292,
+            "CallTime": "2024-05-13T09:20:22+02:00",
+            "CallerId": "0104510789",
+            "Destination": "0886630663",
+            "Duration": "00:16:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16443,
+            "CallTime": "2024-05-13T16:22:43+02:00",
+            "CallerId": "0224227641",
+            "Destination": "0702140214",
+            "Duration": "00:04:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16465,
+            "CallTime": "2024-05-13T16:45:01+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0887226600",
+            "Duration": "00:11:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16548,
+            "CallTime": "2024-05-14T10:24:30+02:00",
+            "CallerId": "0630419005",
+            "Destination": "0880561533",
+            "Duration": "00:04:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16557,
+            "CallTime": "2024-05-14T10:31:53+02:00",
+            "CallerId": "0630419005",
+            "Destination": "0880561533",
+            "Duration": "00:18:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16593,
+            "CallTime": "2024-05-14T12:59:20+02:00",
+            "CallerId": "0577490851",
+            "Destination": "0577491880",
+            "Duration": "00:00:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16620,
+            "CallTime": "2024-05-14T14:05:28+02:00",
+            "CallerId": "0306889206",
+            "Destination": "0880085888",
+            "Duration": "00:13:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16631,
+            "CallTime": "2024-05-14T15:04:40+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0582345678",
+            "Duration": "00:00:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16641,
+            "CallTime": "2024-05-14T15:44:09+02:00",
+            "CallerId": "0630419005",
+            "Destination": "0880561533",
+            "Duration": "00:02:02",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16652,
+            "CallTime": "2024-05-14T16:02:51+02:00",
+            "CallerId": "0181320357",
+            "Destination": "0880088112",
+            "Duration": "00:03:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16663,
+            "CallTime": "2024-05-14T16:10:58+02:00",
+            "CallerId": "0658995542",
+            "Destination": "0303104999",
+            "Duration": "00:00:36",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16699,
+            "CallTime": "2024-05-15T08:29:28+02:00",
+            "CallerId": "0653126754",
+            "Destination": "0887226666",
+            "Duration": "00:03:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16714,
+            "CallTime": "2024-05-15T09:45:34+02:00",
+            "CallerId": "0527698289",
+            "Destination": "0306592915",
+            "Duration": "00:04:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16727,
+            "CallTime": "2024-05-15T09:52:31+02:00",
+            "CallerId": "0653126754",
+            "Destination": "0887226666",
+            "Duration": "00:05:16",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16738,
+            "CallTime": "2024-05-15T09:51:27+02:00",
+            "CallerId": "0499323683",
+            "Destination": "0612001200",
+            "Duration": "00:08:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16758,
+            "CallTime": "2024-05-15T11:37:06+02:00",
+            "CallerId": "0768896116",
+            "Destination": "0765217764",
+            "Duration": "00:04:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16787,
+            "CallTime": "2024-05-15T13:05:15+02:00",
+            "CallerId": "0615002854",
+            "Destination": "09001884",
+            "Duration": "00:05:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16824,
+            "CallTime": "2024-05-16T09:32:08+02:00",
+            "CallerId": "0683210540",
+            "Destination": "0880552000",
+            "Duration": "00:03:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16887,
+            "CallTime": "2024-05-16T17:54:49+02:00",
+            "CallerId": "0684547163",
+            "Destination": "0888686161",
+            "Duration": "00:00:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 16898,
+            "CallTime": "2024-05-16T17:51:57+02:00",
+            "CallerId": "0654957814",
+            "Destination": "0303104999",
+            "Duration": "00:08:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17010,
+            "CallTime": "2024-05-17T16:05:32+02:00",
+            "CallerId": "0184691720",
+            "Destination": "0612001200",
+            "Duration": "00:17:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17136,
+            "CallTime": "2024-05-18T15:14:48+02:00",
+            "CallerId": "0341491711",
+            "Destination": "0880552000",
+            "Duration": "00:00:27",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17236,
+            "CallTime": "2024-05-20T16:23:47+02:00",
+            "CallerId": "0357725513",
+            "Destination": "0356249960",
+            "Duration": "00:00:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17273,
+            "CallTime": "2024-05-21T10:06:22+02:00",
+            "CallerId": "0229505394",
+            "Destination": "0880451600",
+            "Duration": "00:06:43",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17325,
+            "CallTime": "2024-05-21T12:13:23+02:00",
+            "CallerId": "0302894998",
+            "Destination": "0612001200",
+            "Duration": "00:06:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17496,
+            "CallTime": "2024-05-22T14:22:13+02:00",
+            "CallerId": "0433112101",
+            "Destination": "0202288800",
+            "Duration": "00:00:52",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17507,
+            "CallTime": "2024-05-22T14:21:03+02:00",
+            "CallerId": "0651706965",
+            "Destination": "0612001200",
+            "Duration": "00:04:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17529,
+            "CallTime": "2024-05-22T14:24:55+02:00",
+            "CallerId": "0433112101",
+            "Destination": "0202288800",
+            "Duration": "00:07:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17597,
+            "CallTime": "2024-05-22T20:01:04+02:00",
+            "CallerId": "0624407485",
+            "Destination": "0888686161",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17684,
+            "CallTime": "2024-05-24T11:50:54+02:00",
+            "CallerId": "0413272132",
+            "Destination": "0591571080",
+            "Duration": "00:11:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17797,
+            "CallTime": "2024-05-24T19:57:20+02:00",
+            "CallerId": "0651513480",
+            "Destination": "0786176380",
+            "Duration": "00:02:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 17815,
+            "CallTime": "2024-05-25T09:14:25+02:00",
+            "CallerId": "0618108883",
+            "Destination": "0880552000",
+            "Duration": "00:00:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18011,
+            "CallTime": "2024-05-27T11:27:32+02:00",
+            "CallerId": "0206791461",
+            "Destination": "0433876800",
+            "Duration": "00:00:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18040,
+            "CallTime": "2024-05-27T13:07:54+02:00",
+            "CallerId": "0657387958",
+            "Destination": "0880088112",
+            "Duration": "00:06:58",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18083,
+            "CallTime": "2024-05-28T13:21:24+02:00",
+            "CallerId": "0622152080",
+            "Destination": "0880088112",
+            "Duration": "00:00:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18144,
+            "CallTime": "2024-05-28T19:40:09+02:00",
+            "CallerId": "0619761811",
+            "Destination": "09001884",
+            "Duration": "00:03:43",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18179,
+            "CallTime": "2024-05-29T11:46:11+02:00",
+            "CallerId": "0626302286",
+            "Destination": "0541588111",
+            "Duration": "00:06:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18199,
+            "CallTime": "2024-05-29T12:44:44+02:00",
+            "CallerId": "0613808805",
+            "Destination": "0880552000",
+            "Duration": "00:04:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18223,
+            "CallTime": "2024-05-29T15:29:17+02:00",
+            "CallerId": "0593552500",
+            "Destination": "0880552000",
+            "Duration": "00:00:49",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18232,
+            "CallTime": "2024-05-29T15:35:29+02:00",
+            "CallerId": "0315377515",
+            "Destination": "0880561505",
+            "Duration": "00:01:30",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18241,
+            "CallTime": "2024-05-29T15:40:33+02:00",
+            "CallerId": "0315377515",
+            "Destination": "0880561505",
+            "Duration": "00:02:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18263,
+            "CallTime": "2024-05-29T16:29:03+02:00",
+            "CallerId": "0653250051",
+            "Destination": "0880088112",
+            "Duration": "00:04:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18282,
+            "CallTime": "2024-05-30T09:52:02+02:00",
+            "CallerId": "0642517710",
+            "Destination": "0880552000",
+            "Duration": "00:00:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18295,
+            "CallTime": "2024-05-30T10:45:02+02:00",
+            "CallerId": "0788433505",
+            "Destination": "0880201020",
+            "Duration": "00:00:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18359,
+            "CallTime": "2024-05-30T15:22:02+02:00",
+            "CallerId": "0620002189",
+            "Destination": "0624001200",
+            "Duration": "00:18:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18370,
+            "CallTime": "2024-05-30T15:52:26+02:00",
+            "CallerId": "0619948531",
+            "Destination": "0880088112",
+            "Duration": "00:07:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18387,
+            "CallTime": "2024-05-30T16:48:28+02:00",
+            "CallerId": "0617465550",
+            "Destination": "0883203000",
+            "Duration": "00:01:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18405,
+            "CallTime": "2024-05-30T19:30:45+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0880552000",
+            "Duration": "00:00:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18464,
+            "CallTime": "2024-05-31T11:52:27+02:00",
+            "CallerId": "0643122123",
+            "Destination": "0880552000",
+            "Duration": "00:01:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18484,
+            "CallTime": "2024-05-31T12:57:39+02:00",
+            "CallerId": "0174502828",
+            "Destination": "0880088112",
+            "Duration": "00:02:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18499,
+            "CallTime": "2024-05-31T13:29:18+02:00",
+            "CallerId": "0174502828",
+            "Destination": "0880088112",
+            "Duration": "00:03:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18510,
+            "CallTime": "2024-05-31T14:20:15+02:00",
+            "CallerId": "0645056768",
+            "Destination": "0880088112",
+            "Duration": "00:01:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18555,
+            "CallTime": "2024-05-31T17:39:01+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0880552000",
+            "Duration": "00:01:30",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18643,
+            "CallTime": "2024-06-03T09:40:25+02:00",
+            "CallerId": "0168402996",
+            "Destination": "0880552000",
+            "Duration": "00:03:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18677,
+            "CallTime": "2024-06-03T13:06:30+02:00",
+            "CallerId": "0622033945",
+            "Destination": "0880552000",
+            "Duration": "00:01:47",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18704,
+            "CallTime": "2024-06-03T15:50:17+02:00",
+            "CallerId": "0614432834",
+            "Destination": "0880552000",
+            "Duration": "00:02:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18933,
+            "CallTime": "2024-06-05T15:42:26+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0880088112",
+            "Duration": "00:01:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 18957,
+            "CallTime": "2024-06-06T10:34:33+02:00",
+            "CallerId": "0187684065",
+            "Destination": "09001884",
+            "Duration": "00:01:45",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19145,
+            "CallTime": "2024-06-06T17:47:10+02:00",
+            "CallerId": "0235404492",
+            "Destination": "0612001200",
+            "Duration": "00:12:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19169,
+            "CallTime": "2024-06-07T10:45:27+02:00",
+            "CallerId": "0620916819",
+            "Destination": "09001884",
+            "Duration": "00:04:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19188,
+            "CallTime": "2024-06-07T12:28:41+02:00",
+            "CallerId": "0620916819",
+            "Destination": "09001884",
+            "Duration": "00:03:35",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": true,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19323,
+            "CallTime": "2024-06-07T15:44:46+02:00",
+            "CallerId": "0622586095",
+            "Destination": "0880561575",
+            "Duration": "00:15:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19497,
+            "CallTime": "2024-06-08T18:17:19+02:00",
+            "CallerId": "0654318667",
+            "Destination": "0888686161",
+            "Duration": "00:00:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19616,
+            "CallTime": "2024-06-10T13:33:17+02:00",
+            "CallerId": "00971503656828",
+            "Destination": "0612001200",
+            "Duration": "00:00:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19740,
+            "CallTime": "2024-06-10T14:11:28+02:00",
+            "CallerId": "0627318871",
+            "Destination": "0202288888",
+            "Duration": "00:18:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19766,
+            "CallTime": "2024-06-10T15:48:06+02:00",
+            "CallerId": "0622334548",
+            "Destination": "0880505050",
+            "Duration": "00:03:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19777,
+            "CallTime": "2024-06-10T16:01:33+02:00",
+            "CallerId": "0619171363",
+            "Destination": "0880505050",
+            "Duration": "00:00:25",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19802,
+            "CallTime": "2024-06-10T18:09:02+02:00",
+            "CallerId": "0651186833",
+            "Destination": "0612001200",
+            "Duration": "00:01:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19813,
+            "CallTime": "2024-06-10T19:38:39+02:00",
+            "CallerId": "0648750323",
+            "Destination": "09001884",
+            "Duration": "00:01:37",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19843,
+            "CallTime": "2024-06-11T09:55:15+02:00",
+            "CallerId": "0651860430",
+            "Destination": "0880209303",
+            "Duration": "00:03:04",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19856,
+            "CallTime": "2024-06-11T10:34:40+02:00",
+            "CallerId": "0643275750",
+            "Destination": "0880088112",
+            "Duration": "00:01:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 19873,
+            "CallTime": "2024-06-11T13:50:47+02:00",
+            "CallerId": "0657711692",
+            "Destination": "0612001200",
+            "Duration": "00:00:27",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20131,
+            "CallTime": "2024-06-12T17:25:20+02:00",
+            "CallerId": "0642603727",
+            "Destination": "0880552000",
+            "Duration": "00:00:06",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20292,
+            "CallTime": "2024-06-13T12:16:54+02:00",
+            "CallerId": "0620203032",
+            "Destination": "0633850256",
+            "Duration": "00:04:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20413,
+            "CallTime": "2024-06-13T15:26:35+02:00",
+            "CallerId": "0612835967",
+            "Destination": "0880552000",
+            "Duration": "00:00:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20440,
+            "CallTime": "2024-06-14T09:58:54+02:00",
+            "CallerId": "0651469156",
+            "Destination": "0880561565",
+            "Duration": "00:03:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20548,
+            "CallTime": "2024-06-14T15:17:20+02:00",
+            "CallerId": "0617244521",
+            "Destination": "09001884",
+            "Duration": "00:00:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20571,
+            "CallTime": "2024-06-14T17:02:28+02:00",
+            "CallerId": "0653433880",
+            "Destination": "0202288888",
+            "Duration": "00:01:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20875,
+            "CallTime": "2024-06-15T14:31:52+02:00",
+            "CallerId": "0111417385",
+            "Destination": "0880552000",
+            "Duration": "00:00:10",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20957,
+            "CallTime": "2024-06-17T12:15:43+02:00",
+            "CallerId": "0615002854",
+            "Destination": "09001884",
+            "Duration": "00:01:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 20993,
+            "CallTime": "2024-06-17T13:46:54+02:00",
+            "CallerId": "0438515911",
+            "Destination": "09008490",
+            "Duration": "00:05:38",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21101,
+            "CallTime": "2024-06-18T18:28:11+02:00",
+            "CallerId": "0433112101",
+            "Destination": "0880552000",
+            "Duration": "00:00:22",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21137,
+            "CallTime": "2024-06-19T13:37:26+02:00",
+            "CallerId": "0683950089",
+            "Destination": "0702210041",
+            "Duration": "00:02:11",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21205,
+            "CallTime": "2024-06-20T11:25:45+02:00",
+            "CallerId": "0683143309",
+            "Destination": "0850408602",
+            "Duration": "00:01:54",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21271,
+            "CallTime": "2024-06-21T09:59:52+02:00",
+            "CallerId": "0621560263",
+            "Destination": "0134680402",
+            "Duration": "00:13:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21298,
+            "CallTime": "2024-06-21T13:12:16+02:00",
+            "CallerId": "0235286766",
+            "Destination": "09001884",
+            "Duration": "00:10:44",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21316,
+            "CallTime": "2024-06-21T14:12:18+02:00",
+            "CallerId": "0207856564",
+            "Destination": "09009394",
+            "Duration": "00:04:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21338,
+            "CallTime": "2024-06-21T15:25:45+02:00",
+            "CallerId": "0622412390",
+            "Destination": "0880552000",
+            "Duration": "00:04:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21358,
+            "CallTime": "2024-06-21T17:36:31+02:00",
+            "CallerId": "0615478064",
+            "Destination": "0880088112",
+            "Duration": "00:04:55",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21456,
+            "CallTime": "2024-06-24T11:29:35+02:00",
+            "CallerId": "0682672948",
+            "Destination": "0880552000",
+            "Duration": "00:11:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21480,
+            "CallTime": "2024-06-24T11:55:14+02:00",
+            "CallerId": "0630235742",
+            "Destination": "0205040500",
+            "Duration": "00:08:08",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21496,
+            "CallTime": "2024-06-24T13:40:00+02:00",
+            "CallerId": "0621590797",
+            "Destination": "0887226600",
+            "Duration": "00:09:17",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21643,
+            "CallTime": "2024-06-26T13:53:17+02:00",
+            "CallerId": "0644256762",
+            "Destination": "09008688",
+            "Duration": "00:00:14",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21736,
+            "CallTime": "2024-06-28T08:03:05+02:00",
+            "CallerId": "0637006851",
+            "Destination": "0880552000",
+            "Duration": "00:01:56",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21782,
+            "CallTime": "2024-06-28T10:24:33+02:00",
+            "CallerId": "0621624240",
+            "Destination": "09001884",
+            "Duration": "00:00:06",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21800,
+            "CallTime": "2024-06-28T11:28:02+02:00",
+            "CallerId": "0630058521",
+            "Destination": "0888955955",
+            "Duration": "00:16:53",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21816,
+            "CallTime": "2024-06-28T12:07:45+02:00",
+            "CallerId": "0651477627",
+            "Destination": "0880201020",
+            "Duration": "00:00:50",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21832,
+            "CallTime": "2024-06-28T19:21:15+02:00",
+            "CallerId": "0610376707",
+            "Destination": "0880552000",
+            "Duration": "00:00:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21892,
+            "CallTime": "2024-06-29T13:07:14+02:00",
+            "CallerId": "0641599378",
+            "Destination": "0880088112",
+            "Duration": "00:02:34",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21906,
+            "CallTime": "2024-06-29T14:22:55+02:00",
+            "CallerId": "0206950909",
+            "Destination": "0206796035",
+            "Duration": "00:02:43",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 21974,
+            "CallTime": "2024-07-01T08:47:58+02:00",
+            "CallerId": "0263251552",
+            "Destination": "0344679381",
+            "Duration": "00:02:59",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22063,
+            "CallTime": "2024-07-03T10:05:26+02:00",
+            "CallerId": "0418642635",
+            "Destination": "0886630663",
+            "Duration": "00:00:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22132,
+            "CallTime": "2024-07-03T15:33:43+02:00",
+            "CallerId": "0115608217",
+            "Destination": "0887226666",
+            "Duration": "00:17:03",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22147,
+            "CallTime": "2024-07-03T16:10:12+02:00",
+            "CallerId": "0527698289",
+            "Destination": "09001884",
+            "Duration": "00:10:24",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22215,
+            "CallTime": "2024-07-04T17:14:18+02:00",
+            "CallerId": "0623703296",
+            "Destination": "0880552000",
+            "Duration": "00:00:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22340,
+            "CallTime": "2024-07-08T09:10:43+02:00",
+            "CallerId": "0619854211",
+            "Destination": "0887226666",
+            "Duration": "00:12:28",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22351,
+            "CallTime": "2024-07-08T10:20:20+02:00",
+            "CallerId": "0651861408",
+            "Destination": "0880552000",
+            "Duration": "00:00:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22387,
+            "CallTime": "2024-07-08T16:15:52+02:00",
+            "CallerId": "0793620259",
+            "Destination": "0880088112",
+            "Duration": "00:00:43",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22444,
+            "CallTime": "2024-07-10T10:54:53+02:00",
+            "CallerId": "0640792496",
+            "Destination": "0235252208",
+            "Duration": "00:03:31",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22487,
+            "CallTime": "2024-07-10T17:58:32+02:00",
+            "CallerId": "0651991469",
+            "Destination": "0887226666",
+            "Duration": "00:08:29",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22507,
+            "CallTime": "2024-07-11T09:44:02+02:00",
+            "CallerId": "0575460281",
+            "Destination": "0648181069",
+            "Duration": "00:02:05",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22581,
+            "CallTime": "2024-07-11T20:47:50+02:00",
+            "CallerId": "0570551552",
+            "Destination": "09001884",
+            "Duration": "00:01:57",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22732,
+            "CallTime": "2024-07-15T14:23:06+02:00",
+            "CallerId": "0648159218",
+            "Destination": "0307515155",
+            "Duration": "00:00:42",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22834,
+            "CallTime": "2024-07-16T18:08:10+02:00",
+            "CallerId": "0643525087",
+            "Destination": "09000024",
+            "Duration": "00:00:45",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22898,
+            "CallTime": "2024-07-17T18:27:02+02:00",
+            "CallerId": "0653496063",
+            "Destination": "0184444888",
+            "Duration": "00:00:58",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22918,
+            "CallTime": "2024-07-18T09:22:44+02:00",
+            "CallerId": "0637277607",
+            "Destination": "0880552000",
+            "Duration": "00:00:33",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22943,
+            "CallTime": "2024-07-18T10:29:18+02:00",
+            "CallerId": "0653748464",
+            "Destination": "0880552000",
+            "Duration": "00:06:20",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 22954,
+            "CallTime": "2024-07-18T10:42:08+02:00",
+            "CallerId": "0653748464",
+            "Destination": "0612001200",
+            "Duration": "00:00:32",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23037,
+            "CallTime": "2024-07-19T16:29:31+02:00",
+            "CallerId": "anonymous",
+            "Destination": "0205040500",
+            "Duration": "00:01:51",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23127,
+            "CallTime": "2024-07-22T09:34:38+02:00",
+            "CallerId": "0611151673",
+            "Destination": "0880552000",
+            "Duration": "00:00:09",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23161,
+            "CallTime": "2024-07-22T10:05:54+02:00",
+            "CallerId": "0610786760",
+            "Destination": "09001884",
+            "Duration": "00:08:00",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23172,
+            "CallTime": "2024-07-22T10:28:06+02:00",
+            "CallerId": "0651144525",
+            "Destination": "0882224040",
+            "Duration": "00:06:13",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23207,
+            "CallTime": "2024-07-22T12:24:00+02:00",
+            "CallerId": "0648964567",
+            "Destination": "0612001200",
+            "Duration": "00:00:26",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23354,
+            "CallTime": "2024-07-24T10:03:04+02:00",
+            "CallerId": "0627318483",
+            "Destination": "0612001200",
+            "Duration": "00:12:23",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23393,
+            "CallTime": "2024-07-24T15:25:23+02:00",
+            "CallerId": "0614053084",
+            "Destination": "0118225500",
+            "Duration": "00:05:07",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}
+{
+    "CallLogRows": [
+        {
+            "Id": 23542,
+            "CallTime": "2024-07-26T12:10:55+02:00",
+            "CallerId": "0575512761",
+            "Destination": "09001884",
+            "Duration": "00:08:01",
+            "Answered": true
+        }
+    ],
+    "HasMoreRows": false,
+    "IsExportAllowed": true
+}

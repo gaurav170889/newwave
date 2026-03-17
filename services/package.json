@@ -1,0 +1,19 @@
+{
+  "name": "predictive-dialer-service",
+  "version": "1.0.0",
+  "description": "Predictive Dialer Service for Vantrap",
+  "main": "dialer.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dialer.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.4.0",
+    "mysql2": "^3.9.0",
+    "qs": "^6.11.0",
+    "uuid": "^13.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
