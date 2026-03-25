@@ -1,4 +1,8 @@
 <?php
+if (!defined('DIALERDB_HOST')) {
+    require_once __DIR__ . '/variables.php';
+}
+
 function loadmodal($modulename){
 				$class = ucwords($modulename."_modal");
 				if (class_exists($class)) {
