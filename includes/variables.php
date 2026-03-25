@@ -19,7 +19,7 @@ define("QUEUE_WEBHOOK_URL", "$protocol://$ip/newwave/api/webhook_queue_status_se
 
 // Dialer DB — override these on the server via a local config
 define('DIALERDB_HOST', 'localhost');
-define('DIALERDB_USER', '');
-define('DIALERDB_PASS', '');
-define('DIALERDB_NAME', '');
+define('DIALERDB_USER', 'root');
+define('DIALERDB_PASS', 'root');
+define('DIALERDB_NAME', 'dialerwave');
 ?>
