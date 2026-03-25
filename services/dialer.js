@@ -13,7 +13,6 @@ const QUEUE_FRESH_SEC = 10;
 const TOKEN_REUSE_SEC = 45;
 const PHONE_LOCK_TTL_SEC = 7200; // Keep lock during long calls; stale locks are auto-cleaned
 const PHONE_LOCK_CLEANUP_MS = 30000;
-const DIALER_DN = "802"; // Predictive Dialer Extension
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const LOG_FILE = path.join(__dirname, "dialer.log");
@@ -388,7 +387,8 @@ async function unlockLead(companyId, leadId, newState, nextCallAt = null) {
 
 // ------------ 3CX & Monitor ------------
 async function makeCall({ pbxurl, token, destination, dialerDn }) {
-    const dn = dialerDn || DIALER_DN;
+    const dn = String(dialerDn || "").trim();
+    if (!dn) throw new Error("Campaign dialer DN is missing");
     const url = `${pbxurl}/callcontrol/${dn}/makecall`;
     const payload = { destination, timeout: 30 };
     const resp = await axios.post(url, payload, {
@@ -635,9 +635,13 @@ async function tick() {
 
         for (const c of campaigns) {
             const queueDn = String(c.routeto || "").trim();
-            const dialerDn = String(c.dn_number || DIALER_DN).trim(); // Use campaign DN or default
+            const dialerDn = String(c.dn_number || "").trim();
 
             if (!queueDn) continue;
+            if (!dialerDn) {
+                log(`[Camp ${c.id}] Skipped - campaign dn_number is empty.`);
+                continue;
+            }
 
             // Check Queue
             const gate = await queueAllowsDialing(c.company_id, queueDn);
