@@ -12,7 +12,7 @@ Class Disposition{
 		include(INCLUDEPATH.'modules/common/navbar_1.php');	
 		
 		// Access Control: Only Super Admin and Company Admin
-		if(!isset($_SESSION['erole']) || ($_SESSION['erole'] != 'super_admin' && $_SESSION['erole'] != 'company_admin'))
+		if(!isset($_SESSION['prole']) || ($_SESSION['prole'] != 'super_admin' && $_SESSION['prole'] != 'company_admin'))
 		{
 			echo "<script>window.location.href='".BASE_URL."?route=dashboard/index';</script>";
 			exit;

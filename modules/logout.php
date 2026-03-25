@@ -1,5 +1,6 @@
 <?php 
+require_once($_SERVER['DOCUMENT_ROOT'].'/newwave/includes/variables.php');
 session_start();
-session_destroy(); // or  session_unset('session_name'); to dystroy individual session
-header("Location: http://192.168.1.234/smartlife"); // to redirect user after logout
+session_destroy();
+header("Location: ".BASE_URL);
 ?>

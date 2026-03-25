@@ -9,14 +9,14 @@ class Did {
     public function index() {
         $_SESSION['navurl'] = 'Did';
 
-        $isAdmin = isset($_SESSION['erole']) && in_array($_SESSION['erole'], ['super_admin', 'company_admin'], true);
+        $isAdmin = isset($_SESSION['prole']) && in_array($_SESSION['prole'], ['super_admin', 'company_admin'], true);
         if (!$isAdmin) {
             echo "Access Denied";
             return;
         }
 
         $companies = [];
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] === 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] === 'super_admin') {
             $companies = $this->modal->getCompanies();
         }
 
@@ -27,7 +27,7 @@ class Did {
     }
 
     private function resolveCompanyIdFromRequest() {
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] === 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] === 'super_admin') {
             $cid = isset($_REQUEST['company_id']) ? intval($_REQUEST['company_id']) : 0;
             return $cid > 0 ? $cid : 0;
         }

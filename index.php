@@ -21,7 +21,7 @@ include("modules/login.php");
 	
 
 
-if(!isset($_SESSION['zid'])){
+if(!isset($_SESSION['pid'])){
 		$class = ucwords('login');
 		if(class_exists($class))	{
 			$myclass = new $class();

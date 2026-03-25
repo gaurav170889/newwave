@@ -16,4 +16,10 @@ define("BASE_URL", "$protocol://$ip/newwave/");
 define("UPLOAD", ROOT_PATH."/newwave/asset/importnum/");
 define("WEBHOOK_URL", "$protocol://$ip/newwave/api/webhook_rating.php");
 define("QUEUE_WEBHOOK_URL", "$protocol://$ip/newwave/api/webhook_queue_status_secure.php");
+
+// Dialer DB — override these on the server via a local config
+define('DIALERDB_HOST', 'localhost');
+define('DIALERDB_USER', '');
+define('DIALERDB_PASS', '');
+define('DIALERDB_NAME', '');
 ?>

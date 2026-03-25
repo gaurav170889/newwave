@@ -29,8 +29,8 @@ Class Campcontact_modal{
     public function getallcontact() {
          $where = "";
          // Filter for agents only
-         if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'uagent') {
-             $zid = $_SESSION['zid'];
+         if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'uagent') {
+             $zid = $_SESSION['pid'];
              $u_query = "SELECT agentid FROM users WHERE id = '$zid'";
              $u_res = mysqli_query($this->conn, $u_query);
              $agent_id = 0;
@@ -276,7 +276,7 @@ Class Campcontact_modal{
         // Check if new notes are added
         $notesUpdate = "";
         if (!empty($notes)) {
-             $userId = $_SESSION['zid']; 
+             $userId = $_SESSION['pid']; 
              $userName = "Unknown";
              
              // Get User Name

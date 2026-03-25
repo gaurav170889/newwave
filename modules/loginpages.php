@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="robots" content="all,follow">
-	<base href="/vantrap/">
+	<base href="/newwave/">
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="modules/common/login/vendor/bootstrap/css/bootstrap.min.css">
     <!-- Font Awesome CSS-->

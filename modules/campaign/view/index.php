@@ -162,7 +162,7 @@
       </div>
       <div class="modal-body">
         
-        <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+        <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
         <div class="form-group">
           <label for="importCompanySelect">Select Company</label>
           <select id="importCompanySelect" name="company_id" class="form-control" style="width: 100%" required>
@@ -213,7 +213,7 @@
 				<div  class="row justify-content-end">
 					<div class="col-lg-12 text-right">
                     
-                    <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                    <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
                     <div class="form-group d-inline-block mr-2" style="max-width: 200px; text-align: left;">
                         <select class="form-control" id="companyFilter">
                             <option value="">All Companies</option>
@@ -247,7 +247,7 @@
                   <th>Route Type</th>
                   <th>Concurrent Calls</th>
                   <th style="display:none;">Webhook Token</th>
-                  <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                  <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
                   <th>Created By</th>
                   <th>Updated By</th>
                   <?php endif; ?>
@@ -298,7 +298,7 @@
 <script>
 $(document).ready(function() {
     
-    const isSuperAdmin = <?php echo (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') ? 'true' : 'false'; ?>;
+    const isSuperAdmin = <?php echo (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') ? 'true' : 'false'; ?>;
     const QUEUE_WEBHOOK_URL = "<?php echo QUEUE_WEBHOOK_URL; ?>";
     
     const columns = [

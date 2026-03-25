@@ -60,7 +60,7 @@
 						All Dashboard
 					</li>
                     
-                    <?php if(isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                    <?php if(isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
                     <li class="sidebar-item active Admindashboard">
 						<a class="sidebar-link" href="<?php echo BASE_URL;?>?route=admindashboard/index">
 							<i class="align-middle" data-feather="monitor"></i> <span class="align-middle">Admin Dashboard</span>
@@ -87,7 +87,7 @@
 					
 					<?php 
 					// Check for Admin privileges
-					$isAdmin = (isset($_SESSION['erole']) && ($_SESSION['erole'] == 'super_admin' || $_SESSION['erole'] == 'company_admin'));
+					$isAdmin = (isset($_SESSION['prole']) && ($_SESSION['prole'] == 'super_admin' || $_SESSION['prole'] == 'company_admin'));
 					?>
 
 					<?php if($isAdmin): ?>
@@ -128,7 +128,7 @@
 							<li class="sidebar-item Did"><a class="sidebar-link" href="<?php echo NAVURL;?>did/">Did</a></li>
                             <?php endif; ?>
                             
-                            <?php if(isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                            <?php if(isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
 							<li class="sidebar-item Importnum"><a class="sidebar-link" href="<?php echo NAVURL;?>campaign/importlog">Importnum</a></li>
                             <?php endif; ?>
                             

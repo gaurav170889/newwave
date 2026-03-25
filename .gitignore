@@ -1,5 +1,8 @@
 alltables.txt
 trace.txt
+api/database.php
+vcrm/database.php
+includes/db_config.php
 zoho_csv_file.csv
 rate_columns.txt
 Thumbs.db

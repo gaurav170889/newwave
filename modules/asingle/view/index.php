@@ -1,7 +1,7 @@
 <?php
 // Access Control
 $allowed_roles = ['super_admin', 'company_admin', 'manager'];
-$user_role = $_SESSION['erole'] ?? ''; // Assuming 'erole' stores the role slug
+$user_role = $_SESSION['prole'] ?? ''; // Assuming 'erole' stores the role slug
 if (!in_array($user_role, $allowed_roles)) {
     echo "<div class='alert alert-danger'>Access Denied. You do not have permission to view this report.</div>";
     include(MODULEPATH."common/footer_1.php");

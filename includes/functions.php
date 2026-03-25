@@ -14,11 +14,10 @@ function loadmodal($modulename){
  
  function ConnectDB()
 {	
-	
-	$host = 'localhost';
-         $user = 'root';
-         $pass = 'root';
-         $db = 'dialerwave';
+	$host = defined('DIALERDB_HOST') ? DIALERDB_HOST : 'localhost';
+         $user = defined('DIALERDB_USER') ? DIALERDB_USER : '';
+         $pass = defined('DIALERDB_PASS') ? DIALERDB_PASS : '';
+         $db   = defined('DIALERDB_NAME') ? DIALERDB_NAME : '';
          $connection = mysqli_connect($host,$user,$pass,$db); 
 		 
 		// Check connection

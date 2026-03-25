@@ -9,7 +9,7 @@
             <h6 class="card-subtitle text-muted">Sync inbound DIDs from PBX, then assign multiple DIDs and one outbound rule per campaign.</h6>
           </div>
           <div class="card-body">
-            <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+            <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
             <div class="form-group">
               <label for="didCompanySelect">Company</label>
               <select class="form-control" id="didCompanySelect">
@@ -81,7 +81,7 @@
 
 <script>
 $(document).ready(function() {
-  const isSuperAdmin = <?php echo (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') ? 'true' : 'false'; ?>;
+  const isSuperAdmin = <?php echo (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') ? 'true' : 'false'; ?>;
   let allDidRows = [];
 
   function didOptionHtml(row) {

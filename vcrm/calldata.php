@@ -4,7 +4,7 @@ require_once('database.php');
 date_default_timezone_set("Europe/Amsterdam");
 
 $tests = file_get_contents('php://input');
-$get= file_put_contents($_SERVER['DOCUMENT_ROOT']."/vantrap/vcrm/rawdata/".date('Y-m-d').'_test12.txt', $tests.PHP_EOL,FILE_APPEND);
+$get= file_put_contents($_SERVER['DOCUMENT_ROOT']."/newwave/vcrm/rawdata/".date('Y-m-d').'_test12.txt', $tests.PHP_EOL,FILE_APPEND);
 $gdata=json_decode($tests,true);
 $jdata=explode(",",$gdata['data']);
 //print_r($jdata);
@@ -23,7 +23,7 @@ $newchain=str_replace(['Chain: ','Ext.'],"",$chain);
 $chainarray= explode(';',$newchain);
 $ttime = gettotaltime($finalsttime,$finalendtime);
 $calltype=$jdata[15];
-$gets= file_put_contents($_SERVER['DOCUMENT_ROOT']."/vantrap/vcrm/rawdata/".date('Y-m-d').'_test123.txt', $callid." ".$starttime." ".$endtime." ".$calltype." ".$newchain.PHP_EOL,FILE_APPEND);
+$gets= file_put_contents($_SERVER['DOCUMENT_ROOT']."/newwave/vcrm/rawdata/".date('Y-m-d').'_test123.txt', $callid." ".$starttime." ".$endtime." ".$calltype." ".$newchain.PHP_EOL,FILE_APPEND);
 
 $countarray=count($chainarray);
 
@@ -232,7 +232,7 @@ function inserdata($rid,$agent,$caller,$externalno,$startdate,$starttime,$durati
 					}
 				else 
 					{
-						file_put_contents($_SERVER['DOCUMENT_ROOT']."/vantrap/vcrm/sqlerror/".date('Y-m-d')."_err_sql_ins.txt","Error: " . $sql . " " . mysqli_error($conn).PHP_EOL, FILE_APPEND);
+						file_put_contents($_SERVER['DOCUMENT_ROOT']."/newwave/vcrm/sqlerror/".date('Y-m-d')."_err_sql_ins.txt","Error: " . $sql . " " . mysqli_error($conn).PHP_EOL, FILE_APPEND);
 						return false;
 						
 					}

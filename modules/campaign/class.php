@@ -31,7 +31,7 @@ Class Campaign{
 	    //	$counter = 1;
 	    
 	    $companies = [];
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
             $companies = $this->modal->getCompanies();
         }
         
@@ -69,7 +69,7 @@ Class Campaign{
 	    $company_id = null;
 
         // If Super Admin, check for filter
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
             if (isset($_GET['company_id']) && !empty($_GET['company_id'])) {
                 $company_id = intval($_GET['company_id']);
             }
@@ -97,10 +97,10 @@ Class Campaign{
         $route_type  = $_POST['route_type'] ?? 'Queue';
         $concurrent_calls = $_POST['concurrent_calls'] ?? 1;
         
-        $created_by = $_SESSION['zid'] ?? 0;
+        $created_by = $_SESSION['pid'] ?? 0;
         $company_id = 0;
 
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
             // Super Admin must select a company
             $company_id = isset($_POST['company_id']) ? intval($_POST['company_id']) : 0;
             if ($company_id === 0) {
@@ -197,7 +197,7 @@ Class Campaign{
             return;
         }
         
-        $userId = $_SESSION['zid'] ?? 0;
+        $userId = $_SESSION['pid'] ?? 0;
         
         // Log Import
         $this->modal->logImport($campaignId, $originalFileName, $tempFileName, $userId);
@@ -282,7 +282,7 @@ Class Campaign{
              $webhook_token = md5(uniqid(rand(), true));
         }
         
-        $updated_by = $_SESSION['zid'] ?? 0;
+        $updated_by = $_SESSION['pid'] ?? 0;
     
         $data = [
             'name' => $name,
@@ -335,7 +335,7 @@ Class Campaign{
 		include(INCLUDEPATH.'modules/common/navbar_1.php');
         
         $companies = [];
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
             $companies = $this->modal->getCompanies();
         }
         
@@ -346,7 +346,7 @@ Class Campaign{
     public function get_skipped_numbers_list()
     {
         $company_id = null;
-        if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') {
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
              $company_id = isset($_GET['company_id']) && !empty($_GET['company_id']) ? intval($_GET['company_id']) : null;
         } elseif (isset($_SESSION['company_id'])) {
             $company_id = $_SESSION['company_id'];
@@ -362,7 +362,7 @@ Class Campaign{
         $_SESSION['navurl'] = 'Importnum';
         // Only Super Admin should access? Or allow company admin to see their logs?
         // User request: "Importnum(only for super admin)"
-        if (!isset($_SESSION['erole']) || $_SESSION['erole'] != 'super_admin') {
+        if (!isset($_SESSION['prole']) || $_SESSION['prole'] != 'super_admin') {
             echo "Access Denied";
             return;
         }
@@ -379,7 +379,7 @@ Class Campaign{
     public function get_import_logs_list()
     {
         // Super admin only
-        if (!isset($_SESSION['erole']) || $_SESSION['erole'] != 'super_admin') {
+        if (!isset($_SESSION['prole']) || $_SESSION['prole'] != 'super_admin') {
              echo json_encode([]);
              return;
         }

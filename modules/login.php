@@ -6,9 +6,9 @@ class Login {
 
 	public function index() {
 		$error_msg="";
-		if (isset($_SESSION['error_msg']) && !empty($_SESSION['error_msg'])) {
-			$error_msg = $_SESSION['error_msg'];
-			unset($_SESSION['error_msg']); // Clear the session variable after assigning
+		if (isset($_SESSION['perror_msg']) && !empty($_SESSION['perror_msg'])) {
+			$error_msg = $_SESSION['perror_msg'];
+			unset($_SESSION['perror_msg']); // Clear the session variable after assigning
 		}
 
 		if(isset($_POST['uname1']) and $_POST['pwd1']!="") {
@@ -41,9 +41,9 @@ class Login {
                     // Regenerate ID to prevent fixation
                     session_regenerate_id(true); 
 
-					$_SESSION['zid'] = $getuser['id'];
-					$_SESSION['ename'] = $getuser['user_email'];
-					$_SESSION['erole'] = $getuser['user_type'];
+					$_SESSION['pid'] = $getuser['id'];
+					$_SESSION['pname'] = $getuser['user_email'];
+					$_SESSION['prole'] = $getuser['user_type'];
                     $_SESSION['company_id'] = $getuser['company_id'];
 
                     echo '<div class="alert alert-success" role="alert">
@@ -109,7 +109,7 @@ class Login {
 	
 	public function logout() {
 		session_destroy(); // or  session_unset('session_name'); to dystroy individual session
-		header("Location: http://192.168.1.234/smartlife_test"); // to redirect user after logout
+		header("Location: ".BASE_URL);
 	}
 }
 

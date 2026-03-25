@@ -148,8 +148,8 @@ Class Campaign_modal{
         $returnCall = intval($campaignData['returncall']);
         $maxAttempts = ($returnCall > 0) ? $returnCall : 3;
         
-        $createdBy = $_SESSION['zid'] ?? 0;
-        $activeUser = $_SESSION['zid'] ?? 0;
+        $createdBy = $_SESSION['pid'] ?? 0;
+        $activeUser = $_SESSION['pid'] ?? 0;
 
         if (($handle = fopen($filePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle); // First line is header

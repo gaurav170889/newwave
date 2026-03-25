@@ -5,7 +5,7 @@ global $connect;
 $connect = $conn;
 
 $tests = file_get_contents('php://input');
-$get=  file_put_contents($_SERVER['DOCUMENT_ROOT']."/vantrap/vcrm/journal/".date('Y-m-d')."_journal_rawdata.txt","Data is : " .$tests.PHP_EOL,FILE_APPEND);
+$get=  file_put_contents($_SERVER['DOCUMENT_ROOT']."/newwave/vcrm/journal/".date('Y-m-d')."_journal_rawdata.txt","Data is : " .$tests.PHP_EOL,FILE_APPEND);
 $data= json_decode($tests,true);
 
 if(!empty($data['phone']))

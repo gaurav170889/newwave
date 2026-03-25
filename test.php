@@ -12,7 +12,7 @@ require_once('modules/campaign/modal.php');
 $modal = new Campaign_modal();
 
 // Simulate session variables
-$_SESSION['zid'] = 1;
+$_SESSION['pid'] = 1;
 
 // Assuming campaign 1 exists based on the SQL dump where company 1 has a campaign or we can insert one
 mysqli_query($conn, "INSERT INTO campaign (id, company_id, name, routeto) VALUES (999, 1, 'Test Campaign', 'test') ON DUPLICATE KEY UPDATE id=id");

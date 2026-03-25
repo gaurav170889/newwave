@@ -6,7 +6,7 @@
 				<div  class="row justify-content-end">
 					<div class="col-lg-12 text-right">
                     
-                    <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                    <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
                     <div class="form-group d-inline-block mr-2" style="max-width: 200px; text-align: left;">
                         <select class="form-control" id="companyFilter">
                             <option value="">All Companies</option>
@@ -30,7 +30,7 @@
                     <table id="skippedTable" class="table table-striped table-hover" style="width:100%">
                       <thead>
                         <tr>
-                          <?php if (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin'): ?>
+                          <?php if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
                           <th>Company</th>
                           <?php endif; ?>
                           <th>Campaign</th>
@@ -50,7 +50,7 @@
 
 <script>
 $(document).ready(function() {
-    const isSuperAdmin = <?php echo (isset($_SESSION['erole']) && $_SESSION['erole'] == 'super_admin') ? 'true' : 'false'; ?>;
+    const isSuperAdmin = <?php echo (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') ? 'true' : 'false'; ?>;
     
     const columns = [
           { data: 'campaign_name' },
