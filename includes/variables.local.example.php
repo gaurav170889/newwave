@@ -2,6 +2,9 @@
 // Optional alternative to `.env` for PHP-only local/server overrides.
 // Copy this file to `includes/variables.local.php` and set your real values.
 
+// For a subdomain mapped directly to this folder, use:
+// putenv('APP_BASE_URL=https://newwave.your-domain.com');
+// putenv('APP_BASE_PATH=/');
 putenv('APP_BASE_URL=https://your-domain.com/newwave');
 putenv('APP_BASE_PATH=/newwave');
 putenv('DB_HOST=localhost');

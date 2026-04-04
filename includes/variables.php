@@ -79,14 +79,21 @@ $protocol = envValue(
     (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) ? 'https' : 'http'
 );
 
-$basePath = rtrim((string) envValue('APP_BASE_PATH', '/newwave'), '/');
-if ($basePath === '') {
-    $basePath = '/';
+$isWebRequest = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '';
+$scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+$scriptDirectory = trim(str_replace('\\', '/', dirname($scriptName)), '/');
+
+if ($isWebRequest) {
+    $basePath = ($scriptDirectory === '' || $scriptDirectory === '.') ? '/' : '/' . $scriptDirectory;
+} else {
+    $configuredBasePath = trim((string) envValue('APP_BASE_PATH', '/newwave'), '/');
+    $basePath = $configuredBasePath === '' ? '/' : '/' . $configuredBasePath;
 }
 
-$pathSuffix = ($basePath === '/') ? '' : $basePath;
+$pathSuffix = ($basePath === '/') ? '' : rtrim($basePath, '/');
 $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? dirname($projectRoot);
-$baseUrl = (string) envValue('APP_BASE_URL', ($basePath === '/' ? $protocol . '://' . $ip : $protocol . '://' . $ip . $basePath));
+$calculatedBaseUrl = $protocol . '://' . $ip . $pathSuffix;
+$baseUrl = $isWebRequest ? $calculatedBaseUrl : (string) envValue('APP_BASE_URL', $calculatedBaseUrl);
 $baseUrl = rtrim($baseUrl, '/') . '/';
 
 define('ROOT_PATH', $documentRoot);
