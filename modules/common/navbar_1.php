@@ -73,6 +73,11 @@
 							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
 						</a>
 					</li>
+                    <li class="sidebar-item Ratedashboard">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=dashboard/rates">
+							<i class="align-middle" data-feather="star"></i> <span class="align-middle">Rate Dashboard</span>
+						</a>
+					</li>
 					<!--<li class="sidebar-item Wallboard">
 						<a class="sidebar-link" href="<echo NAVURL;?>wallboard/">
 							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Wallboard</span>
