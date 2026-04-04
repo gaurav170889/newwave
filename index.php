@@ -11,7 +11,8 @@ include("includes/functions.php");
 if(isset($_GET['type']))
 {
 	session_destroy();
-	header("Location: http://$ip/newwave");
+	header("Location: " . rtrim(BASE_URL, '/'));
+	exit();
 }
 require("modules/checkprivilege.php");
 
