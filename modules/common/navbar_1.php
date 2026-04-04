@@ -61,7 +61,7 @@
 					</li>
                     
                     <?php if(isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
-                    <li class="sidebar-item active Admindashboard">
+                    <li class="sidebar-item Admindashboard">
 						<a class="sidebar-link" href="<?php echo BASE_URL;?>?route=admindashboard/index">
 							<i class="align-middle" data-feather="monitor"></i> <span class="align-middle">Admin Dashboard</span>
 						</a>
@@ -69,7 +69,7 @@
                     <?php endif; ?>
 
 					<li class="sidebar-item Dashboard">
-						<a class="sidebar-link" href="<?php echo NAVURL;?>dashboard/">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=dashboard/index">
 							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
 						</a>
 					</li>
