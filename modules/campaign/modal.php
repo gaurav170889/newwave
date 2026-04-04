@@ -29,7 +29,7 @@ Class Campaign_modal{
         $dpd_to_sql = $dpd_to !== null ? intval($dpd_to) : "NULL";
 
         if ($status == '1') {
-            $sql = "UPDATE campaign SET status = '$statusText', statusupdate = '$now', dpd_filter_from = $dpd_from_sql, dpd_filter_to = $dpd_to_sql WHERE id = $id";
+            $sql = "UPDATE campaign SET status = '$statusText', statusupdate = '$now', dpd_filter_from = $dpd_from_sql, dpd_filter_to = $dpd_to_sql, notify_email_sent_at = NULL WHERE id = $id";
             
             // Log the run filter history
             $queryCmp = mysqli_query($this->conn, "SELECT company_id FROM campaign WHERE id = $id LIMIT 1");
@@ -91,7 +91,7 @@ Class Campaign_modal{
         return json_encode($data);
     }
 	
-	public function addCampaignSql($name, $routeto, $returncall, $weekdays, $starttime, $stoptime, $company_id, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token = null, $dn_number = null) 
+	public function addCampaignSql($name, $routeto, $returncall, $weekdays, $starttime, $stoptime, $company_id, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token = null, $dn_number = null, $notify_no_leads_email = 0, $notify_email = null)
 	{
          if (is_array($weekdays)) {
             $weekdays = json_encode($weekdays);
@@ -112,11 +112,13 @@ Class Campaign_modal{
         $concurrent_calls = $concurrent_calls !== '' ? intval($concurrent_calls) : 1;
         $webhook_token = $webhook_token ? "'" . mysqli_real_escape_string($this->conn, $webhook_token) . "'" : "NULL";
         $dn_number = $dn_number ? "'" . mysqli_real_escape_string($this->conn, $dn_number) . "'" : "NULL";
+        $notify_no_leads_email = intval($notify_no_leads_email) ? 1 : 0;
+        $notify_email = ($notify_email !== null && trim($notify_email) !== '') ? "'" . mysqli_real_escape_string($this->conn, trim($notify_email)) . "'" : "NULL";
     
         // Final SQL query
         $query = "
-            INSERT INTO campaign (company_id, name, routeto, dn_number, returncall, weekdays, starttime, stoptime, created_by, dialer_mode, route_type, concurrent_calls, webhook_token)
-            VALUES ($company_id, '$name', '$routeto', $dn_number, $returncall, '$weekdays', $starttime, $stoptime, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token)
+            INSERT INTO campaign (company_id, name, routeto, dn_number, returncall, weekdays, starttime, stoptime, created_by, dialer_mode, route_type, concurrent_calls, webhook_token, notify_no_leads_email, notify_email)
+            VALUES ($company_id, '$name', '$routeto', $dn_number, $returncall, '$weekdays', $starttime, $stoptime, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token, $notify_no_leads_email, $notify_email)
         ";
     
         $insert_fire = mysqli_query($this->conn, $query);
@@ -301,7 +303,12 @@ Class Campaign_modal{
         $fields = [];
     
         foreach ($data as $key => $value) {
-            $escaped = mysqli_real_escape_string($this->conn, $value);
+            if ($value === null) {
+                $fields[] = "`$key` = NULL";
+                continue;
+            }
+
+            $escaped = mysqli_real_escape_string($this->conn, (string)$value);
             $fields[] = "`$key` = '$escaped'";
         }
     

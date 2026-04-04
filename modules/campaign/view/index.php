@@ -86,6 +86,18 @@
             <input type="number" class="form-control" id="concurrentCalls" name="concurrent_calls" value="1" min="1" required>
         </div>
 
+        <div class="form-group" id="emptyDialNotifyWrapper">
+            <label class="d-block mb-2">Empty List Notification</label>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifyNoLeadsEmail" name="notify_no_leads_email" value="1">
+                <label class="form-check-label" for="notifyNoLeadsEmail">
+                    Send one email when no PST/DPD numbers are left to dial
+                </label>
+            </div>
+            <input type="email" class="form-control" id="notifyEmail" name="notify_email" placeholder="alerts@example.com" disabled>
+            <small class="form-text text-muted">The predictive dialer will send this only once per campaign run and then mark it as sent.</small>
+        </div>
+
         <!-- Return Call (1, 2, or 3 only) -->
         <div class="form-group">
           <label for="returncall">Return Call</label>
@@ -387,9 +399,13 @@ $(document).ready(function() {
       
       // Clear checkboxes
       $('input[name="weekdays[]"]').prop('checked', false);
+      $('#notifyNoLeadsEmail').prop('checked', false);
+      $('#notifyEmail').val('');
+      $('#webhookToken').val('');
       
       // Trigger change to update UI state based on default value
       $('#dialerMode').trigger('change');
+      syncEmptyDialNotifyUi();
       
       $('#addCampaignModal').modal('show');
     });
@@ -415,6 +431,10 @@ $(document).ready(function() {
       $('#dialerMode').val(rowData.dialer_mode || 'Power Dialer').trigger('change');
       $('#routeType').val(rowData.route_type || 'Queue');
       $('#concurrentCalls').val(rowData.concurrent_calls || 1);
+      $('#webhookToken').val(rowData.webhook_token || '');
+      $('#notifyNoLeadsEmail').prop('checked', String(rowData.notify_no_leads_email || '0') === '1');
+      $('#notifyEmail').val(rowData.notify_email || '');
+      syncEmptyDialNotifyUi();
     
       // Handle weekdays
       $('input[name="weekdays[]"]').prop('checked', false); 
@@ -668,6 +688,21 @@ $(document).ready(function() {
         });
     });
 
+    function syncEmptyDialNotifyUi() {
+        const isPredictive = $('#dialerMode').val() === 'Predictive Dialer';
+        const enabled = $('#notifyNoLeadsEmail').is(':checked');
+
+        $('#emptyDialNotifyWrapper').toggle(isPredictive);
+        $('#notifyNoLeadsEmail').prop('disabled', !isPredictive);
+        $('#notifyEmail')
+            .prop('disabled', !isPredictive || !enabled)
+            .prop('required', isPredictive && enabled);
+    }
+
+    $('#notifyNoLeadsEmail').on('change', function() {
+        syncEmptyDialNotifyUi();
+    });
+
     // --- Dialer Mode Logic ---
     $('#dialerMode').on('change', function() {
         const mode = $(this).val();
@@ -692,7 +727,11 @@ $(document).ready(function() {
                  routeTypeSelect.val('Extension');
              }
         }
+
+        syncEmptyDialNotifyUi();
     });
+
+    syncEmptyDialNotifyUi();
 
 });
 </script>

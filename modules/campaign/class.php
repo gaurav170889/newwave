@@ -96,6 +96,8 @@ Class Campaign{
         $dialer_mode = $_POST['dialer_mode'] ?? 'Power Dialer';
         $route_type  = $_POST['route_type'] ?? 'Queue';
         $concurrent_calls = $_POST['concurrent_calls'] ?? 1;
+        $notify_no_leads_email = isset($_POST['notify_no_leads_email']) ? 1 : 0;
+        $notify_email = trim($_POST['notify_email'] ?? '');
         
         $created_by = $_SESSION['pid'] ?? 0;
         $company_id = 0;
@@ -124,6 +126,22 @@ Class Campaign{
              echo json_encode(['success' => false, 'error' => 'Campaign name already exists for this company.']);
              return;
         }
+
+        if ($notify_no_leads_email) {
+            if ($dialer_mode !== 'Predictive Dialer') {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'No-numbers-left email is only available for Predictive Dialer campaigns.']);
+                return;
+            }
+
+            if (!filter_var($notify_email, FILTER_VALIDATE_EMAIL)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => 'Please enter a valid notification email address.']);
+                return;
+            }
+        } else {
+            $notify_email = '';
+        }
         
         // Generate Webhook Token for Predictive Dialer
         $webhook_token = null;
@@ -131,7 +149,7 @@ Class Campaign{
             $webhook_token = md5(uniqid(rand(), true));
         }
     
-        $result = $this->modal->addCampaignSql($name, $routeto, $returncall, $weekdays, $starttime, $stoptime, $company_id, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token, $dn_number);
+        $result = $this->modal->addCampaignSql($name, $routeto, $returncall, $weekdays, $starttime, $stoptime, $company_id, $created_by, $dialer_mode, $route_type, $concurrent_calls, $webhook_token, $dn_number, $notify_no_leads_email, $notify_email);
     
         header('Content-Type: application/json');
         echo json_encode($result);
@@ -258,6 +276,8 @@ Class Campaign{
         $route_type = isset($_POST['route_type']) ? $_POST['route_type'] : 'Queue';
         $concurrent_calls = isset($_POST['concurrent_calls']) ? intval($_POST['concurrent_calls']) : 1;
         $webhook_token = $_POST['webhook_token'] ?? '';
+        $notify_no_leads_email = isset($_POST['notify_no_leads_email']) ? 1 : 0;
+        $notify_email = trim($_POST['notify_email'] ?? '');
     
         if ($id <= 0 || $name === '' || $routeto === '' || $returncall === '' || $starttime === '' || $stoptime === '') {
             echo json_encode(['success' => false, 'error' => 'Missing required fields']);
@@ -281,6 +301,20 @@ Class Campaign{
         if ($dialer_mode === 'Predictive Dialer' && empty($webhook_token)) {
              $webhook_token = md5(uniqid(rand(), true));
         }
+
+        if ($notify_no_leads_email) {
+            if ($dialer_mode !== 'Predictive Dialer') {
+                echo json_encode(['success' => false, 'error' => 'No-numbers-left email is only available for Predictive Dialer campaigns.']);
+                return;
+            }
+
+            if (!filter_var($notify_email, FILTER_VALIDATE_EMAIL)) {
+                echo json_encode(['success' => false, 'error' => 'Please enter a valid notification email address.']);
+                return;
+            }
+        } else {
+            $notify_email = '';
+        }
         
         $updated_by = $_SESSION['pid'] ?? 0;
     
@@ -296,6 +330,9 @@ Class Campaign{
             'route_type' => $route_type,
             'concurrent_calls' => $concurrent_calls,
             'webhook_token' => $webhook_token,
+            'notify_no_leads_email' => $notify_no_leads_email,
+            'notify_email' => $notify_email,
+            'notify_email_sent_at' => null,
             'updated_by' => $updated_by
         ];
     

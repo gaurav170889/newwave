@@ -1,22 +1,36 @@
-import 'dotenv/config';
-console.log("DIALER V3 STARTING - DEBUG MODE");
 import mysql from "mysql2/promise";
 import axios from "axios";
 import qs from "qs";
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from 'uuid';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+[
+    path.join(__dirname, '..', '.env.local'),
+    path.join(__dirname, '..', '.env'),
+    path.join(__dirname, '.env.local'),
+    path.join(__dirname, '.env')
+].forEach((envFile) => {
+    if (fs.existsSync(envFile)) {
+        dotenv.config({ path: envFile, override: false });
+    }
+});
+
+console.log("DIALER V3 STARTING - DEBUG MODE");
 
 const LOOP_MS = 1000;
 const QUEUE_FRESH_SEC = 10;
 const TOKEN_REUSE_SEC = 45;
 const PHONE_LOCK_TTL_SEC = 7200; // Keep lock during long calls; stale locks are auto-cleaned
 const PHONE_LOCK_CLEANUP_MS = 30000;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const LOG_FILE = path.join(__dirname, "dialer.log");
 const WORKER_ID = `worker-${process.pid}`;
+const APP_BASE_URL = (process.env.APP_BASE_URL || "http://127.0.0.1/newwave").replace(/\/$/, "");
 
 // ------------ Helpers ------------
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -385,6 +399,63 @@ async function unlockLead(companyId, leadId, newState, nextCallAt = null) {
     await db.execute(sql, params);
 }
 
+async function hasRemainingDialableLeads(companyId, campaignId, dpdFrom, dpdTo) {
+    let dpdSql = "";
+    const sqlParams = [companyId, campaignId];
+
+    if (dpdFrom !== null && dpdTo !== null) {
+        dpdSql = " AND (days_past_due >= ? AND days_past_due <= ?) ";
+        sqlParams.push(dpdFrom, dpdTo);
+    }
+
+    const [rows] = await db.execute(
+        `SELECT COUNT(*) AS count
+         FROM campaignnumbers
+         WHERE company_id=? AND campaignid=?
+           AND is_dnc=0
+           AND attempts_used < max_attempts
+           AND state IN ('READY','SCHEDULED','DIALING','DISPO_PENDING')
+           ${dpdSql}`,
+        sqlParams
+    );
+
+    return Number(rows?.[0]?.count || 0) > 0;
+}
+
+async function notifyIfCampaignHasNoNumbersLeft(campaign) {
+    const hasRemaining = await hasRemainingDialableLeads(
+        campaign.company_id,
+        campaign.id,
+        campaign.dpd_filter_from,
+        campaign.dpd_filter_to
+    );
+
+    if (hasRemaining) return false;
+
+    try {
+        const response = await axios.post(
+            `${APP_BASE_URL}/api/send_campaign_empty_notification.php`,
+            {
+                company_id: campaign.company_id,
+                campaign_id: campaign.id
+            },
+            {
+                headers: { "Content-Type": "application/json" },
+                timeout: 10000
+            }
+        );
+
+        if (response.data?.success) {
+            log(`[Camp ${campaign.id}] No-numbers-left email sent.`, response.data);
+            return true;
+        }
+    } catch (e) {
+        log(`[Camp ${campaign.id}] No-numbers-left email error: ${e.message}`);
+    }
+
+    return false;
+}
+
 // ------------ 3CX & Monitor ------------
 async function makeCall({ pbxurl, token, destination, dialerDn }) {
     const dn = String(dialerDn || "").trim();
@@ -646,7 +717,7 @@ async function tick() {
             // Check Queue
             const gate = await queueAllowsDialing(c.company_id, queueDn);
             if (!gate.ok) {
-                // log(`[Camp ${c.id}] Gate closed: ${gate.reason}`);
+                await notifyIfCampaignHasNoNumbersLeft(c).catch(() => { });
                 continue;
             }
 
@@ -673,7 +744,10 @@ async function tick() {
 
             // Pick Lead
             const lead = await pickLead(c.company_id, c.id, c.dpd_filter_from, c.dpd_filter_to);
-            if (!lead) continue;
+            if (!lead) {
+                await notifyIfCampaignHasNoNumbersLeft(c).catch(() => { });
+                continue;
+            }
 
             // Dial as a concurrent task, don't await blocking `waitThenTransfer`
             spawnCallFlow(c, lead, queueDn, dialerDn).catch(e => {
