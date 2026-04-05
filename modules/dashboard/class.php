@@ -33,7 +33,7 @@ Class Dashboard{
         return [
             'selectedRange' => $rangeInfo['key'],
             'rangeInfo' => $rangeInfo,
-            'fallbackNotice' => 'Static preview mode is enabled right now so the Dashboard page loads without pulling live analytics data.',
+            'fallbackNotice' => 'Static preview is shown first while live dashboard data loads in the background. If loading fails, 0 values stay visible here.',
             'outboundSummary' => [
                 'total_calls' => 0,
                 'unique_numbers' => 0,
@@ -59,7 +59,7 @@ Class Dashboard{
         return [
             'selectedRange' => $rangeInfo['key'],
             'rangeInfo' => $rangeInfo,
-            'fallbackNotice' => 'Static preview mode is enabled right now so the Rate Dashboard page loads without pulling live rating data.',
+            'fallbackNotice' => 'Static preview is shown first while live rate data loads in the background. If loading fails, 0 values stay visible here.',
             'point_1' => [0],
             'point_3' => [0],
             'point_5' => [0],
@@ -107,6 +107,51 @@ Class Dashboard{
         ];
     }
 
+    private function buildDashboardAjaxViewData($requestedRange, $companyId)
+    {
+        try {
+            return $this->buildDashboardViewData($requestedRange, $companyId);
+        } catch (\Throwable $exception) {
+            error_log('Dashboard AJAX error: ' . $exception->getMessage());
+        }
+
+        $viewData = $this->buildStaticDashboardViewData($requestedRange);
+        $viewData['fallbackNotice'] = 'Live dashboard data could not be loaded right now, so 0 values are being shown.';
+
+        return $viewData;
+    }
+
+    private function buildRateAjaxViewData($requestedRange, $companyId)
+    {
+        try {
+            return $this->buildRateViewData($requestedRange, $companyId);
+        } catch (\Throwable $exception) {
+            error_log('Rate dashboard AJAX error: ' . $exception->getMessage());
+        }
+
+        $viewData = $this->buildStaticRateViewData($requestedRange);
+        $viewData['fallbackNotice'] = 'Live rate data could not be loaded right now, so 0 values are being shown.';
+
+        return $viewData;
+    }
+
+    private function renderAnalyticsResponse($viewFile, array $viewData)
+    {
+        extract($viewData);
+
+        ob_start();
+        include(__DIR__ . $viewFile);
+        $html = ob_get_clean();
+
+        echo json_encode([
+            'status' => 101,
+            'selectedRange' => $viewData['selectedRange'] ?? 'today',
+            'message' => $viewData['fallbackNotice'] ?? '',
+            'html' => $html,
+        ]);
+        exit;
+    }
+
 	public function index(){
         $_SESSION['navurl'] = 'Dashboard';
 		include(INCLUDEPATH.'modules/common/header.php');
@@ -118,18 +163,10 @@ Class Dashboard{
 
     public function analytics(){
         header('Content-Type: application/json');
-        extract($this->buildStaticDashboardViewData($this->getSelectedRange()));
-
-        ob_start();
-        include(__DIR__ . "/view/analytics_content.php");
-        $html = ob_get_clean();
-
-        echo json_encode([
-            'status' => 101,
-            'selectedRange' => $selectedRange,
-            'html' => $html,
-        ]);
-        exit;
+        $this->renderAnalyticsResponse(
+            "/view/analytics_content.php",
+            $this->buildDashboardAjaxViewData($this->getSelectedRange(), $this->getCompanyId())
+        );
     }
 
     public function rates(){
@@ -143,18 +180,10 @@ Class Dashboard{
 
     public function rateanalytics(){
         header('Content-Type: application/json');
-        extract($this->buildStaticRateViewData($this->getSelectedRange()));
-
-        ob_start();
-        include(__DIR__ . "/view/rates_content.php");
-        $html = ob_get_clean();
-
-        echo json_encode([
-            'status' => 101,
-            'selectedRange' => $selectedRange,
-            'html' => $html,
-        ]);
-        exit;
+        $this->renderAnalyticsResponse(
+            "/view/rates_content.php",
+            $this->buildRateAjaxViewData($this->getSelectedRange(), $this->getCompanyId())
+        );
     }
 	
 	public function goga(){

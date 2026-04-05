@@ -32,6 +32,8 @@
             </div>
         </div>
 
+        <div id="rateDashboardRequestState"></div>
+
         <div id="rateDashboardAjaxContent">
             <?php include(__DIR__ . '/rates_content.php'); ?>
         </div>
@@ -44,37 +46,67 @@
         return;
     }
 
-    function setRateLoading() {
-        $('#rateDashboardAjaxContent').html('<div class="alert alert-light border mb-4">Loading rate dashboard data...</div>');
+    var rateDashboardStaticHtml = $('#rateDashboardAjaxContent').html();
+
+    function escapeHtml(value) {
+        return $('<div>').text(value || '').html();
     }
 
-    function refreshRateDashboard(range, fallbackUrl) {
-        setRateLoading();
+    function setActiveRateRange(range) {
+        $('.js-rate-range').removeClass('btn-primary').addClass('btn-outline-secondary');
+        $('.js-rate-range[data-range="' + range + '"]')
+            .removeClass('btn-outline-secondary')
+            .addClass('btn-primary');
+    }
+
+    function setRateDashboardState(message, type) {
+        if (!message) {
+            $('#rateDashboardRequestState').html('');
+            return;
+        }
+
+        $('#rateDashboardRequestState').html(
+            '<div class="alert alert-' + type + ' border mb-3"><strong>' + escapeHtml(message) + '</strong></div>'
+        );
+    }
+
+    function showRateFallback(range, message) {
+        setActiveRateRange(range);
+        setRateDashboardState(message || 'Live rate data could not be loaded right now. Showing 0 values instead.', 'warning');
+        $('#rateDashboardAjaxContent').html(rateDashboardStaticHtml);
+    }
+
+    function refreshRateDashboard(range) {
+        setActiveRateRange(range);
+        setRateDashboardState('Loading rate dashboard data...', 'light');
 
         $.ajax({
             url: '<?php echo BASE_URL; ?>?route=dashboard/rateanalytics',
             type: 'GET',
             dataType: 'json',
+            cache: false,
             data: { range: range }
         }).done(function(response) {
-            if (!response || parseInt(response.status, 10) !== 101) {
-                window.location.href = fallbackUrl;
+            if (!response || parseInt(response.status, 10) !== 101 || typeof response.html !== 'string') {
+                showRateFallback(range);
                 return;
             }
 
-            $('#rateDashboardAjaxContent').html(response.html || '');
-            $('.js-rate-range').removeClass('btn-primary').addClass('btn-outline-secondary');
-            $('.js-rate-range[data-range="' + (response.selectedRange || range) + '"]')
-                .removeClass('btn-outline-secondary')
-                .addClass('btn-primary');
+            $('#rateDashboardAjaxContent').html(response.html || rateDashboardStaticHtml);
+            setActiveRateRange(response.selectedRange || range);
+            setRateDashboardState('', 'light');
         }).fail(function() {
-            window.location.href = fallbackUrl;
+            showRateFallback(range);
         });
     }
 
+    $(function() {
+        refreshRateDashboard('<?php echo htmlspecialchars($selectedRange, ENT_QUOTES, 'UTF-8'); ?>');
+    });
+
     $(document).on('click', '.js-rate-range', function(event) {
         event.preventDefault();
-        refreshRateDashboard($(this).data('range'), $(this).attr('href'));
+        refreshRateDashboard($(this).data('range'));
     });
 })(window.jQuery);
 </script>

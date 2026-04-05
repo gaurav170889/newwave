@@ -67,6 +67,8 @@
             </div>
         </div>
 
+        <div id="dashboardRequestState"></div>
+
         <div id="dashboardAjaxContent">
             <?php include(__DIR__ . '/analytics_content.php'); ?>
         </div>
@@ -79,37 +81,67 @@
         return;
     }
 
-    function setDashboardLoading() {
-        $('#dashboardAjaxContent').html('<div class="alert alert-light border mb-4">Loading dashboard data...</div>');
+    var dashboardStaticHtml = $('#dashboardAjaxContent').html();
+
+    function escapeHtml(value) {
+        return $('<div>').text(value || '').html();
     }
 
-    function refreshDashboard(range, fallbackUrl) {
-        setDashboardLoading();
+    function setActiveDashboardRange(range) {
+        $('.js-dashboard-range').removeClass('btn-primary').addClass('btn-outline-secondary');
+        $('.js-dashboard-range[data-range="' + range + '"]')
+            .removeClass('btn-outline-secondary')
+            .addClass('btn-primary');
+    }
+
+    function setDashboardState(message, type) {
+        if (!message) {
+            $('#dashboardRequestState').html('');
+            return;
+        }
+
+        $('#dashboardRequestState').html(
+            '<div class="alert alert-' + type + ' border mb-3"><strong>' + escapeHtml(message) + '</strong></div>'
+        );
+    }
+
+    function showDashboardFallback(range, message) {
+        setActiveDashboardRange(range);
+        setDashboardState(message || 'Live dashboard data could not be loaded right now. Showing 0 values instead.', 'warning');
+        $('#dashboardAjaxContent').html(dashboardStaticHtml);
+    }
+
+    function refreshDashboard(range) {
+        setActiveDashboardRange(range);
+        setDashboardState('Loading dashboard data...', 'light');
 
         $.ajax({
             url: '<?php echo BASE_URL; ?>?route=dashboard/analytics',
             type: 'GET',
             dataType: 'json',
+            cache: false,
             data: { range: range }
         }).done(function(response) {
-            if (!response || parseInt(response.status, 10) !== 101) {
-                window.location.href = fallbackUrl;
+            if (!response || parseInt(response.status, 10) !== 101 || typeof response.html !== 'string') {
+                showDashboardFallback(range);
                 return;
             }
 
-            $('#dashboardAjaxContent').html(response.html || '');
-            $('.js-dashboard-range').removeClass('btn-primary').addClass('btn-outline-secondary');
-            $('.js-dashboard-range[data-range="' + (response.selectedRange || range) + '"]')
-                .removeClass('btn-outline-secondary')
-                .addClass('btn-primary');
+            $('#dashboardAjaxContent').html(response.html || dashboardStaticHtml);
+            setActiveDashboardRange(response.selectedRange || range);
+            setDashboardState('', 'light');
         }).fail(function() {
-            window.location.href = fallbackUrl;
+            showDashboardFallback(range);
         });
     }
 
+    $(function() {
+        refreshDashboard('<?php echo htmlspecialchars($selectedRange, ENT_QUOTES, 'UTF-8'); ?>');
+    });
+
     $(document).on('click', '.js-dashboard-range', function(event) {
         event.preventDefault();
-        refreshDashboard($(this).data('range'), $(this).attr('href'));
+        refreshDashboard($(this).data('range'));
     });
 })(window.jQuery);
 </script>
