@@ -5,31 +5,31 @@ Class Users{
       $this->modal = loadmodal("users");;
     }
 	public function index(){
-		include(INCLUDEPATH.'modules/common/header.php');
-		include(INCLUDEPATH.'modules/common/navbar_1.php');
-		
-		// Access Control
-		if(!isset($_SESSION['prole']) || ($_SESSION['prole'] != 'super_admin' && $_SESSION['prole'] != 'company_admin'))
+		$sessionRole = $_SESSION['prole'] ?? ($_SESSION['role'] ?? '');
+		$isSuperAdmin = ($sessionRole === 'super_admin');
+		$companyId = (isset($_SESSION['company_id']) && intval($_SESSION['company_id']) > 0) ? intval($_SESSION['company_id']) : null;
+
+		if($sessionRole !== 'super_admin' && $sessionRole !== 'company_admin')
 		{
 			echo "<script>window.location.href='".BASE_URL."?route=dashboard/index';</script>";
 			exit;
 		}
 
-		if($_SESSION['role']== "uagent")
+		$_SESSION['navurl'] = 'Users';
+		include(INCLUDEPATH.'modules/common/header.php');
+		include(INCLUDEPATH.'modules/common/navbar_1.php');
+
+		if($sessionRole === "uagent")
 		{
-			//$qagent = $this->getagent();
-			
 			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
-		$data = $this->modal->select("users");
-		//$group = $this->modal->groupassoc("agentgroup");
-		//print_r($group);
-		$counter = 1;
-		include(__DIR__ . "/view/index.php");
+			$data = $this->modal->select("users", $companyId, $isSuperAdmin, $sessionRole);
+			$counter = 1;
+			include(__DIR__ . "/view/index.php");
 		}
-		include('modules/common/footer_1.php');
+		include(INCLUDEPATH.'modules/common/footer_1.php');
 		
 		//include("view/record.php");
 	}
@@ -37,22 +37,21 @@ Class Users{
 	public function record()
 	{
 		$counter = 1;
+		$sessionRole = $_SESSION['prole'] ?? ($_SESSION['role'] ?? '');
+		$isSuperAdmin = ($sessionRole === 'super_admin');
+		$companyId = (isset($_SESSION['company_id']) && intval($_SESSION['company_id']) > 0) ? intval($_SESSION['company_id']) : null;
 
 		if(isset($_POST['keyword']) && !empty(trim($_POST['keyword']))){
-
-		$keyword = $this->modal->htmlvalidation($_POST['keyword']);
-
-		$match_field['agent_ext'] = $keyword;
-		$match_field['agent_name'] = $keyword;
-		$select = $this->modal->search("users", $match_field, "OR");
-
+			$keyword = $this->modal->htmlvalidation($_POST['keyword']);
+			$match_field['email'] = $keyword;
+			$match_field['user_email'] = $keyword;
+			$match_field['role'] = $keyword;
+			$match_field['user_type'] = $keyword;
+			$select = $this->modal->search("users", $match_field, "OR", $companyId, $isSuperAdmin, $sessionRole);
 		}
 		else
 		{
-
-		$select = $this->modal->select('users');
-		
-
+			$select = $this->modal->select('users', $companyId, $isSuperAdmin, $sessionRole);
 		}
 		include(__DIR__ . "/view/record.php");
 	}
@@ -62,9 +61,10 @@ Class Users{
 		$json = array();
 		if(isset($_POST['depart']))
 		{
-			//echo "goga";
-			$select_grp = $this->modal->agentassoc("agent");
-			//print_r($select_grp);
+			$sessionRole = $_SESSION['prole'] ?? ($_SESSION['role'] ?? '');
+			$isSuperAdmin = ($sessionRole === 'super_admin');
+			$companyId = (isset($_SESSION['company_id']) && intval($_SESSION['company_id']) > 0) ? intval($_SESSION['company_id']) : null;
+			$select_grp = $this->modal->agentassoc("agent", $companyId, $isSuperAdmin);
 			if($select_grp)
 			{
 				$json =  json_encode($select_grp);
@@ -74,13 +74,12 @@ Class Users{
 			{
 				$json['status'] = 102;
 				$json['msg'] = "Data Not Inserted";
-				//"Data Not Inserted"
 			}
 		}
 		else
 		{
 			$json['status'] = 103;
-				$json['msg'] = "Error in Request";
+			$json['msg'] = "Error in Request";
 		}
 	}
 	

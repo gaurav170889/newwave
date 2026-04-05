@@ -43,6 +43,12 @@ $rangeDisplay = $rangeInfo['display'] ?? date('M d, Y');
             </div>
         </div>
 
+        <?php if (!empty($fallbackNotice)): ?>
+            <div class="alert alert-warning border mb-4">
+                <strong><?php echo htmlspecialchars($fallbackNotice, ENT_QUOTES, 'UTF-8'); ?></strong>
+            </div>
+        <?php endif; ?>
+
         <div class="row mb-2">
             <div class="col-sm-6 col-xl-3 mb-3">
                 <div class="card rate-card bg-primary text-white h-100">

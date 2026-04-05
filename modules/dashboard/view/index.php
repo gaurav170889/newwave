@@ -67,7 +67,7 @@ $avgTalkTime = $outboundSummary['avg_talk_time'] ?? '00:00:00';
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-3">
             <div>
                 <h3 class="mb-1"><strong>Outbound Dialer</strong> Dashboard</h3>
-                <p class="text-muted mb-0">Track dialer activity, agent connects, and customer rating performance.</p>
+                <p class="text-muted mb-0">Track dialer activity, agent connects, and campaign outcomes.</p>
             </div>
             <div class="dashboard-filter-group mt-3 mt-lg-0">
                 <?php foreach ($rangeOptions as $rangeKey => $rangeText): ?>

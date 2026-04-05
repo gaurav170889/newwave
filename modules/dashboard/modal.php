@@ -23,6 +23,77 @@ Class Dashboard_modal{
         return $companyId > 0 ? " AND {$alias}.company_id = {$companyId}" : "";
     }
 
+    private function formatSeconds($seconds)
+    {
+        $seconds = max(0, (int) round($seconds));
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $remainingSeconds = $seconds % 60;
+
+        return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
+    }
+
+    private function tableExists($tableName)
+    {
+        $tableName = $this->escape($tableName);
+        $query = $this->conn->query("SHOW TABLES LIKE '{$tableName}'");
+        return $query && mysqli_num_rows($query) > 0;
+    }
+
+    private function getRateRows($startDate, $endDate, $companyId = 0)
+    {
+        if (!$this->tableExists('rate')) {
+            return [];
+        }
+
+        $startDate = $this->escape($startDate);
+        $endDate = $this->escape($endDate);
+        $companyFilter = $companyId > 0 ? " AND r.company_id = " . intval($companyId) : "";
+        $rows = [];
+
+        $sql = "SELECT r.agentno,
+                       r.created_at,
+                       r.ratings_json,
+                       COALESCE(a.agent_ext, r.agentno, 'Unassigned') AS agent_ext,
+                       COALESCE(a.agent_name, '') AS agent_name
+                FROM rate r
+                LEFT JOIN agent a ON a.agent_ext = r.agentno
+                WHERE r.created_at >= '{$startDate} 00:00:00'
+                  AND r.created_at <= '{$endDate} 23:59:59'{$companyFilter}
+                ORDER BY r.created_at DESC";
+
+        if ($result = $this->conn->query($sql)) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $rows[] = $row;
+            }
+        }
+
+        return $rows;
+    }
+
+    private function extractRatingValues($ratingsJson)
+    {
+        $decoded = json_decode((string) $ratingsJson, true);
+        $values = [];
+
+        if (!is_array($decoded)) {
+            return $values;
+        }
+
+        foreach ($decoded as $value) {
+            if (!is_numeric($value)) {
+                continue;
+            }
+
+            $score = (float) $value;
+            if ($score > 0) {
+                $values[] = $score;
+            }
+        }
+
+        return $values;
+    }
+
     public function resolveDateRange($rangeKey = 'today')
     {
         $allowedRanges = ['today', 'this_week', 'last_week', 'this_month', 'last_month'];
@@ -141,19 +212,22 @@ Class Dashboard_modal{
     private function pointCount($tablename, $point, $startDate = null, $endDate = null, $companyId = 0)
     {
         $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
-        $point = $this->escape($point);
-        $startDate = $this->escape($range['start_date']);
-        $endDate = $this->escape($range['end_date']);
-        $companyFilter = $companyId > 0 ? " AND company_id = " . intval($companyId) : "";
+        $targetPoint = (int) $point;
+        $count = 0;
 
-        $sql = "SELECT COUNT(point) AS total FROM $tablename WHERE point = '$point' AND start_date >= '$startDate' AND start_date <= '$endDate'{$companyFilter}";
-        $search_query = mysqli_query($this->conn, $sql);
-        if($search_query && mysqli_num_rows($search_query) > 0){
-            $search_fetch = mysqli_fetch_assoc($search_query);
-            return [intval($search_fetch['total'] ?? 0)];
+        foreach ($this->getRateRows($range['start_date'], $range['end_date'], $companyId) as $row) {
+            $values = $this->extractRatingValues($row['ratings_json'] ?? '');
+            if (empty($values)) {
+                continue;
+            }
+
+            $averagePoint = (int) round(array_sum($values) / count($values));
+            if ($averagePoint === $targetPoint) {
+                $count++;
+            }
         }
 
-        return [0];
+        return [$count];
     }
 
 	public function pointone($tablename,$point, $startDate = null, $endDate = null, $companyId = 0)
@@ -174,18 +248,15 @@ Class Dashboard_modal{
 	public function totalcallpoint($tablename, $startDate = null, $endDate = null, $companyId = 0)
 	{
         $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
-        $startDate = $this->escape($range['start_date']);
-        $endDate = $this->escape($range['end_date']);
-        $companyFilter = $companyId > 0 ? " AND company_id = " . intval($companyId) : "";
+        $total = 0;
 
-		$sql = "SELECT COUNT(point) AS total FROM $tablename WHERE start_date >= '$startDate' AND start_date <= '$endDate'{$companyFilter}";
-		$search_query = mysqli_query($this->conn, $sql);
-		if($search_query && mysqli_num_rows($search_query) > 0){
-			$search_fetch = mysqli_fetch_assoc($search_query);
-			return [intval($search_fetch['total'] ?? 0)];
-		}
+        foreach ($this->getRateRows($range['start_date'], $range['end_date'], $companyId) as $row) {
+            if (!empty($this->extractRatingValues($row['ratings_json'] ?? ''))) {
+                $total++;
+            }
+        }
 
-		return [0];
+		return [$total];
 	}
 
 	public function averagescore($tablename, $startDate = null, $endDate = null, $companyId = 0)
@@ -193,38 +264,53 @@ Class Dashboard_modal{
 		$data = [];
 		$id = 1;
         $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
-        $startDate = $this->escape($range['start_date']);
-        $endDate = $this->escape($range['end_date']);
-        $agentCompanyFilter = $companyId > 0 ? " AND a.company_id = " . intval($companyId) : "";
+        $agentStats = [];
 
-        $query = "SELECT a.agent_ext,
-                         COALESCE(a.agent_name, '') AS agent_name,
-                         COALESCE(SUM(CAST(r.point AS UNSIGNED)), 0) AS total_point,
-                         ROUND(COALESCE(AVG(CAST(r.point AS UNSIGNED)), 0), 2) AS avg_point,
-                         COUNT(r.point) AS total_calls,
-                         COUNT(r.agentno) AS total_records
-                  FROM agent a
-                  LEFT JOIN $tablename r
-                    ON a.agent_ext = r.agentno
-                   AND r.start_date >= '$startDate'
-                   AND r.start_date <= '$endDate'
-                  WHERE a.is_archived = 0{$agentCompanyFilter}
-                  GROUP BY a.agent_id, a.agent_ext, a.agent_name
-                  ORDER BY total_calls DESC, avg_point DESC, a.agent_ext ASC";
+        foreach ($this->getRateRows($range['start_date'], $range['end_date'], $companyId) as $row) {
+            $agentKey = $row['agent_ext'] ?: ($row['agentno'] ?: 'Unassigned');
 
-        if ($sql = $this->conn->query($query)) {
-            while ($row = mysqli_fetch_assoc($sql)) {
-                $row['cx_id'] = $id;
-                $totalRecords = intval($row['total_records'] ?? 0);
-                $ratedCalls = intval($row['total_calls'] ?? 0);
-                $gradedPercent = $totalRecords > 0 ? ($ratedCalls * 100 / $totalRecords) : 0;
-                $row['total'] = $totalRecords;
-                $row['percent_grade'] = number_format($gradedPercent, 2) . '%';
-                $row['percent_not_grade'] = number_format(max(0, 100 - $gradedPercent), 2) . '%';
-                $id++;
-                $data[] = $row;
+            if (!isset($agentStats[$agentKey])) {
+                $agentStats[$agentKey] = [
+                    'agent_ext' => $agentKey,
+                    'agent_name' => $row['agent_name'] ?? '',
+                    'total_point' => 0,
+                    'score_count' => 0,
+                    'total_calls' => 0,
+                    'total' => 0,
+                ];
+            }
+
+            $agentStats[$agentKey]['total']++;
+            $values = $this->extractRatingValues($row['ratings_json'] ?? '');
+
+            if (!empty($values)) {
+                $agentStats[$agentKey]['total_point'] += array_sum($values);
+                $agentStats[$agentKey]['score_count'] += count($values);
+                $agentStats[$agentKey]['total_calls']++;
             }
         }
+
+        foreach ($agentStats as $row) {
+            $totalRecords = intval($row['total'] ?? 0);
+            $ratedCalls = intval($row['total_calls'] ?? 0);
+            $gradedPercent = $totalRecords > 0 ? ($ratedCalls * 100 / $totalRecords) : 0;
+            $row['cx_id'] = $id;
+            $row['avg_point'] = ($row['score_count'] ?? 0) > 0
+                ? number_format($row['total_point'] / $row['score_count'], 2)
+                : '0.00';
+            $row['percent_grade'] = number_format($gradedPercent, 2) . '%';
+            $row['percent_not_grade'] = number_format(max(0, 100 - $gradedPercent), 2) . '%';
+            unset($row['score_count']);
+            $id++;
+            $data[] = $row;
+        }
+
+        usort($data, function ($left, $right) {
+            if ($left['total_calls'] === $right['total_calls']) {
+                return strcmp((string) $left['agent_ext'], (string) $right['agent_ext']);
+            }
+            return $right['total_calls'] <=> $left['total_calls'];
+        });
 
         return $data;
 	}
@@ -236,7 +322,6 @@ Class Dashboard_modal{
         $sqlStart = $startDate . ' 00:00:00';
         $sqlEnd = $endDate . ' 23:59:59';
         $companyFilter = $this->companyCondition('d', $companyId);
-        $agentCompanyFilter = $companyId > 0 ? " AND a.company_id = " . intval($companyId) : "";
 
         $summary = [
             'total_calls' => 0,
@@ -251,8 +336,12 @@ Class Dashboard_modal{
 
         $query = "SELECT COUNT(*) AS total_calls,
                          COUNT(DISTINCT CASE WHEN d.campaignnumber_id > 0 THEN d.campaignnumber_id END) AS unique_numbers,
+                         SUM(CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN 1 ELSE 0 END) AS connected_calls,
+                         COUNT(DISTINCT CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN NULLIF(d.agent_id, '') END) AS active_agents,
                          COUNT(DISTINCT CASE WHEN d.campaign_id > 0 THEN d.campaign_id END) AS active_campaigns,
-                         SUM(CASE WHEN d.disposition IS NOT NULL AND d.disposition <> '' THEN 1 ELSE 0 END) AS dispositions_logged
+                         SUM(CASE WHEN d.disposition IS NOT NULL AND d.disposition <> '' THEN 1 ELSE 0 END) AS dispositions_logged,
+                         COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0) AS total_talk_seconds,
+                         COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0) AS avg_talk_seconds
                   FROM dialer_call_log d
                   WHERE d.started_at >= '$sqlStart' AND d.started_at <= '$sqlEnd'{$companyFilter}";
 
@@ -261,27 +350,12 @@ Class Dashboard_modal{
             if ($row) {
                 $summary['total_calls'] = intval($row['total_calls'] ?? 0);
                 $summary['unique_numbers'] = intval($row['unique_numbers'] ?? 0);
-                $summary['active_campaigns'] = intval($row['active_campaigns'] ?? 0);
-                $summary['dispositions_logged'] = intval($row['dispositions_logged'] ?? 0);
-            }
-        }
-
-        $connectQuery = "SELECT COUNT(*) AS connected_calls,
-                                COUNT(DISTINCT c.r_ext) AS active_agents,
-                                SEC_TO_TIME(COALESCE(SUM(TIME_TO_SEC(NULLIF(c.r_totaltime, ''))), 0)) AS total_talk_time,
-                                TIME_FORMAT(SEC_TO_TIME(COALESCE(AVG(TIME_TO_SEC(NULLIF(c.r_totaltime, ''))), 0)), '%H:%i:%s') AS avg_talk_time
-                         FROM custdata c
-                         INNER JOIN agent a ON a.agent_ext = c.r_ext
-                         WHERE c.r_externalno IS NOT NULL AND c.r_externalno <> ''
-                           AND c.r_startdt >= '$startDate' AND c.r_startdt <= '$endDate'{$agentCompanyFilter}";
-
-        if ($connectResult = $this->conn->query($connectQuery)) {
-            $row = mysqli_fetch_assoc($connectResult);
-            if ($row) {
                 $summary['connected_calls'] = intval($row['connected_calls'] ?? 0);
                 $summary['active_agents'] = intval($row['active_agents'] ?? 0);
-                $summary['total_talk_time'] = $row['total_talk_time'] ?: '00:00:00';
-                $summary['avg_talk_time'] = $row['avg_talk_time'] ?: '00:00:00';
+                $summary['active_campaigns'] = intval($row['active_campaigns'] ?? 0);
+                $summary['dispositions_logged'] = intval($row['dispositions_logged'] ?? 0);
+                $summary['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
+                $summary['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
             }
         }
 
@@ -342,34 +416,46 @@ Class Dashboard_modal{
     {
         $startDate = $this->escape($startDate);
         $endDate = $this->escape($endDate);
-        $agentCompanyFilter = $companyId > 0 ? " AND a.company_id = " . intval($companyId) : "";
+        $companyFilter = $this->companyCondition('d', $companyId);
         $data = [];
 
-        $query = "SELECT a.agent_ext,
+        $query = "SELECT COALESCE(a.agent_ext, NULLIF(d.agent_id, ''), 'Unassigned') AS agent_ext,
                          COALESCE(a.agent_name, '') AS agent_name,
-                         COUNT(c.r_callid) AS connected_calls,
-                         COUNT(DISTINCT c.r_externalno) AS unique_numbers,
-                         SEC_TO_TIME(COALESCE(SUM(TIME_TO_SEC(NULLIF(c.r_totaltime, ''))), 0)) AS total_talk_time,
-                         TIME_FORMAT(SEC_TO_TIME(COALESCE(AVG(TIME_TO_SEC(NULLIF(c.r_totaltime, ''))), 0)), '%H:%i:%s') AS avg_talk_time
-                  FROM agent a
-                  LEFT JOIN custdata c
-                    ON c.r_ext = a.agent_ext
-                   AND c.r_externalno IS NOT NULL
-                   AND c.r_externalno <> ''
-                   AND c.r_startdt >= '$startDate'
-                   AND c.r_startdt <= '$endDate'
-                  WHERE a.is_archived = 0{$agentCompanyFilter}
-                  GROUP BY a.agent_id, a.agent_ext, a.agent_name
+                         SUM(CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN 1 ELSE 0 END) AS connected_calls,
+                         COUNT(DISTINCT CASE WHEN d.campaignnumber_id > 0 THEN d.campaignnumber_id END) AS unique_numbers,
+                         COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0) AS total_talk_seconds,
+                         COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0) AS avg_talk_seconds
+                  FROM dialer_call_log d
+                  LEFT JOIN agent a ON a.agent_ext = d.agent_id
+                  WHERE d.started_at >= '{$startDate} 00:00:00'
+                    AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}
+                  GROUP BY COALESCE(a.agent_ext, NULLIF(d.agent_id, ''), 'Unassigned'), COALESCE(a.agent_name, '')
                   HAVING connected_calls > 0 OR unique_numbers > 0
-                  ORDER BY connected_calls DESC, unique_numbers DESC, a.agent_ext ASC";
+                  ORDER BY connected_calls DESC, unique_numbers DESC, agent_ext ASC";
 
         if ($result = $this->conn->query($query)) {
             while ($row = mysqli_fetch_assoc($result)) {
+                $row['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
+                $row['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
+                unset($row['total_talk_seconds'], $row['avg_talk_seconds']);
                 $data[] = $row;
             }
         }
 
         return $data;
+    }
+
+    public function getLatestOutboundActivity($companyId = 0)
+    {
+        $companyFilter = $this->companyCondition('d', $companyId);
+        $query = "SELECT MAX(d.started_at) AS last_activity_at FROM dialer_call_log d WHERE 1=1{$companyFilter}";
+
+        if ($result = $this->conn->query($query)) {
+            $row = mysqli_fetch_assoc($result);
+            return $row['last_activity_at'] ?? null;
+        }
+
+        return null;
     }
 }
 ?>
