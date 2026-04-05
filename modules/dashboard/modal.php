@@ -17,10 +17,98 @@ Class Dashboard_modal{
         return mysqli_real_escape_string($this->conn, (string) $value);
     }
 
-    private function companyCondition($alias, $companyId)
+    private function companyCondition($alias, $companyId, $tableName = 'dialer_call_log', $includeLegacyRows = false)
     {
         $companyId = intval($companyId);
-        return $companyId > 0 ? " AND {$alias}.company_id = {$companyId}" : "";
+        if ($companyId <= 0 || !$this->hasColumn($tableName, 'company_id')) {
+            return '';
+        }
+
+        $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
+        if ($includeLegacyRows) {
+            return " AND ({$prefix}company_id = {$companyId} OR COALESCE({$prefix}company_id, 0) = 0)";
+        }
+
+        return " AND {$prefix}company_id = {$companyId}";
+    }
+
+    private function hasColumn($tableName, $columnName)
+    {
+        $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
+        $columnName = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
+        $query = $this->conn->query("SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'");
+        return $query && mysqli_num_rows($query) > 0;
+    }
+
+    private function fetchAssoc($sql)
+    {
+        $result = $this->conn->query($sql);
+        if (!$result) {
+            error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+            return [];
+        }
+
+        return mysqli_fetch_assoc($result) ?: [];
+    }
+
+    private function fetchAll($sql)
+    {
+        $result = $this->conn->query($sql);
+        if (!$result) {
+            error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+            return [];
+        }
+
+        return mysqli_fetch_all($result, MYSQLI_ASSOC) ?: [];
+    }
+
+    private function buildDateExpression($tableName, $primaryColumn, $fallbackColumn = null, $alias = '')
+    {
+        $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
+        $hasPrimary = $this->hasColumn($tableName, $primaryColumn);
+        $hasFallback = $fallbackColumn !== null && $this->hasColumn($tableName, $fallbackColumn);
+
+        if ($hasPrimary && $hasFallback) {
+            return "COALESCE({$prefix}{$primaryColumn}, {$prefix}{$fallbackColumn})";
+        }
+        if ($hasPrimary) {
+            return $prefix . $primaryColumn;
+        }
+        if ($hasFallback) {
+            return $prefix . $fallbackColumn;
+        }
+
+        return $prefix . $primaryColumn;
+    }
+
+    private function buildAnsweredCondition($alias = 'd', $tableName = 'dialer_call_log')
+    {
+        $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
+        $statusCondition = $this->hasColumn($tableName, 'call_status')
+            ? "UPPER(COALESCE({$prefix}call_status, '')) = 'ANSWERED'"
+            : '0 = 1';
+        $agentCondition = $this->hasColumn($tableName, 'agent_id')
+            ? "NULLIF(TRIM(COALESCE({$prefix}agent_id, '')), '') IS NOT NULL"
+            : '0 = 1';
+
+        return "({$statusCondition} OR {$agentCondition})";
+    }
+
+    private function getUniqueNumberExpression($alias = 'd')
+    {
+        $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
+
+        if ($this->hasColumn('dialer_call_log', 'campaignnumber_id')) {
+            return "CASE WHEN {$prefix}campaignnumber_id > 0 THEN {$prefix}campaignnumber_id END";
+        }
+        if ($this->hasColumn('dialer_call_log', 'caller_id')) {
+            return "NULLIF({$prefix}caller_id, '')";
+        }
+        if ($this->hasColumn('dialer_call_log', 'call_id')) {
+            return "NULLIF({$prefix}call_id, '')";
+        }
+
+        return 'NULL';
     }
 
     private function formatSeconds($seconds)
@@ -48,19 +136,20 @@ Class Dashboard_modal{
 
         $startDate = $this->escape($startDate);
         $endDate = $this->escape($endDate);
-        $companyFilter = $companyId > 0 ? " AND r.company_id = " . intval($companyId) : "";
+        $companyFilter = $this->companyCondition('r', $companyId, 'rate', true);
+        $dateExpression = $this->buildDateExpression('rate', 'created_at', 'start_date', 'r');
         $rows = [];
 
         $sql = "SELECT r.agentno,
-                       r.created_at,
+                       {$dateExpression} AS rating_date,
                        r.ratings_json,
                        COALESCE(a.agent_ext, r.agentno, 'Unassigned') AS agent_ext,
                        COALESCE(a.agent_name, '') AS agent_name
                 FROM rate r
-                LEFT JOIN agent a ON a.agent_ext = r.agentno
-                WHERE r.created_at >= '{$startDate} 00:00:00'
-                  AND r.created_at <= '{$endDate} 23:59:59'{$companyFilter}
-                ORDER BY r.created_at DESC";
+                LEFT JOIN agent a ON a.agent_ext = r.agentno OR CAST(a.agent_id AS CHAR) = r.agentno
+                WHERE {$dateExpression} >= '{$startDate} 00:00:00'
+                  AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                ORDER BY {$dateExpression} DESC";
 
         if ($result = $this->conn->query($sql)) {
             while ($row = mysqli_fetch_assoc($result)) {
@@ -317,12 +406,6 @@ Class Dashboard_modal{
 
     public function getOutboundSummary($startDate, $endDate, $companyId = 0)
     {
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
-        $sqlStart = $startDate . ' 00:00:00';
-        $sqlEnd = $endDate . ' 23:59:59';
-        $companyFilter = $this->companyCondition('d', $companyId);
-
         $summary = [
             'total_calls' => 0,
             'unique_numbers' => 0,
@@ -334,29 +417,55 @@ Class Dashboard_modal{
             'avg_talk_time' => '00:00:00',
         ];
 
-        $query = "SELECT COUNT(*) AS total_calls,
-                         COUNT(DISTINCT CASE WHEN d.campaignnumber_id > 0 THEN d.campaignnumber_id END) AS unique_numbers,
-                         SUM(CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN 1 ELSE 0 END) AS connected_calls,
-                         COUNT(DISTINCT CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN NULLIF(d.agent_id, '') END) AS active_agents,
-                         COUNT(DISTINCT CASE WHEN d.campaign_id > 0 THEN d.campaign_id END) AS active_campaigns,
-                         SUM(CASE WHEN d.disposition IS NOT NULL AND d.disposition <> '' THEN 1 ELSE 0 END) AS dispositions_logged,
-                         COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0) AS total_talk_seconds,
-                         COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0) AS avg_talk_seconds
-                  FROM dialer_call_log d
-                  WHERE d.started_at >= '$sqlStart' AND d.started_at <= '$sqlEnd'{$companyFilter}";
+        if (!$this->tableExists('dialer_call_log')) {
+            return $summary;
+        }
 
-        if ($result = $this->conn->query($query)) {
-            $row = mysqli_fetch_assoc($result);
-            if ($row) {
-                $summary['total_calls'] = intval($row['total_calls'] ?? 0);
-                $summary['unique_numbers'] = intval($row['unique_numbers'] ?? 0);
-                $summary['connected_calls'] = intval($row['connected_calls'] ?? 0);
-                $summary['active_agents'] = intval($row['active_agents'] ?? 0);
-                $summary['active_campaigns'] = intval($row['active_campaigns'] ?? 0);
-                $summary['dispositions_logged'] = intval($row['dispositions_logged'] ?? 0);
-                $summary['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
-                $summary['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
-            }
+        $startDate = $this->escape($startDate);
+        $endDate = $this->escape($endDate);
+        $sqlStart = $startDate . ' 00:00:00';
+        $sqlEnd = $endDate . ' 23:59:59';
+        $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
+        $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
+        $uniqueExpression = $this->getUniqueNumberExpression('d');
+        $answeredCondition = $this->buildAnsweredCondition('d', 'dialer_call_log');
+        $campaignExpression = $this->hasColumn('dialer_call_log', 'campaign_id')
+            ? "COUNT(DISTINCT CASE WHEN d.campaign_id > 0 THEN d.campaign_id END)"
+            : '0';
+        $activeAgentExpression = $this->hasColumn('dialer_call_log', 'agent_id')
+            ? "COUNT(DISTINCT CASE WHEN {$answeredCondition} THEN NULLIF(TRIM(COALESCE(d.agent_id, '')), '') END)"
+            : '0';
+        $dispositionExpression = $this->hasColumn('dialer_call_log', 'disposition')
+            ? "SUM(CASE WHEN d.disposition IS NOT NULL AND d.disposition <> '' THEN 1 ELSE 0 END)"
+            : '0';
+        $durationSumExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
+            ? "COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0)"
+            : '0';
+        $durationAvgExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
+            ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
+            : '0';
+
+        $query = "SELECT COUNT(*) AS total_calls,
+                         COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
+                         SUM(CASE WHEN {$answeredCondition} THEN 1 ELSE 0 END) AS connected_calls,
+                         {$activeAgentExpression} AS active_agents,
+                         {$campaignExpression} AS active_campaigns,
+                         {$dispositionExpression} AS dispositions_logged,
+                         {$durationSumExpression} AS total_talk_seconds,
+                         {$durationAvgExpression} AS avg_talk_seconds
+                  FROM dialer_call_log d
+                  WHERE {$dateExpression} >= '$sqlStart' AND {$dateExpression} <= '$sqlEnd'{$companyFilter}";
+
+        $row = $this->fetchAssoc($query);
+        if (!empty($row)) {
+            $summary['total_calls'] = intval($row['total_calls'] ?? 0);
+            $summary['unique_numbers'] = intval($row['unique_numbers'] ?? 0);
+            $summary['connected_calls'] = intval($row['connected_calls'] ?? 0);
+            $summary['active_agents'] = intval($row['active_agents'] ?? 0);
+            $summary['active_campaigns'] = intval($row['active_campaigns'] ?? 0);
+            $summary['dispositions_logged'] = intval($row['dispositions_logged'] ?? 0);
+            $summary['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
+            $summary['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
         }
 
         return $summary;
@@ -364,98 +473,124 @@ Class Dashboard_modal{
 
     public function getCallStatusBreakdown($startDate, $endDate, $companyId = 0)
     {
+        if (!$this->tableExists('dialer_call_log')) {
+            return [];
+        }
+
         $startDate = $this->escape($startDate);
         $endDate = $this->escape($endDate);
-        $companyFilter = $this->companyCondition('d', $companyId);
-        $data = [];
+        $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
+        $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
+        $statusExpression = $this->hasColumn('dialer_call_log', 'call_status')
+            ? "COALESCE(NULLIF(d.call_status, ''), 'UNKNOWN')"
+            : "'UNKNOWN'";
 
-        $query = "SELECT COALESCE(NULLIF(d.call_status, ''), 'UNKNOWN') AS status, COUNT(*) AS total
+        $query = "SELECT {$statusExpression} AS status, COUNT(*) AS total
                   FROM dialer_call_log d
-                  WHERE d.started_at >= '{$startDate} 00:00:00' AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}
-                  GROUP BY COALESCE(NULLIF(d.call_status, ''), 'UNKNOWN')
+                  WHERE {$dateExpression} >= '{$startDate} 00:00:00' AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  GROUP BY {$statusExpression}
                   ORDER BY total DESC, status ASC
                   LIMIT 6";
 
-        if ($result = $this->conn->query($query)) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $data[] = $row;
-            }
-        }
-
-        return $data;
+        return $this->fetchAll($query);
     }
 
     public function getCampaignActivity($startDate, $endDate, $companyId = 0)
     {
+        if (!$this->tableExists('dialer_call_log')) {
+            return [];
+        }
+
         $startDate = $this->escape($startDate);
         $endDate = $this->escape($endDate);
-        $companyFilter = $this->companyCondition('d', $companyId);
-        $data = [];
+        $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
+        $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
+        $uniqueExpression = $this->getUniqueNumberExpression('d');
+        $hasCampaignTable = $this->tableExists('campaign') && $this->hasColumn('dialer_call_log', 'campaign_id');
+        $campaignNameExpression = $hasCampaignTable
+            ? "COALESCE(c.name, CONCAT('Campaign #', d.campaign_id))"
+            : "'General Activity'";
+        $campaignJoin = $hasCampaignTable ? " LEFT JOIN campaign c ON c.id = d.campaign_id" : '';
+        $groupBy = $hasCampaignTable ? 'd.campaign_id, c.name' : $campaignNameExpression;
 
-        $query = "SELECT COALESCE(c.name, CONCAT('Campaign #', d.campaign_id)) AS campaign_name,
+        $query = "SELECT {$campaignNameExpression} AS campaign_name,
                          COUNT(*) AS total_calls,
-                         COUNT(DISTINCT CASE WHEN d.campaignnumber_id > 0 THEN d.campaignnumber_id END) AS unique_numbers,
-                         MAX(d.started_at) AS last_call_at
-                  FROM dialer_call_log d
-                  LEFT JOIN campaign c ON c.id = d.campaign_id
-                  WHERE d.started_at >= '{$startDate} 00:00:00' AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}
-                  GROUP BY d.campaign_id, c.name
+                         COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
+                         MAX({$dateExpression}) AS last_call_at
+                  FROM dialer_call_log d{$campaignJoin}
+                  WHERE {$dateExpression} >= '{$startDate} 00:00:00' AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  GROUP BY {$groupBy}
                   ORDER BY total_calls DESC, unique_numbers DESC, campaign_name ASC
                   LIMIT 5";
 
-        if ($result = $this->conn->query($query)) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $data[] = $row;
-            }
-        }
-
-        return $data;
+        return $this->fetchAll($query);
     }
 
     public function getAgentPickupAnalytics($startDate, $endDate, $companyId = 0)
     {
+        if (!$this->tableExists('dialer_call_log')) {
+            return [];
+        }
+
         $startDate = $this->escape($startDate);
         $endDate = $this->escape($endDate);
-        $companyFilter = $this->companyCondition('d', $companyId);
-        $data = [];
+        $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
+        $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
+        $uniqueExpression = $this->getUniqueNumberExpression('d');
+        $answeredCondition = $this->buildAnsweredCondition('d', 'dialer_call_log');
+        $durationSumExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
+            ? "COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0)"
+            : '0';
+        $durationAvgExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
+            ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
+            : '0';
+        $hasAgentId = $this->hasColumn('dialer_call_log', 'agent_id');
+        $agentExtExpression = $hasAgentId
+            ? "COALESCE(a.agent_ext, NULLIF(TRIM(d.agent_id), ''), 'Unassigned')"
+            : "'Unassigned'";
+        $agentNameExpression = $this->tableExists('agent')
+            ? "COALESCE(a.agent_name, '')"
+            : "''";
+        $agentJoin = ($this->tableExists('agent') && $hasAgentId)
+            ? " LEFT JOIN agent a ON a.agent_ext = d.agent_id OR CAST(a.agent_id AS CHAR) = d.agent_id"
+            : '';
 
-        $query = "SELECT COALESCE(a.agent_ext, NULLIF(d.agent_id, ''), 'Unassigned') AS agent_ext,
-                         COALESCE(a.agent_name, '') AS agent_name,
-                         SUM(CASE WHEN UPPER(COALESCE(d.call_status, '')) = 'ANSWERED' OR (d.agent_id IS NOT NULL AND d.agent_id <> '') THEN 1 ELSE 0 END) AS connected_calls,
-                         COUNT(DISTINCT CASE WHEN d.campaignnumber_id > 0 THEN d.campaignnumber_id END) AS unique_numbers,
-                         COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0) AS total_talk_seconds,
-                         COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0) AS avg_talk_seconds
-                  FROM dialer_call_log d
-                  LEFT JOIN agent a ON a.agent_ext = d.agent_id
-                  WHERE d.started_at >= '{$startDate} 00:00:00'
-                    AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}
-                  GROUP BY COALESCE(a.agent_ext, NULLIF(d.agent_id, ''), 'Unassigned'), COALESCE(a.agent_name, '')
+        $query = "SELECT {$agentExtExpression} AS agent_ext,
+                         {$agentNameExpression} AS agent_name,
+                         SUM(CASE WHEN {$answeredCondition} THEN 1 ELSE 0 END) AS connected_calls,
+                         COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
+                         {$durationSumExpression} AS total_talk_seconds,
+                         {$durationAvgExpression} AS avg_talk_seconds
+                  FROM dialer_call_log d{$agentJoin}
+                  WHERE {$dateExpression} >= '{$startDate} 00:00:00'
+                    AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  GROUP BY {$agentExtExpression}, {$agentNameExpression}
                   HAVING connected_calls > 0 OR unique_numbers > 0
                   ORDER BY connected_calls DESC, unique_numbers DESC, agent_ext ASC";
 
-        if ($result = $this->conn->query($query)) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $row['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
-                $row['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
-                unset($row['total_talk_seconds'], $row['avg_talk_seconds']);
-                $data[] = $row;
-            }
+        $data = $this->fetchAll($query);
+        foreach ($data as &$row) {
+            $row['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
+            $row['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
+            unset($row['total_talk_seconds'], $row['avg_talk_seconds']);
         }
+        unset($row);
 
         return $data;
     }
 
     public function getLatestOutboundActivity($companyId = 0)
     {
-        $companyFilter = $this->companyCondition('d', $companyId);
-        $query = "SELECT MAX(d.started_at) AS last_activity_at FROM dialer_call_log d WHERE 1=1{$companyFilter}";
-
-        if ($result = $this->conn->query($query)) {
-            $row = mysqli_fetch_assoc($result);
-            return $row['last_activity_at'] ?? null;
+        if (!$this->tableExists('dialer_call_log')) {
+            return null;
         }
 
-        return null;
+        $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
+        $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
+        $query = "SELECT MAX({$dateExpression}) AS last_activity_at FROM dialer_call_log d WHERE 1=1{$companyFilter}";
+        $row = $this->fetchAssoc($query);
+
+        return $row['last_activity_at'] ?? null;
     }
 }
 ?>

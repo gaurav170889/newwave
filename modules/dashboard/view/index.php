@@ -87,6 +87,15 @@ $avgTalkTime = $outboundSummary['avg_talk_time'] ?? '00:00:00';
             <small class="text-muted mt-2 mt-md-0">Default filter: Today</small>
         </div>
 
+        <?php if (!empty($fallbackNotice) || ($totalCalls === 0 && !empty($latestActivityAt))): ?>
+            <div class="alert alert-warning border mb-4">
+                <strong><?php echo htmlspecialchars($fallbackNotice ?: 'No outbound calls were found for the selected period.', ENT_QUOTES, 'UTF-8'); ?></strong>
+                <?php if (!empty($latestActivityAt)): ?>
+                    <div class="small mt-1 text-muted">Latest recorded outbound call: <?php echo htmlspecialchars(date('M d, Y h:i A', strtotime($latestActivityAt)), ENT_QUOTES, 'UTF-8'); ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
         <div class="row">
             <div class="col-md-6 col-xl-4 mb-3">
                 <div class="card metric-card metric-card-primary h-100">
@@ -298,5 +307,5 @@ $avgTalkTime = $outboundSummary['avg_talk_time'] ?? '00:00:00';
 </main>
 
 <?php
-include('modules/common/footer_1.php');
+include(INCLUDEPATH . 'modules/common/footer_1.php');
 ?>

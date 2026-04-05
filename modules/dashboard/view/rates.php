@@ -140,5 +140,5 @@ $rangeDisplay = $rangeInfo['display'] ?? date('M d, Y');
 </main>
 
 <?php
-include('modules/common/footer_1.php');
+include(INCLUDEPATH . 'modules/common/footer_1.php');
 ?>
