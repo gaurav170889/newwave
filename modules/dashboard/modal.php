@@ -200,6 +200,48 @@ Class Dashboard_modal{
         return $this->fetchAll($sql);
     }
 
+    private function getAgentDirectory($companyId = 0)
+    {
+        if (!$this->tableExists('agent')) {
+            return [];
+        }
+
+        $agentExtColumn = $this->resolveColumn('agent', 'agent_ext');
+        $agentIdColumn = $this->resolveColumn('agent', 'agent_id');
+        $agentNameColumn = $this->resolveColumn('agent', 'agent_name');
+
+        if ($agentExtColumn === null && $agentIdColumn === null) {
+            return [];
+        }
+
+        $companyFilter = $this->companyCondition('', $companyId, 'agent', true);
+        $sql = "SELECT "
+            . ($agentIdColumn ? "`{$agentIdColumn}` AS agent_id" : "NULL AS agent_id")
+            . ", " . ($agentExtColumn ? "`{$agentExtColumn}` AS agent_ext" : "NULL AS agent_ext")
+            . ", " . ($agentNameColumn ? "`{$agentNameColumn}` AS agent_name" : "'' AS agent_name")
+            . " FROM agent WHERE 1=1{$companyFilter}";
+
+        $directory = [];
+        foreach ($this->fetchAll($sql) as $row) {
+            $agentExt = trim((string) ($row['agent_ext'] ?? ''));
+            $agentId = trim((string) ($row['agent_id'] ?? ''));
+            $agentName = (string) ($row['agent_name'] ?? '');
+            $payload = [
+                'agent_ext' => $agentExt !== '' ? $agentExt : ($agentId !== '' ? $agentId : 'Unassigned'),
+                'agent_name' => $agentName,
+            ];
+
+            if ($agentExt !== '') {
+                $directory[$agentExt] = $payload;
+            }
+            if ($agentId !== '') {
+                $directory[$agentId] = $payload;
+            }
+        }
+
+        return $directory;
+    }
+
     private function extractRatingValues($ratingsJson)
     {
         $decoded = json_decode((string) $ratingsJson, true);
@@ -575,7 +617,7 @@ Class Dashboard_modal{
 
     public function getAgentPickupAnalytics($startDate, $endDate, $companyId = 0)
     {
-        if (!$this->tableExists('dialer_call_log')) {
+        if (!$this->tableExists('dialer_call_log') || !$this->hasColumn('dialer_call_log', 'agent_id')) {
             return [];
         }
 
@@ -591,41 +633,31 @@ Class Dashboard_modal{
         $durationAvgExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
             ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
             : '0';
-        $hasAgentId = $this->hasColumn('dialer_call_log', 'agent_id');
-        $hasAgentTable = $hasAgentId && $this->tableExists('agent');
-        $agentExtColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_ext') : null;
-        $agentNameColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_name') : null;
-        $agentPkColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_id') : null;
-        $agentJoin = ($hasAgentTable && $agentExtColumn)
-            ? " LEFT JOIN agent a ON a.`{$agentExtColumn}` = d.agent_id" . ($agentPkColumn ? " OR CAST(a.`{$agentPkColumn}` AS CHAR) = d.agent_id" : '')
-            : '';
-        $agentExtExpression = $hasAgentId
-            ? (($agentJoin !== '' && $agentExtColumn)
-                ? "COALESCE(a.`{$agentExtColumn}`, NULLIF(TRIM(d.agent_id), ''), 'Unassigned')"
-                : "COALESCE(NULLIF(TRIM(d.agent_id), ''), 'Unassigned')")
-            : "'Unassigned'";
-        $agentNameExpression = ($agentJoin !== '' && $agentNameColumn)
-            ? "COALESCE(a.`{$agentNameColumn}`, '')"
-            : "''";
+        $agentKeyExpression = "COALESCE(NULLIF(TRIM(d.agent_id), ''), 'Unassigned')";
 
-        $query = "SELECT {$agentExtExpression} AS agent_ext,
-                         {$agentNameExpression} AS agent_name,
+        $query = "SELECT {$agentKeyExpression} AS agent_key,
                          SUM(CASE WHEN {$answeredCondition} THEN 1 ELSE 0 END) AS connected_calls,
                          COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
                          {$durationSumExpression} AS total_talk_seconds,
                          {$durationAvgExpression} AS avg_talk_seconds
-                  FROM dialer_call_log d{$agentJoin}
+                  FROM dialer_call_log d
                   WHERE {$dateExpression} >= '{$startDate} 00:00:00'
                     AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
-                  GROUP BY {$agentExtExpression}, {$agentNameExpression}
+                  GROUP BY {$agentKeyExpression}
                   HAVING connected_calls > 0 OR unique_numbers > 0
-                  ORDER BY connected_calls DESC, unique_numbers DESC, agent_ext ASC";
+                  ORDER BY connected_calls DESC, unique_numbers DESC, agent_key ASC";
 
         $data = $this->fetchAll($query);
+        $agentDirectory = $this->getAgentDirectory($companyId);
+
         foreach ($data as &$row) {
+            $agentKey = trim((string) ($row['agent_key'] ?? ''));
+            $lookup = $agentDirectory[$agentKey] ?? null;
+            $row['agent_ext'] = $lookup['agent_ext'] ?? ($agentKey !== '' ? $agentKey : 'Unassigned');
+            $row['agent_name'] = $lookup['agent_name'] ?? '';
             $row['total_talk_time'] = $this->formatSeconds($row['total_talk_seconds'] ?? 0);
             $row['avg_talk_time'] = $this->formatSeconds($row['avg_talk_seconds'] ?? 0);
-            unset($row['total_talk_seconds'], $row['avg_talk_seconds']);
+            unset($row['agent_key'], $row['total_talk_seconds'], $row['avg_talk_seconds']);
         }
         unset($row);
 
