@@ -14,10 +14,179 @@ Class Campcontact_modal{
 		$form_data = mysqli_real_escape_string($this->conn, trim(strip_tags($form_data)));
 		return $form_data;
 	}
+
+    private function getSessionRole()
+    {
+        return strtolower(trim((string) ($_SESSION['prole'] ?? ($_SESSION['role'] ?? ''))));
+    }
+
+    private function isSuperAdmin()
+    {
+        return $this->getSessionRole() === 'super_admin';
+    }
+
+    private function resolveCompanyIdFromRequest()
+    {
+        if ($this->isSuperAdmin()) {
+            $requestCompanyId = isset($_REQUEST['company_id']) ? intval($_REQUEST['company_id']) : 0;
+            if ($requestCompanyId > 0) {
+                return $requestCompanyId;
+            }
+        }
+
+        return isset($_SESSION['company_id']) ? intval($_SESSION['company_id']) : 0;
+    }
+
+    private function fetchRows($query)
+    {
+        $rows = [];
+        $result = mysqli_query($this->conn, $query);
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $rows[] = $row;
+            }
+        }
+        return $rows;
+    }
+
+    private function getCompanyTimezone($companyId)
+    {
+        $defaultTimezone = date_default_timezone_get();
+        $companyId = intval($companyId);
+
+        if ($companyId <= 0) {
+            return $defaultTimezone;
+        }
+
+        $query = mysqli_query($this->conn, "SELECT timezone FROM pbxdetail WHERE company_id = {$companyId} LIMIT 1");
+        if ($query && mysqli_num_rows($query) > 0) {
+            $row = mysqli_fetch_assoc($query);
+            $timezone = trim((string) ($row['timezone'] ?? ''));
+            if ($timezone !== '') {
+                try {
+                    new DateTimeZone($timezone);
+                    return $timezone;
+                } catch (Exception $exception) {
+                    // Fallback to application timezone below.
+                }
+            }
+        }
+
+        return $defaultTimezone;
+    }
+
+    private function getTodayWindowForCompany($companyId)
+    {
+        $companyTimezoneName = $this->getCompanyTimezone($companyId);
+        $companyTimezone = new DateTimeZone($companyTimezoneName);
+        $appTimezone = new DateTimeZone(date_default_timezone_get());
+        $now = new DateTimeImmutable('now', $companyTimezone);
+        $start = $now->setTime(0, 0, 0)->setTimezone($appTimezone);
+        $end = $now->setTime(23, 59, 59)->setTimezone($appTimezone);
+
+        return [
+            'timezone' => $companyTimezoneName,
+            'today_label' => $now->format('Y-m-d'),
+            'start' => $start->format('Y-m-d H:i:s'),
+            'end' => $end->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getCompanies($companyId = 0)
+    {
+        $companyId = intval($companyId);
+        $where = $companyId > 0 ? "WHERE id = {$companyId}" : '';
+        return $this->fetchRows("SELECT id, name FROM companies {$where} ORDER BY name ASC");
+    }
+
+    public function getCampaignsByCompany($companyId)
+    {
+        $companyId = intval($companyId);
+        if ($companyId <= 0) {
+            return [];
+        }
+
+        return $this->fetchRows("SELECT id, name FROM campaign WHERE company_id = {$companyId} AND is_deleted = 0 ORDER BY name ASC");
+    }
+
+    public function getFilterValues($companyId, $campaignId = 0, $filterType = '')
+    {
+        $companyId = intval($companyId);
+        $campaignId = intval($campaignId);
+        $filterType = strtolower(trim((string) $filterType));
+
+        if ($companyId <= 0 || $campaignId <= 0 || $filterType === '') {
+            return [];
+        }
+
+        if ($filterType === 'agent') {
+            $rows = $this->fetchRows("SELECT agent_id, agent_name, agent_ext FROM agent WHERE company_id = {$companyId} ORDER BY agent_name ASC, agent_ext ASC");
+            $options = [['value' => '__all__', 'label' => 'All Agents']];
+
+            foreach ($rows as $row) {
+                $agentId = trim((string) ($row['agent_id'] ?? ''));
+                if ($agentId === '') {
+                    continue;
+                }
+
+                $agentName = trim((string) ($row['agent_name'] ?? ''));
+                $agentExt = trim((string) ($row['agent_ext'] ?? ''));
+                $label = $agentName !== '' ? $agentName : ('Agent ' . $agentId);
+                if ($agentExt !== '') {
+                    $label .= ' (' . $agentExt . ')';
+                }
+
+                $options[] = ['value' => $agentId, 'label' => $label];
+            }
+
+            return $options;
+        }
+
+        $todayWindow = $this->getTodayWindowForCompany($companyId);
+        $baseWhere = "company_id = {$companyId} AND campaignid = {$campaignId} AND created_at >= '{$todayWindow['start']}' AND created_at <= '{$todayWindow['end']}'";
+        $options = [];
+
+        if ($filterType === 'answered') {
+            $options[] = ['value' => '__all__', 'label' => 'All Answered'];
+            $rows = $this->fetchRows("SELECT DISTINCT UPPER(COALESCE(last_call_status, '')) AS status_value FROM campaignnumbers WHERE {$baseWhere} AND UPPER(COALESCE(last_call_status, '')) = 'ANSWERED'");
+            foreach ($rows as $row) {
+                $statusValue = trim((string) ($row['status_value'] ?? ''));
+                if ($statusValue !== '') {
+                    $options[] = ['value' => $statusValue, 'label' => $statusValue];
+                }
+            }
+            return $options;
+        }
+
+        if ($filterType === 'not_answered') {
+            $options[] = ['value' => '__all__', 'label' => 'All Not Answered'];
+            $rows = $this->fetchRows("SELECT DISTINCT COALESCE(NULLIF(TRIM(last_call_status), ''), 'NOT_DIALED') AS status_value FROM campaignnumbers WHERE {$baseWhere} AND UPPER(COALESCE(last_call_status, '')) <> 'ANSWERED' ORDER BY status_value ASC");
+            foreach ($rows as $row) {
+                $statusValue = trim((string) ($row['status_value'] ?? ''));
+                if ($statusValue !== '') {
+                    $label = $statusValue === 'NOT_DIALED' ? 'NOT_DIALED' : $statusValue;
+                    $options[] = ['value' => $statusValue, 'label' => $label];
+                }
+            }
+        }
+
+        return $options;
+    }
 	
 	public function deletecontacts()
 	{
-	    $sql = "DELETE FROM campaignnumbers WHERE DATE(iserttime) = CURDATE()";
+        $companyId = $this->resolveCompanyIdFromRequest();
+        $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
+
+        if ($companyId <= 0) {
+            http_response_code(400);
+            echo "Invalid company selection.";
+            return;
+        }
+
+        $todayWindow = $this->getTodayWindowForCompany($companyId);
+        $campaignClause = $campaignId > 0 ? " AND campaignid = {$campaignId}" : '';
+        $sql = "DELETE FROM campaignnumbers WHERE company_id = {$companyId}{$campaignClause} AND created_at >= '{$todayWindow['start']}' AND created_at <= '{$todayWindow['end']}'";
         if (mysqli_query($this->conn, $sql)) {
             echo "success";
         } else {
@@ -27,34 +196,27 @@ Class Campcontact_modal{
 	}
 	
     public function getallcontact() {
-         $whereClauses = [];
-         $companyId = isset($_SESSION['company_id']) ? intval($_SESSION['company_id']) : 0;
+         $companyId = $this->resolveCompanyIdFromRequest();
+         $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
+         $filterType = strtolower(trim((string) ($_REQUEST['filter_type'] ?? '')));
+         $filterValue = trim((string) ($_REQUEST['filter_value'] ?? ''));
 
-         if ($companyId > 0) {
-             $whereClauses[] = "c.company_id = '{$companyId}'";
+         if ($companyId <= 0 || $campaignId <= 0) {
+             return json_encode([]);
          }
 
-         // Show only contacts that have NOT been dialed by the system yet.
-         $whereClauses[] = "COALESCE(c.attempts_used, 0) = 0";
-         $whereClauses[] = "NOT EXISTS (
-                                SELECT 1
-                                FROM dialer_call_log dl
-                                WHERE dl.company_id = c.company_id
-                                  AND dl.campaign_id = c.campaignid
-                                  AND (
-                                      dl.campaignnumber_id = c.id
-                                      OR (
-                                          NULLIF(TRIM(COALESCE(dl.caller_id, '')), '') IS NOT NULL
-                                          AND (dl.caller_id = c.phone_e164 OR dl.caller_id = c.phone_raw)
-                                      )
-                                  )
-                                  AND UPPER(COALESCE(dl.call_status, '')) <> 'MANUAL_DISPO'
-                            )";
+         $todayWindow = $this->getTodayWindowForCompany($companyId);
+         $whereClauses = [
+             "c.company_id = '{$companyId}'",
+             "c.campaignid = '{$campaignId}'",
+             "c.created_at >= '{$todayWindow['start']}'",
+             "c.created_at <= '{$todayWindow['end']}'",
+         ];
 
          // Filter for agents only
-         if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'uagent') {
+         if ($this->getSessionRole() === 'uagent') {
              $zid = intval($_SESSION['pid'] ?? 0);
-             $u_query = "SELECT agentid FROM users WHERE id = '$zid'";
+             $u_query = "SELECT agentid FROM users WHERE id = '{$zid}'";
              $u_res = mysqli_query($this->conn, $u_query);
              $agent_id = 0;
              if ($u_res && mysqli_num_rows($u_res) > 0) {
@@ -63,26 +225,46 @@ Class Campcontact_modal{
              }
              
              if ($agent_id > 0) {
-                 $whereClauses[] = "c.agent_connected = '$agent_id'";
+                 $whereClauses[] = "c.agent_connected = '{$agent_id}'";
              } else {
                  $whereClauses[] = "1=0";
              }
          }
 
-         $where = !empty($whereClauses) ? ('WHERE ' . implode(' AND ', $whereClauses)) : '';
+         if ($filterType === 'agent' && $filterValue !== '' && $filterValue !== '__all__') {
+             $safeFilterValue = mysqli_real_escape_string($this->conn, $filterValue);
+             $whereClauses[] = "CAST(COALESCE(c.agent_connected, '') AS CHAR) = '{$safeFilterValue}'";
+         } elseif ($filterType === 'answered') {
+             $whereClauses[] = "UPPER(COALESCE(c.last_call_status, '')) = 'ANSWERED'";
+             if ($filterValue !== '' && $filterValue !== '__all__') {
+                 $safeFilterValue = mysqli_real_escape_string($this->conn, strtoupper($filterValue));
+                 $whereClauses[] = "UPPER(COALESCE(c.last_call_status, '')) = '{$safeFilterValue}'";
+             }
+         } elseif ($filterType === 'not_answered') {
+             if (strtoupper($filterValue) === 'NOT_DIALED') {
+                 $whereClauses[] = "NULLIF(TRIM(COALESCE(c.last_call_status, '')), '') IS NULL";
+             } else {
+                 $whereClauses[] = "UPPER(COALESCE(c.last_call_status, '')) <> 'ANSWERED'";
+                 if ($filterValue !== '' && $filterValue !== '__all__') {
+                     $safeFilterValue = mysqli_real_escape_string($this->conn, strtoupper($filterValue));
+                     $whereClauses[] = "UPPER(COALESCE(c.last_call_status, '')) = '{$safeFilterValue}'";
+                 }
+             }
+         }
 
-         // New Schema Query
+         $where = 'WHERE ' . implode(' AND ', $whereClauses);
+
          $query = "SELECT c.id, c.phone_e164, c.first_name, c.last_name, c.days_past_due,
                      c.state, c.attempts_used, c.max_attempts,
                      c.last_call_status, c.last_call_started_at,
                      c.agent_connected, c.notes, c.last_disposition,
                      c.next_call_at,
-					 a.agent_name, d.color_code
-			  FROM campaignnumbers c
-			  LEFT JOIN agent a ON c.agent_connected = a.agent_id
-              LEFT JOIN dialer_disposition_master d ON c.last_disposition = d.label AND c.company_id = d.company_id
-			  $where
-              ORDER BY c.id DESC LIMIT 2000";
+                     a.agent_name, d.color_code
+                  FROM campaignnumbers c
+                  LEFT JOIN agent a ON c.agent_connected = a.agent_id
+                  LEFT JOIN dialer_disposition_master d ON c.last_disposition = d.label AND c.company_id = d.company_id
+                  {$where}
+                  ORDER BY c.id DESC LIMIT 2000";
 
         $result = mysqli_query($this->conn, $query);
 
@@ -93,26 +275,26 @@ Class Campcontact_modal{
         $response = [];
     
         while ($row = mysqli_fetch_assoc($result)) {
-            // Merge Name
-            $fullName = trim($row['first_name'] . ' ' . $row['last_name']);
+            $fullName = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+            $lastCallStatus = trim((string) ($row['last_call_status'] ?? ''));
+            $isAnswered = strtoupper($lastCallStatus) === 'ANSWERED';
         
             $response[] = [
-                'id'          => $row['id'],
-                'number'      => $row['phone_e164'],
-                'name'        => $fullName,
+                'id'            => $row['id'],
+                'number'        => $row['phone_e164'],
+                'name'          => $fullName,
                 'days_past_due' => $row['days_past_due'],
-                'type'        => 'Lead',
-                'feedback'    => $row['last_call_status'],
-                'call_status' => $row['state'],
-                'last_try'    => $row['attempts_used'] . '/' . $row['max_attempts'],
+                'type'          => $isAnswered ? 'Answered' : 'Not Answered',
+                'feedback'      => $lastCallStatus !== '' ? $lastCallStatus : 'NOT_DIALED',
+                'call_status'   => $row['state'],
+                'last_try'      => $row['attempts_used'] . '/' . $row['max_attempts'],
                 'attempts_used' => $row['attempts_used'],
-                'last_try_dt' => $row['last_call_started_at'],
-                'last_try_dt' => $row['last_call_started_at'],
-                'agent_name'  => $row['agent_name'] ?? '',
-                'disposition' => $row['last_disposition'],
-                'color_code'  => $row['color_code'] ?? '#808080',
-                'notes'       => $row['notes'],
-                'next_call_at'=> $row['next_call_at']
+                'last_try_dt'   => $row['last_call_started_at'],
+                'agent_name'    => $row['agent_name'] ?? '',
+                'disposition'   => $row['last_disposition'],
+                'color_code'    => $row['color_code'] ?? '#808080',
+                'notes'         => $row['notes'],
+                'next_call_at'  => $row['next_call_at']
             ];
         }
 
@@ -126,23 +308,8 @@ Class Campcontact_modal{
 	
 	public function getcampaign()
 	{
-	    
-	     $query = "SELECT * FROM campaign";
-        $result = mysqli_query($this->conn, $query);
-    
-        $data = [];
-    
-        if ($result && mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                // Decode weekdays from JSON
-                $row['weekdays'] = json_decode($row['weekdays'], true);
-                $row['weekdays'] = is_array($row['weekdays']) ? implode(', ', $row['weekdays']) : '';
-                $data[] = $row;
-            }
-        }
-    
-        //header('Content-Type: application/json');
-        return json_encode($data);
+	     $companyId = $this->resolveCompanyIdFromRequest();
+         return json_encode($this->getCampaignsByCompany($companyId));
 	}
 	
 	public function addCampaignSql($name, $routeto, $returncall, $weekdays, $starttime, $stoptime) 

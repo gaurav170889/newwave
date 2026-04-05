@@ -8,29 +8,40 @@ Class Campcontact{
 	public function __construct() {
       $this->modal = loadmodal("campcontact");
     }
+
+    private function getSessionRole()
+    {
+        return strtolower(trim((string) ($_SESSION['prole'] ?? ($_SESSION['role'] ?? ''))));
+    }
+
+    private function resolveCompanyIdFromRequest()
+    {
+        if ($this->getSessionRole() === 'super_admin') {
+            $requestCompanyId = isset($_REQUEST['company_id']) ? intval($_REQUEST['company_id']) : 0;
+            if ($requestCompanyId > 0) {
+                return $requestCompanyId;
+            }
+        }
+
+        return isset($_SESSION['company_id']) ? intval($_SESSION['company_id']) : 0;
+    }
+
 	public function index(){
         $_SESSION['navurl'] = 'Campcontact';
-	    //echo "abcd";
-	   // exit();
+        $sessionRole = $this->getSessionRole();
+        $isSuperAdmin = ($sessionRole === 'super_admin');
+        $selectedCompanyId = $this->resolveCompanyIdFromRequest();
+        $companies = $this->modal->getCompanies($isSuperAdmin ? 0 : $selectedCompanyId);
+
 		include(INCLUDEPATH.'modules/common/campaignheader.php');
 		include(INCLUDEPATH.'modules/common/navbar_1.php');	
-		//echo "abcd";
-	//	exit();
-		if($_SESSION['role']== "uagent")
+		if($sessionRole == "uagent")
 		{
-			//$qagent = $this->getagent();
-			
 			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
-		//$page = (isset($_GET['page']) && is_numeric($_GET['page']) ) ? $_GET['page'] : 1;
-		//$data = $this->modal->select("agent");
-		//$group = $this->modal->groupassoc("agentgroup");
-		//print_r($group);
-	//	$counter = 1;
-		include(__DIR__ . "/view/index.php");
-		//$this->record();
+			include(__DIR__ . "/view/index.php");
 		}
 		
 		include('modules/common/campcontactfooter.php');
@@ -46,11 +57,26 @@ Class Campcontact{
 	
     public function getallcontact() 
     {
-        
-        $data = $this->modal->getallcontact() ;
+        $data = $this->modal->getallcontact();
         header('Content-Type: application/json');
-        echo $data ;
-        
+        echo $data;
+    }
+
+    public function getcampaigns()
+    {
+        $companyId = $this->resolveCompanyIdFromRequest();
+        header('Content-Type: application/json');
+        echo json_encode($companyId > 0 ? $this->modal->getCampaignsByCompany($companyId) : []);
+    }
+
+    public function getfiltervalues()
+    {
+        $companyId = $this->resolveCompanyIdFromRequest();
+        $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
+        $filterType = isset($_REQUEST['filter_type']) ? (string) $_REQUEST['filter_type'] : '';
+
+        header('Content-Type: application/json');
+        echo json_encode($this->modal->getFilterValues($companyId, $campaignId, $filterType));
     }
 	
 	public function addcampaign()

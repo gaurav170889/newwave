@@ -76,11 +76,54 @@
 
 <main class="content">
 	<div class="container-fluid p-0">
-		<div class="container-fluid" style="margin-top:30px;margin-bottom:20px;">
-			<div class="container">
-			
-			</div>
-		</div>
+		<div class="card shadow-sm border-primary mb-3" id="campaignContactFilters"
+             data-is-super-admin="<?php echo !empty($isSuperAdmin) ? '1' : '0'; ?>"
+             data-company-id="<?php echo intval($selectedCompanyId ?? 0); ?>">
+            <div class="card-body">
+                <h5 class="text-uppercase text-primary mb-3" style="letter-spacing: 0.08em; font-size: 0.95rem;">Campaign Contact Filters</h5>
+                <div class="form-row align-items-end">
+                    <div class="form-group col-md-3">
+                        <label for="contactCompanySelect">Select Company</label>
+                        <select class="form-control" id="contactCompanySelect" <?php echo !empty($isSuperAdmin) ? '' : 'disabled'; ?>>
+                            <option value="">Select Company</option>
+                            <?php foreach (($companies ?? []) as $company): ?>
+                                <option value="<?php echo intval($company['id']); ?>" <?php echo intval($selectedCompanyId ?? 0) === intval($company['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($company['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="contactCampaignSelect">Select Campaign</label>
+                        <select class="form-control" id="contactCampaignSelect">
+                            <option value="">Select Campaign</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="contactTypeSelect">Select Type</label>
+                        <select class="form-control" id="contactTypeSelect">
+                            <option value="">Select Type</option>
+                            <option value="agent">Agent</option>
+                            <option value="answered">Answered</option>
+                            <option value="not_answered">Not Answered</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="contactValueSelect">Select Value</label>
+                        <select class="form-control" id="contactValueSelect" disabled>
+                            <option value="">Select Value</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <button type="button" class="btn btn-outline-secondary btn-block" id="clearContactFilters">Clear Filters</button>
+                    </div>
+                </div>
+                <div class="alert alert-info py-2 px-3 mb-0" id="contactFilterStatus">
+                    Select a campaign to load today's contacts using the company PBX timezone. Answered / Not Answered is based on <strong>`last_call_status`</strong>.
+                </div>
+            </div>
+        </div>
+
 		<div class="d-flex justify-content-end mb-2">
           <button id="deleteAllBtn" class="btn btn-danger btn-sm" onclick="deleteAllContacts()">
             Delete All Contacts

@@ -70,6 +70,138 @@ $("#myInput").on("keyup", function()
 
 <script>
 $(document).ready(function () {
+    const filterPanel = $('#campaignContactFilters');
+    const isSuperAdmin = String(filterPanel.data('is-super-admin') || '0') === '1';
+    const defaultCompanyId = String(filterPanel.data('company-id') || $('#contactCompanySelect').val() || '');
+
+    function escapeHtml(value) {
+        return $('<div>').text(value || '').html();
+    }
+
+    function selectedCompanyId() {
+        return isSuperAdmin ? ($('#contactCompanySelect').val() || '') : (defaultCompanyId || $('#contactCompanySelect').val() || '');
+    }
+
+    function selectedCampaignId() {
+        return $('#contactCampaignSelect').val() || '';
+    }
+
+    function selectedFilterType() {
+        return $('#contactTypeSelect').val() || '';
+    }
+
+    function updateFilterNotice(message, type) {
+        const alertType = type || 'info';
+        $('#contactFilterStatus')
+            .removeClass('alert-info alert-warning alert-success')
+            .addClass('alert-' + alertType)
+            .html(message || '');
+    }
+
+    function resetValueSelect(placeholder) {
+        $('#contactValueSelect')
+            .prop('disabled', true)
+            .html('<option value="">' + escapeHtml(placeholder || 'Select Value') + '</option>');
+    }
+
+    function reloadCampaignTable() {
+        if ($.fn.DataTable.isDataTable('#campaignTable')) {
+            $('#campaignTable').DataTable().ajax.reload();
+        }
+    }
+
+    function loadCampaigns(autoSelectFirst) {
+        const companyId = selectedCompanyId();
+        $('#contactCampaignSelect').html('<option value="">Loading campaigns...</option>');
+        $('#contactTypeSelect').val('');
+        resetValueSelect('Select Value');
+
+        if (!companyId) {
+            $('#contactCampaignSelect').html('<option value="">Select Campaign</option>');
+            updateFilterNotice('Select a company first to load campaigns.', 'warning');
+            reloadCampaignTable();
+            return;
+        }
+
+        $.ajax({
+            url: 'campcontact/getcampaigns',
+            type: 'GET',
+            dataType: 'json',
+            data: { company_id: companyId }
+        }).done(function(rows) {
+            let html = '<option value="">Select Campaign</option>';
+            rows = Array.isArray(rows) ? rows : [];
+
+            rows.forEach(function(row) {
+                html += '<option value="' + escapeHtml(row.id) + '">' + escapeHtml(row.name) + '</option>';
+            });
+
+            $('#contactCampaignSelect').html(html);
+
+            if (autoSelectFirst && rows.length > 0) {
+                $('#contactCampaignSelect').val(String(rows[0].id));
+                updateFilterNotice('Campaign selected. You can now choose Type (Agent, Answered, Not Answered).', 'info');
+            } else if (rows.length === 0) {
+                updateFilterNotice('No campaigns were found for the selected company.', 'warning');
+            }
+
+            reloadCampaignTable();
+        }).fail(function() {
+            $('#contactCampaignSelect').html('<option value="">Select Campaign</option>');
+            updateFilterNotice('Could not load campaigns right now.', 'warning');
+            reloadCampaignTable();
+        });
+    }
+
+    function loadFilterValues() {
+        const companyId = selectedCompanyId();
+        const campaignId = selectedCampaignId();
+        const filterType = selectedFilterType();
+
+        if (!campaignId) {
+            resetValueSelect('Select Value');
+            updateFilterNotice('Select a campaign to load today\'s contacts using the company PBX timezone.', 'info');
+            reloadCampaignTable();
+            return;
+        }
+
+        if (!filterType) {
+            resetValueSelect('Select Value');
+            updateFilterNotice('Campaign selected. You can now choose Type (Agent, Answered, Not Answered).', 'info');
+            reloadCampaignTable();
+            return;
+        }
+
+        $('#contactValueSelect')
+            .prop('disabled', true)
+            .html('<option value="">Loading values...</option>');
+
+        $.ajax({
+            url: 'campcontact/getfiltervalues',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                company_id: companyId,
+                campaign_id: campaignId,
+                filter_type: filterType
+            }
+        }).done(function(rows) {
+            let html = '<option value="">Select Value</option>';
+            rows = Array.isArray(rows) ? rows : [];
+
+            rows.forEach(function(row) {
+                html += '<option value="' + escapeHtml(row.value) + '">' + escapeHtml(row.label) + '</option>';
+            });
+
+            $('#contactValueSelect').html(html).prop('disabled', false);
+            reloadCampaignTable();
+        }).fail(function() {
+            resetValueSelect('Select Value');
+            updateFilterNotice('Could not load filter values right now.', 'warning');
+            reloadCampaignTable();
+        });
+    }
+
     // JIT Popover Initialization (Avoids jQuery UI Tooltip conflict)
     $('body').on('mouseenter', '[data-toggle="tooltip"]', function() {
         if (!$(this).data('bs.popover')) {
@@ -85,12 +217,17 @@ $(document).ready(function () {
         }
     });
 
-    $('#campaignTable').DataTable(
-    {
+    const contactTable = $('#campaignTable').DataTable({
         ajax: {
-            url: 'campcontact/getallcontact', // Replace with your actual PHP endpoint
+            url: 'campcontact/getallcontact',
             type: 'POST',
-            dataSrc: ''
+            dataSrc: '',
+            data: function(payload) {
+                payload.company_id = selectedCompanyId();
+                payload.campaign_id = selectedCampaignId();
+                payload.filter_type = selectedFilterType();
+                payload.filter_value = $('#contactValueSelect').val() || '';
+            }
         },
         columns: [
             { data: 'id' },
@@ -103,7 +240,7 @@ $(document).ready(function () {
             { data: 'last_try' },
             { data: 'last_try_dt' },
             { data: 'agent_name' },
-            { 
+            {
                 data: 'disposition',
                 render: function(data, type, row) {
                     if(data && type === 'display') {
@@ -113,41 +250,35 @@ $(document).ready(function () {
                     return data || '';
                 }
             },
-            { 
+            {
                 data: null,
                 render: function(data, type, row) {
                     if (parseInt(row.attempts_used) > 0) {
-                        // Use encodeURIComponent to safely transport notes (newlines, quotes)
-                        var safeNotes = encodeURIComponent(row.notes || "");
-                        var lastNote = "";
-                        var tooltipTitle = "";
+                        var safeNotes = encodeURIComponent(row.notes || '');
+                        var lastNote = '';
+                        var tooltipTitle = '';
 
-                        // Parse Notes (JSON or String)
                         if(row.notes) {
                             try {
                                 var parsed = JSON.parse(row.notes);
                                 if(Array.isArray(parsed) && parsed.length > 0) {
-                                    // JSON Format: [{date, user, note}, ...]
-                                    // Last entry is at the end? logic in backend appends.
                                     var last = parsed[parsed.length - 1];
-                                    tooltipTitle = (last.date || "") + "<br>" + (last.note || "") + "<br>By: " + (last.user || "Unknown");
+                                    tooltipTitle = (last.date || '') + '<br>' + (last.note || '') + '<br>By: ' + (last.user || 'Unknown');
                                 } else {
-                                    throw "Not Array";
+                                    throw 'Not Array';
                                 }
                             } catch(e) {
-                                // Legacy String Format
                                 var lines = row.notes.split('\n');
                                 for(var i=lines.length-1; i>=0; i--) {
-                                     if(lines[i].trim() !== "") {
+                                     if(lines[i].trim() !== '') {
                                          lastNote = lines[i];
                                          break;
                                      }
                                 }
                                 if(lastNote) {
-                                    // Match: [timestamp] user: note
                                     var match = lastNote.match(/^\[(.*?)\] (.*?): (.*)$/);
                                     if(match) {
-                                        tooltipTitle = match[1] + "<br>" + match[3] + "<br>By: " + match[2];
+                                        tooltipTitle = match[1] + '<br>' + match[3] + '<br>By: ' + match[2];
                                     } else {
                                         tooltipTitle = lastNote;
                                     }
@@ -155,16 +286,14 @@ $(document).ready(function () {
                             }
                         }
 
-                        // Use data-tooltip-content to store HTML content, avoid 'title' attribute to prevent double tooltip
                         var tooltipAttr = tooltipTitle ? 'data-toggle="tooltip" data-html="true" data-tooltip-content="'+tooltipTitle.replace(/"/g, '&quot;')+'"' : '';
                         var iconHtml = tooltipTitle ? '<i class="fas fa-sticky-note text-primary mr-2" style="cursor:pointer; font-size: 1.2em;" '+tooltipAttr+'></i>' : '<span class="mr-4"></span>';
-
                         var nextCall = row.next_call_at || '';
-                        
-                        return '<div class="d-flex align-items-center justify-content-center">' + 
-                               iconHtml + 
-                               '<button class="btn btn-sm btn-info open-dispo" data-id="'+row.id+'" data-notes="'+safeNotes+'" data-disposition="'+row.disposition+'" data-schedule="'+nextCall+'">Disposition</button>' +
-                               '</div>';
+
+                        return '<div class="d-flex align-items-center justify-content-center">'
+                               + iconHtml
+                               + '<button class="btn btn-sm btn-info open-dispo" data-id="'+row.id+'" data-notes="'+safeNotes+'" data-disposition="'+row.disposition+'" data-schedule="'+nextCall+'">Disposition</button>'
+                               + '</div>';
                     }
                     return '';
                 }
@@ -175,12 +304,58 @@ $(document).ready(function () {
             return: true
         },
         language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search all columns"
+            search: '_INPUT_',
+            searchPlaceholder: 'Search all columns'
         },
-        "order": [[0, "desc"]]
+        order: [[0, 'desc']]
     });
 
+    $('#contactCompanySelect').on('change', function() {
+        loadCampaigns(true);
+    });
+
+    $('#contactCampaignSelect').on('change', function() {
+        $('#contactTypeSelect').val('');
+        resetValueSelect('Select Value');
+        if ($(this).val()) {
+            updateFilterNotice('Campaign selected. You can now choose Type (Agent, Answered, Not Answered).', 'info');
+        } else {
+            updateFilterNotice('Select a campaign to load today\'s contacts using the company PBX timezone.', 'info');
+        }
+        reloadCampaignTable();
+    });
+
+    $('#contactTypeSelect').on('change', function() {
+        loadFilterValues();
+    });
+
+    $('#contactValueSelect').on('change', function() {
+        reloadCampaignTable();
+    });
+
+    $('#clearContactFilters').on('click', function() {
+        $('#contactTypeSelect').val('');
+        resetValueSelect('Select Value');
+        if (selectedCompanyId()) {
+            loadCampaigns(true);
+        } else {
+            $('#contactCampaignSelect').html('<option value="">Select Campaign</option>');
+            updateFilterNotice('Select a company first to load campaigns.', 'warning');
+            reloadCampaignTable();
+        }
+    });
+
+    if (!selectedCompanyId() && isSuperAdmin && $('#contactCompanySelect option').length > 1) {
+        $('#contactCompanySelect').val($('#contactCompanySelect option').eq(1).val());
+    }
+
+    if (selectedCompanyId()) {
+        loadCampaigns(true);
+    } else {
+        resetValueSelect('Select Value');
+        updateFilterNotice('Select a company first to load campaigns.', 'warning');
+        contactTable.ajax.reload();
+    }
 
     // Populate Disposition Dropdown on Load
     $.ajax({
@@ -311,16 +486,22 @@ function deleteAllContacts() {
     return;
   }
 
-  // Optional: disable button during request
   const btn = document.getElementById('deleteAllBtn');
+  const filterPanel = document.getElementById('campaignContactFilters');
+  const companySelect = document.getElementById('contactCompanySelect');
+  const campaignSelect = document.getElementById('contactCampaignSelect');
+  const isSuperAdmin = String((filterPanel && filterPanel.getAttribute('data-is-super-admin')) || '0') === '1';
+  const companyId = isSuperAdmin ? (companySelect ? companySelect.value : '') : ((filterPanel && filterPanel.getAttribute('data-company-id')) || (companySelect ? companySelect.value : ''));
+  const campaignId = campaignSelect ? campaignSelect.value : '';
+
   btn.disabled = true;
   btn.textContent = 'Deleting...';
 
-  fetch('campcontact/delete_all_contacts')
+  fetch('campcontact/delete_all_contacts?company_id=' + encodeURIComponent(companyId || '') + '&campaign_id=' + encodeURIComponent(campaignId || ''))
     .then(response => response.text())
     .then(data => {
       alert('All contacts deleted successfully.');
-      $('#campaignTable').DataTable().ajax.reload(); // reload table
+      $('#campaignTable').DataTable().ajax.reload();
     })
     .catch(error => {
       alert('Error deleting contacts.');
