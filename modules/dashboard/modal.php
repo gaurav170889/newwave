@@ -36,30 +36,59 @@ Class Dashboard_modal{
     {
         $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
         $columnName = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-        $query = $this->conn->query("SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'");
-        return $query && mysqli_num_rows($query) > 0;
+
+        try {
+            $query = $this->conn->query("SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'");
+            return $query && mysqli_num_rows($query) > 0;
+        } catch (\Throwable $exception) {
+            error_log('Dashboard column lookup error: ' . $exception->getMessage() . ' | Table: ' . $tableName . ' | Column: ' . $columnName);
+            return false;
+        }
+    }
+
+    private function resolveColumn($tableName, $primaryColumn, $fallbackColumn = null)
+    {
+        if ($this->hasColumn($tableName, $primaryColumn)) {
+            return $primaryColumn;
+        }
+
+        if ($fallbackColumn !== null && $this->hasColumn($tableName, $fallbackColumn)) {
+            return $fallbackColumn;
+        }
+
+        return null;
     }
 
     private function fetchAssoc($sql)
     {
-        $result = $this->conn->query($sql);
-        if (!$result) {
-            error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+        try {
+            $result = $this->conn->query($sql);
+            if (!$result) {
+                error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+                return [];
+            }
+
+            return mysqli_fetch_assoc($result) ?: [];
+        } catch (\Throwable $exception) {
+            error_log('Dashboard SQL exception: ' . $exception->getMessage() . ' | Query: ' . $sql);
             return [];
         }
-
-        return mysqli_fetch_assoc($result) ?: [];
     }
 
     private function fetchAll($sql)
     {
-        $result = $this->conn->query($sql);
-        if (!$result) {
-            error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+        try {
+            $result = $this->conn->query($sql);
+            if (!$result) {
+                error_log('Dashboard SQL error: ' . mysqli_error($this->conn) . ' | Query: ' . $sql);
+                return [];
+            }
+
+            return mysqli_fetch_all($result, MYSQLI_ASSOC) ?: [];
+        } catch (\Throwable $exception) {
+            error_log('Dashboard SQL exception: ' . $exception->getMessage() . ' | Query: ' . $sql);
             return [];
         }
-
-        return mysqli_fetch_all($result, MYSQLI_ASSOC) ?: [];
     }
 
     private function buildDateExpression($tableName, $primaryColumn, $fallbackColumn = null, $alias = '')
@@ -124,8 +153,14 @@ Class Dashboard_modal{
     private function tableExists($tableName)
     {
         $tableName = $this->escape($tableName);
-        $query = $this->conn->query("SHOW TABLES LIKE '{$tableName}'");
-        return $query && mysqli_num_rows($query) > 0;
+
+        try {
+            $query = $this->conn->query("SHOW TABLES LIKE '{$tableName}'");
+            return $query && mysqli_num_rows($query) > 0;
+        } catch (\Throwable $exception) {
+            error_log('Dashboard table lookup error: ' . $exception->getMessage() . ' | Table: ' . $tableName);
+            return false;
+        }
     }
 
     private function getRateRows($startDate, $endDate, $companyId = 0)
@@ -138,26 +173,31 @@ Class Dashboard_modal{
         $endDate = $this->escape($endDate);
         $companyFilter = $this->companyCondition('r', $companyId, 'rate', true);
         $dateExpression = $this->buildDateExpression('rate', 'created_at', 'start_date', 'r');
-        $rows = [];
+        $hasAgentTable = $this->tableExists('agent');
+        $agentExtColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_ext') : null;
+        $agentIdColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_id') : null;
+        $agentNameColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_name') : null;
+        $agentJoin = ($hasAgentTable && $agentExtColumn)
+            ? " LEFT JOIN agent a ON a.`{$agentExtColumn}` = r.agentno" . ($agentIdColumn ? " OR CAST(a.`{$agentIdColumn}` AS CHAR) = r.agentno" : '')
+            : '';
+        $agentExtExpression = ($agentJoin !== '' && $agentExtColumn)
+            ? "a.`{$agentExtColumn}`"
+            : 'NULL';
+        $agentNameExpression = ($agentJoin !== '' && $agentNameColumn)
+            ? "a.`{$agentNameColumn}`"
+            : "''";
 
         $sql = "SELECT r.agentno,
                        {$dateExpression} AS rating_date,
                        r.ratings_json,
-                       COALESCE(a.agent_ext, r.agentno, 'Unassigned') AS agent_ext,
-                       COALESCE(a.agent_name, '') AS agent_name
-                FROM rate r
-                LEFT JOIN agent a ON a.agent_ext = r.agentno OR CAST(a.agent_id AS CHAR) = r.agentno
+                       COALESCE({$agentExtExpression}, r.agentno, 'Unassigned') AS agent_ext,
+                       COALESCE({$agentNameExpression}, '') AS agent_name
+                FROM rate r{$agentJoin}
                 WHERE {$dateExpression} >= '{$startDate} 00:00:00'
                   AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
                 ORDER BY {$dateExpression} DESC";
 
-        if ($result = $this->conn->query($sql)) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $rows[] = $row;
-            }
-        }
-
-        return $rows;
+        return $this->fetchAll($sql);
     }
 
     private function extractRatingValues($ratingsJson)
@@ -506,12 +546,19 @@ Class Dashboard_modal{
         $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
         $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
         $uniqueExpression = $this->getUniqueNumberExpression('d');
-        $hasCampaignTable = $this->tableExists('campaign') && $this->hasColumn('dialer_call_log', 'campaign_id');
-        $campaignNameExpression = $hasCampaignTable
-            ? "COALESCE(c.name, CONCAT('Campaign #', d.campaign_id))"
-            : "'General Activity'";
-        $campaignJoin = $hasCampaignTable ? " LEFT JOIN campaign c ON c.id = d.campaign_id" : '';
-        $groupBy = $hasCampaignTable ? 'd.campaign_id, c.name' : $campaignNameExpression;
+        $hasCampaignId = $this->hasColumn('dialer_call_log', 'campaign_id');
+        $hasCampaignTable = $hasCampaignId && $this->tableExists('campaign');
+        $campaignIdColumn = $hasCampaignTable ? $this->resolveColumn('campaign', 'id') : null;
+        $campaignNameColumn = $hasCampaignTable ? $this->resolveColumn('campaign', 'name') : null;
+        $campaignJoin = ($hasCampaignTable && $campaignIdColumn)
+            ? " LEFT JOIN campaign c ON c.`{$campaignIdColumn}` = d.campaign_id"
+            : '';
+        $campaignNameExpression = ($campaignJoin !== '' && $campaignNameColumn)
+            ? "COALESCE(c.`{$campaignNameColumn}`, CONCAT('Campaign #', d.campaign_id))"
+            : ($hasCampaignId ? "CONCAT('Campaign #', d.campaign_id)" : "'General Activity'");
+        $groupBy = $hasCampaignId
+            ? 'd.campaign_id' . (($campaignJoin !== '' && $campaignNameColumn) ? ", c.`{$campaignNameColumn}`" : '')
+            : $campaignNameExpression;
 
         $query = "SELECT {$campaignNameExpression} AS campaign_name,
                          COUNT(*) AS total_calls,
@@ -545,15 +592,21 @@ Class Dashboard_modal{
             ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
             : '0';
         $hasAgentId = $this->hasColumn('dialer_call_log', 'agent_id');
-        $agentExtExpression = $hasAgentId
-            ? "COALESCE(a.agent_ext, NULLIF(TRIM(d.agent_id), ''), 'Unassigned')"
-            : "'Unassigned'";
-        $agentNameExpression = $this->tableExists('agent')
-            ? "COALESCE(a.agent_name, '')"
-            : "''";
-        $agentJoin = ($this->tableExists('agent') && $hasAgentId)
-            ? " LEFT JOIN agent a ON a.agent_ext = d.agent_id OR CAST(a.agent_id AS CHAR) = d.agent_id"
+        $hasAgentTable = $hasAgentId && $this->tableExists('agent');
+        $agentExtColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_ext') : null;
+        $agentNameColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_name') : null;
+        $agentPkColumn = $hasAgentTable ? $this->resolveColumn('agent', 'agent_id') : null;
+        $agentJoin = ($hasAgentTable && $agentExtColumn)
+            ? " LEFT JOIN agent a ON a.`{$agentExtColumn}` = d.agent_id" . ($agentPkColumn ? " OR CAST(a.`{$agentPkColumn}` AS CHAR) = d.agent_id" : '')
             : '';
+        $agentExtExpression = $hasAgentId
+            ? (($agentJoin !== '' && $agentExtColumn)
+                ? "COALESCE(a.`{$agentExtColumn}`, NULLIF(TRIM(d.agent_id), ''), 'Unassigned')"
+                : "COALESCE(NULLIF(TRIM(d.agent_id), ''), 'Unassigned')")
+            : "'Unassigned'";
+        $agentNameExpression = ($agentJoin !== '' && $agentNameColumn)
+            ? "COALESCE(a.`{$agentNameColumn}`, '')"
+            : "''";
 
         $query = "SELECT {$agentExtExpression} AS agent_ext,
                          {$agentNameExpression} AS agent_name,
