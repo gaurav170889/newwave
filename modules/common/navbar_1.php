@@ -97,19 +97,19 @@
 
 					<?php if($isAdmin): ?>
 					<li class="sidebar-item Users">
-						<a class="sidebar-link" href="<?php echo NAVURL;?>users/">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=users/index">
 							<i class="align-middle" data-feather="user"></i> <span class="align-middle">Users</span>
 						</a>
 					</li>
 
 					<li class="sidebar-item Group">
-						<a class="sidebar-link" href="<?php echo NAVURL;?>group/">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=group/index">
 							<i class="align-middle" data-feather="users"></i> <span class="align-middle">Group</span>
 						</a>
 					</li>
 
 					<li class="sidebar-item Agent">
-						<a class="sidebar-link" href="<?php echo NAVURL;?>agent/">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=agent/index">
 							<i class="align-middle" data-feather="credit-card"></i> <span class="align-middle">Agents</span>
 						</a>
 					</li>
@@ -123,22 +123,22 @@
 						<ul id="campaign" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
 							<!-- Ideally Module should also be restricted if it's administration -->
                             <?php if($isAdmin): ?>
-							<li class="sidebar-item Module"><a class="sidebar-link" href="<?php echo NAVURL;?>campaign/">Module</a></li>
+							<li class="sidebar-item Module"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=campaign/index">Module</a></li>
                             <?php endif; ?>
                             
-                            <li class="sidebar-item Skipnum"><a class="sidebar-link" href="<?php echo NAVURL;?>campaign/skipped">Skipnum</a></li>
+                            <li class="sidebar-item Skipnum"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=campaign/skipped">Skipnum</a></li>
                             
                             <?php if(isset($show_outprefix) && $show_outprefix): ?>
-                            <li class="sidebar-item Outprefix"><a class="sidebar-link" href="<?php echo NAVURL;?>outprefix/">Outprefix</a></li>
-							<li class="sidebar-item Did"><a class="sidebar-link" href="<?php echo NAVURL;?>did/">Did</a></li>
+                            <li class="sidebar-item Outprefix"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=outprefix/index">Outprefix</a></li>
+							<li class="sidebar-item Did"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=did/index">Did</a></li>
                             <?php endif; ?>
                             
                             <?php if(isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin'): ?>
-							<li class="sidebar-item Importnum"><a class="sidebar-link" href="<?php echo NAVURL;?>campaign/importlog">Importnum</a></li>
+							<li class="sidebar-item Importnum"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=campaign/importlog">Importnum</a></li>
                             <?php endif; ?>
                             
-                            <li class="sidebar-item Campcontact Contacts"><a class="sidebar-link" href="<?php echo NAVURL;?>campcontact/">Contacts</a></li>
-                            <li class="sidebar-item Disposition"><a class="sidebar-link" href="<?php echo NAVURL;?>disposition/">Disposition</a></li>
+                            <li class="sidebar-item Campcontact Contacts"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=campcontact/index">Contacts</a></li>
+                            <li class="sidebar-item Disposition"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=disposition/index">Disposition</a></li>
 						</ul>
 					</li>
 					
@@ -164,12 +164,12 @@
 						</a>
 						<ul id="ratingreport" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
                             <li class="sidebar-item Report">
-                                <a class="sidebar-link" href="<?php echo NAVURL;?>report/">
+                                <a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=report/index">
                                     <span class="align-middle">Agent Summary</span>
                                 </a>
                             </li>
                             <li class="sidebar-item Asingle">
-                                <a class="sidebar-link" href="<?php echo NAVURL;?>asingle/">
+                                <a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=asingle/index">
                                     <span class="align-middle">Agent Survey</span>
                                 </a>
                             </li>
@@ -203,7 +203,7 @@
 					</li>-->
 
 	<li class="sidebar-item Settings">
-						<a class="sidebar-link" href="<?php echo NAVURL;?>settings/">
+						<a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=settings/index">
 							<i class="align-middle" data-feather="settings"></i> <span class="align-middle">Settings</span>
 						</a>
 					</li>
