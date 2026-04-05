@@ -24,9 +24,15 @@
             </select>
           </div>
           <div class="form-group col-md-4">
-            <label for="notDialedDpdSelect">Days Past Due (multi-select)</label>
-            <select class="form-control" id="notDialedDpdSelect" multiple size="5"></select>
-            <small class="form-text text-muted">Leave empty to show all DPD values.</small>
+            <label for="notDialedDpdSelect">Days Past Due (search + multi-select)</label>
+            <select class="selectpicker" id="notDialedDpdSelect" multiple
+                    data-width="100%"
+                    data-live-search="true"
+                    data-actions-box="true"
+                    data-size="8"
+                    data-selected-text-format="count > 2"
+                    title="Search and select Days Past Due"></select>
+            <small class="form-text text-muted">Search and select one or more DPD values, or leave empty to show all.</small>
           </div>
           <div class="form-group col-md-2">
             <button type="button" class="btn btn-outline-secondary btn-block" id="clearNotDialedFilters">Clear Filters</button>
@@ -87,8 +93,11 @@
 </main>
 
 <style>
-#notDialedDpdSelect {
-  min-height: 120px;
+#notDialedPanel .bootstrap-select {
+  width: 100% !important;
+}
+#notDialedPanel .bootstrap-select .dropdown-toggle {
+  height: calc(2.25rem + 2px);
 }
 .schedule-days-group .form-check {
   min-width: 110px;
@@ -113,6 +122,16 @@ $(document).ready(function() {
     return $('#notDialedCampaignSelect').val() || '';
   }
 
+  if ($.fn.selectpicker) {
+    $('#notDialedDpdSelect').selectpicker();
+  }
+
+  function refreshDpdSelect() {
+    if ($.fn.selectpicker) {
+      $('#notDialedDpdSelect').selectpicker('refresh');
+    }
+  }
+
   function selectedDpdValues() {
     return $('#notDialedDpdSelect').val() || [];
   }
@@ -135,6 +154,7 @@ $(document).ready(function() {
     const companyId = selectedCompanyId();
     $('#notDialedCampaignSelect').html('<option value="">Loading campaigns...</option>');
     $('#notDialedDpdSelect').html('');
+    refreshDpdSelect();
 
     if (!companyId) {
       $('#notDialedCampaignSelect').html('<option value="">Select Campaign</option>');
@@ -179,6 +199,7 @@ $(document).ready(function() {
 
     if (!companyId || !campaignId) {
       $('#notDialedDpdSelect').html('');
+      refreshDpdSelect();
       reloadTable();
       return;
     }
@@ -200,9 +221,11 @@ $(document).ready(function() {
       });
 
       $('#notDialedDpdSelect').html(html);
+      refreshDpdSelect();
       reloadTable();
     }).fail(function() {
       $('#notDialedDpdSelect').html('');
+      refreshDpdSelect();
       updateStatus('Could not load Days Past Due values right now.', 'warning');
       reloadTable();
     });
@@ -264,6 +287,7 @@ $(document).ready(function() {
 
   $('#clearNotDialedFilters').on('click', function() {
     $('#notDialedDpdSelect').val([]);
+    refreshDpdSelect();
     $('.notdialed-schedule-day').prop('checked', false);
     $('#notDialedScheduleTime').val('09:00');
     loadCampaigns(true);
