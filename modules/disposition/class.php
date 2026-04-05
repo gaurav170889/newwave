@@ -19,7 +19,7 @@ Class Disposition{
 		}
 
         $data = $this->modal->select("dialer_disposition_master");
-        include("view/index.php");
+        include(__DIR__ . "/view/index.php");
 		
 		include('modules/common/dispositionfooter.php');
 	}

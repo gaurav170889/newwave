@@ -11,7 +11,7 @@ Class Report{
 		
 		//$data = $this->modal->getdata("rate");
 		//$counter = 1 ;
-		include("view/newindex.php");
+		include(__DIR__ . "/view/newindex.php");
 		//$this->record();
 		include('modules/common/reportfooter.php');
 		

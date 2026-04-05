@@ -23,7 +23,7 @@ Class Agent{
 		{
 			//$qagent = $this->getagent();
 			
-			include("view/notadmin.php");
+			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
@@ -32,7 +32,7 @@ Class Agent{
 		$group = $this->modal->groupassoc("agentgroup");
 		//print_r($group);
 		$counter = 1;
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 		//$this->record();
 		}
 		include('modules/common/agentfooter.php');
@@ -42,7 +42,7 @@ Class Agent{
 	/*public function record()
 	{
 		
-		include("view/record.php");
+		include(__DIR__ . "/view/record.php");
 	}*/
 	
 	public function updateprocess()

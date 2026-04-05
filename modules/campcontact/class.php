@@ -20,7 +20,7 @@ Class Campcontact{
 		{
 			//$qagent = $this->getagent();
 			
-			include("view/notadmin.php");
+			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
@@ -29,7 +29,7 @@ Class Campcontact{
 		//$group = $this->modal->groupassoc("agentgroup");
 		//print_r($group);
 	//	$counter = 1;
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 		//$this->record();
 		}
 		
@@ -40,7 +40,7 @@ Class Campcontact{
 	/*public function record()
 	{
 		
-		include("view/record.php");
+		include(__DIR__ . "/view/record.php");
 	}*/
 	
 	

@@ -22,7 +22,7 @@ class Did {
 
         include(INCLUDEPATH.'modules/common/campaignheader.php');
         include(INCLUDEPATH.'modules/common/navbar_1.php');
-        include("view/index.php");
+        include(__DIR__ . "/view/index.php");
         include(INCLUDEPATH.'modules/common/campaignfooter.php');
     }
 

@@ -19,7 +19,7 @@ Class Users{
 		{
 			//$qagent = $this->getagent();
 			
-			include("view/notadmin.php");
+			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
@@ -27,7 +27,7 @@ Class Users{
 		//$group = $this->modal->groupassoc("agentgroup");
 		//print_r($group);
 		$counter = 1;
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 		}
 		include('modules/common/footer_1.php');
 		
@@ -54,7 +54,7 @@ Class Users{
 		
 
 		}
-		include("view/record.php");
+		include(__DIR__ . "/view/record.php");
 	}
 	
 	public function getagent()

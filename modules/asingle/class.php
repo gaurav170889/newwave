@@ -8,7 +8,7 @@ Class Asingle{
         $_SESSION['navurl'] = 'Asingle';
 		include('modules/common/header.php');
 		include('modules/common/navbar_1.php');
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 		include('modules/common/footer_1.php');
 	}
 	

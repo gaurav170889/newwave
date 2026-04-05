@@ -26,7 +26,7 @@ Class Dashboard{
             'last_month' => 'Last Month',
         ];
 
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 	}
 
     public function rates(){
@@ -53,7 +53,7 @@ Class Dashboard{
         ];
         $counter = 1;
 
-        include("view/rates.php");
+        include(__DIR__ . "/view/rates.php");
     }
 	
 	public function goga(){

@@ -23,13 +23,13 @@ Class Group{
 		{
 			//$qagent = $this->getagent();
 			
-			include("view/notadmin.php");
+			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
 			$data = $this->modal->select("agentgroup");
 			$counter = 1;
-			include("view/index.php");
+			include(__DIR__ . "/view/index.php");
 		}
 		include('modules/common/groupfooter.php');
 		 
@@ -38,7 +38,7 @@ Class Group{
 	/*public function record()
 	{
 		
-		include("view/record.php");
+		include(__DIR__ . "/view/record.php");
 	}*/
 	
 	public function updateprocess()

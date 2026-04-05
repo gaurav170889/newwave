@@ -20,7 +20,7 @@ Class Campaign{
 		{
 			//$qagent = $this->getagent();
 			
-			include("view/notadmin.php");
+			include(__DIR__ . "/view/notadmin.php");
 		}
 		else
 		{
@@ -35,7 +35,7 @@ Class Campaign{
             $companies = $this->modal->getCompanies();
         }
         
-		include("view/index.php");
+		include(__DIR__ . "/view/index.php");
 		//$this->record();
 		}
 		
@@ -46,7 +46,7 @@ Class Campaign{
 	/*public function record()
 	{
 		
-		include("view/record.php");
+		include(__DIR__ . "/view/record.php");
 	}*/
 	public function toggle_campaign_status()
 	{
