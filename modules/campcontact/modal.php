@@ -27,24 +27,49 @@ Class Campcontact_modal{
 	}
 	
     public function getallcontact() {
-         $where = "";
+         $whereClauses = [];
+         $companyId = isset($_SESSION['company_id']) ? intval($_SESSION['company_id']) : 0;
+
+         if ($companyId > 0) {
+             $whereClauses[] = "c.company_id = '{$companyId}'";
+         }
+
+         // Show only contacts that have NOT been dialed by the system yet.
+         $whereClauses[] = "COALESCE(c.attempts_used, 0) = 0";
+         $whereClauses[] = "NOT EXISTS (
+                                SELECT 1
+                                FROM dialer_call_log dl
+                                WHERE dl.company_id = c.company_id
+                                  AND dl.campaign_id = c.campaignid
+                                  AND (
+                                      dl.campaignnumber_id = c.id
+                                      OR (
+                                          NULLIF(TRIM(COALESCE(dl.caller_id, '')), '') IS NOT NULL
+                                          AND (dl.caller_id = c.phone_e164 OR dl.caller_id = c.phone_raw)
+                                      )
+                                  )
+                                  AND UPPER(COALESCE(dl.call_status, '')) <> 'MANUAL_DISPO'
+                            )";
+
          // Filter for agents only
          if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'uagent') {
-             $zid = $_SESSION['pid'];
+             $zid = intval($_SESSION['pid'] ?? 0);
              $u_query = "SELECT agentid FROM users WHERE id = '$zid'";
              $u_res = mysqli_query($this->conn, $u_query);
              $agent_id = 0;
              if ($u_res && mysqli_num_rows($u_res) > 0) {
                  $u_row = mysqli_fetch_assoc($u_res);
-                 $agent_id = $u_row['agentid'];
+                 $agent_id = intval($u_row['agentid'] ?? 0);
              }
              
-             if ($agent_id) {
-                 $where = "WHERE c.agent_connected = '$agent_id'";
+             if ($agent_id > 0) {
+                 $whereClauses[] = "c.agent_connected = '$agent_id'";
              } else {
-                 $where = "WHERE 1=0"; 
+                 $whereClauses[] = "1=0";
              }
          }
+
+         $where = !empty($whereClauses) ? ('WHERE ' . implode(' AND ', $whereClauses)) : '';
 
          // New Schema Query
          $query = "SELECT c.id, c.phone_e164, c.first_name, c.last_name, c.days_past_due,
