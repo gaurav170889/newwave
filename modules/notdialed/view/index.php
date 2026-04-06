@@ -24,9 +24,20 @@
             </select>
           </div>
           <div class="form-group col-md-4">
-            <label for="notDialedDpdSelect">Days Past Due (search + multi-select)</label>
+            <label for="notDialedDpdSelect">
+              Days Past Due (search + multi-select)
+              <button type="button"
+                      class="btn btn-link btn-sm text-info p-0 ml-1 align-baseline notDialedInfoBtn"
+                      data-toggle="popover"
+                      data-trigger="focus"
+                      data-placement="top"
+                      data-html="true"
+                      data-content="Search and select one or more DPD values, or leave empty to show all."
+                      aria-label="Days Past Due help">
+                <i class="fas fa-info-circle"></i>
+              </button>
+            </label>
             <select class="form-control" id="notDialedDpdSelect" multiple="multiple"></select>
-            <small class="form-text text-muted">Search and select one or more DPD values, or leave empty to show all.</small>
           </div>
           <div class="form-group col-md-2">
             <button type="button" class="btn btn-outline-secondary btn-block" id="clearNotDialedFilters">Clear Filters</button>
@@ -105,6 +116,10 @@
   color: rgba(255, 255, 255, 0.85);
   margin-right: 6px;
 }
+#notDialedPanel .notDialedInfoBtn {
+  text-decoration: none;
+  box-shadow: none !important;
+}
 .schedule-days-group .form-check {
   min-width: 110px;
 }
@@ -115,6 +130,8 @@ $(document).ready(function() {
   const panel = $('#notDialedPanel');
   const isSuperAdmin = String(panel.data('is-super-admin') || '0') === '1';
   const defaultCompanyId = String(panel.data('company-id') || $('#notDialedCompanySelect').val() || '');
+
+  $('[data-toggle="popover"]').popover();
 
   function escapeHtml(value) {
     return $('<div>').text(value || '').html();
