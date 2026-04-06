@@ -83,7 +83,89 @@ class Notdialed_modal {
             return [];
         }
 
-        return $this->fetchRows("SELECT id, name FROM campaign WHERE company_id = {$companyId} AND is_deleted = 0 ORDER BY name ASC");
+        $rows = $this->fetchRows("SELECT id, name, weekdays, starttime, stoptime FROM campaign WHERE company_id = {$companyId} AND is_deleted = 0 ORDER BY name ASC");
+        foreach ($rows as &$row) {
+            $settings = $this->getCampaignScheduleSettings($companyId, intval($row['id'] ?? 0), $row);
+            $row['weekdays'] = $settings['allowed_weekdays'];
+            $row['timezone'] = $settings['timezone'];
+            $row['today_label'] = $settings['today_label'];
+            $row['min_time'] = $settings['min_time'];
+            $row['max_time'] = $settings['max_time'];
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    private function normalizeWeekdays($rawWeekdays)
+    {
+        $allowedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $values = [];
+
+        if (is_array($rawWeekdays)) {
+            $values = $rawWeekdays;
+        } else {
+            $rawWeekdays = trim((string) $rawWeekdays);
+            if ($rawWeekdays !== '') {
+                $decoded = json_decode($rawWeekdays, true);
+                $values = is_array($decoded) ? $decoded : explode(',', $rawWeekdays);
+            }
+        }
+
+        $normalized = [];
+        foreach ($values as $day) {
+            $candidate = ucfirst(strtolower(trim((string) $day)));
+            if (in_array($candidate, $allowedDays, true)) {
+                $normalized[] = $candidate;
+            }
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    private function getCampaignScheduleSettings($companyId, $campaignId = 0, array $campaignRow = [])
+    {
+        $timezone = $this->getCompanyTimezone($companyId);
+        $todayLabel = (new DateTimeImmutable('now', new DateTimeZone($timezone)))->format('Y-m-d');
+        $allowedWeekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $minTime = '09:00';
+        $maxTime = '18:00';
+
+        if (empty($campaignRow) && $campaignId > 0) {
+            $rows = $this->fetchRows("SELECT weekdays, starttime, stoptime FROM campaign WHERE company_id = {$companyId} AND id = {$campaignId} AND is_deleted = 0 LIMIT 1");
+            if (!empty($rows)) {
+                $campaignRow = $rows[0];
+            }
+        }
+
+        if (!empty($campaignRow)) {
+            $campaignWeekdays = $this->normalizeWeekdays($campaignRow['weekdays'] ?? []);
+            if (!empty($campaignWeekdays)) {
+                $allowedWeekdays = $campaignWeekdays;
+            }
+
+            $campaignStart = substr(trim((string) ($campaignRow['starttime'] ?? '')), 0, 5);
+            $campaignStop = substr(trim((string) ($campaignRow['stoptime'] ?? '')), 0, 5);
+
+            if (preg_match('/^\d{2}:\d{2}$/', $campaignStart) && $campaignStart > $minTime) {
+                $minTime = $campaignStart;
+            }
+            if (preg_match('/^\d{2}:\d{2}$/', $campaignStop) && $campaignStop < $maxTime) {
+                $maxTime = $campaignStop;
+            }
+            if ($minTime > $maxTime) {
+                $minTime = '09:00';
+                $maxTime = '18:00';
+            }
+        }
+
+        return [
+            'timezone' => $timezone,
+            'today_label' => $todayLabel,
+            'allowed_weekdays' => $allowedWeekdays,
+            'min_time' => $minTime,
+            'max_time' => $maxTime,
+        ];
     }
 
     private function buildNotDialedWhereSql($companyId, $campaignId = 0, array $daysPastDue = [])
@@ -216,82 +298,95 @@ class Notdialed_modal {
         return $response;
     }
 
-    private function normalizeScheduleDays(array $scheduleDays)
+    private function normalizeScheduleTime($scheduleTime, $fallback = '09:00')
     {
-        $allowedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $normalized = [];
-
-        foreach ($scheduleDays as $day) {
-            $candidate = ucfirst(strtolower(trim((string) $day)));
-            if (in_array($candidate, $allowedDays, true)) {
-                $normalized[] = $candidate;
-            }
-        }
-
-        return array_values(array_unique($normalized));
-    }
-
-    private function buildNextScheduleDateTime($companyId, array $scheduleDays, $scheduleTime = '')
-    {
-        $scheduleDays = $this->normalizeScheduleDays($scheduleDays);
-        if (empty($scheduleDays)) {
-            return null;
-        }
-
+        $scheduleTime = trim((string) $scheduleTime);
         if (!preg_match('/^\d{2}:\d{2}$/', $scheduleTime)) {
-            $scheduleTime = '09:00';
+            return $fallback;
         }
 
-        list($hours, $minutes) = array_map('intval', explode(':', $scheduleTime));
-        $companyTimezone = new DateTimeZone($this->getCompanyTimezone($companyId));
-        $appTimezone = new DateTimeZone(date_default_timezone_get());
-        $now = new DateTimeImmutable('now', $companyTimezone);
-        $candidates = [];
-
-        foreach ($scheduleDays as $dayName) {
-            $candidate = new DateTimeImmutable('today', $companyTimezone);
-            $candidate = $candidate->setTime($hours, $minutes, 0);
-
-            if ($candidate->format('l') !== $dayName) {
-                $candidate = $candidate->modify('next ' . $dayName);
-            } elseif ($candidate <= $now) {
-                $candidate = $candidate->modify('next ' . $dayName);
-            }
-
-            $candidates[] = $candidate;
-        }
-
-        usort($candidates, function ($left, $right) {
-            return $left <=> $right;
-        });
-
-        $nextSlot = reset($candidates);
-        if (!$nextSlot instanceof DateTimeImmutable) {
-            return null;
-        }
-
-        return $nextSlot->setTimezone($appTimezone)->format('Y-m-d H:i:s');
+        return $scheduleTime;
     }
 
-    private function buildScheduledExdata($rawExdata, array $scheduleDays, $scheduleTime, $nextCallAt)
+    private function buildScheduledDateTime($companyId, $campaignId, $scheduleDate = '', $scheduleTime = '')
+    {
+        $scheduleDate = trim((string) $scheduleDate);
+        $settings = $this->getCampaignScheduleSettings($companyId, $campaignId);
+
+        if ($scheduleDate === '') {
+            return [
+                'success' => true,
+                'state' => 'READY',
+                'next_call_at' => (new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())))->format('Y-m-d H:i:s'),
+                'display_time' => 'immediate',
+                'settings' => $settings,
+                'scheduled_date' => '',
+                'scheduled_time' => '',
+            ];
+        }
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $scheduleDate)) {
+            return ['success' => false, 'message' => 'Please select a valid schedule date.'];
+        }
+
+        $scheduleTime = $this->normalizeScheduleTime($scheduleTime, $settings['min_time']);
+        if ($scheduleTime < $settings['min_time'] || $scheduleTime > $settings['max_time']) {
+            return ['success' => false, 'message' => 'Schedule time must be between ' . $settings['min_time'] . ' and ' . $settings['max_time'] . ' in the PBX timezone.'];
+        }
+
+        $companyTimezone = new DateTimeZone($settings['timezone']);
+        $appTimezone = new DateTimeZone(date_default_timezone_get());
+        $scheduledAt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $scheduleDate . ' ' . $scheduleTime, $companyTimezone);
+
+        if (!$scheduledAt instanceof DateTimeImmutable) {
+            return ['success' => false, 'message' => 'Please select a valid schedule date and time.'];
+        }
+
+        $dayName = $scheduledAt->format('l');
+        if (!empty($settings['allowed_weekdays']) && !in_array($dayName, $settings['allowed_weekdays'], true)) {
+            return ['success' => false, 'message' => 'The selected date falls on ' . $dayName . ', but this campaign allows only: ' . implode(', ', $settings['allowed_weekdays']) . '.'];
+        }
+
+        $nowCompany = new DateTimeImmutable('now', $companyTimezone);
+        if ($scheduledAt <= $nowCompany) {
+            return ['success' => false, 'message' => 'Please select a future schedule date/time in the company PBX timezone.'];
+        }
+
+        return [
+            'success' => true,
+            'state' => 'SCHEDULED',
+            'next_call_at' => $scheduledAt->setTimezone($appTimezone)->format('Y-m-d H:i:s'),
+            'display_time' => $scheduledAt->format('Y-m-d H:i:s'),
+            'settings' => $settings,
+            'scheduled_date' => $scheduleDate,
+            'scheduled_time' => $scheduleTime,
+        ];
+    }
+
+    private function buildScheduledExdata($rawExdata, $scheduleDate, $scheduleTime, $nextCallAt)
     {
         $decoded = json_decode((string) $rawExdata, true);
         if (!is_array($decoded)) {
             $decoded = [];
         }
 
-        if (!empty($scheduleDays)) {
-            $decoded['redial_schedule_days'] = array_values($scheduleDays);
+        if ($scheduleDate !== '') {
+            $decoded['redial_schedule_date'] = $scheduleDate;
             $decoded['redial_schedule_time'] = $scheduleTime !== '' ? $scheduleTime : '09:00';
             $decoded['redial_next_call_at'] = $nextCallAt;
         } else {
-            unset($decoded['redial_schedule_days'], $decoded['redial_schedule_time'], $decoded['redial_next_call_at']);
+            unset(
+                $decoded['redial_schedule_days'],
+                $decoded['redial_schedule_date'],
+                $decoded['redial_schedule_time'],
+                $decoded['redial_next_call_at']
+            );
         }
 
         return mysqli_real_escape_string($this->conn, json_encode($decoded));
     }
 
-    public function moveToContacts($companyId, $campaignId, array $contactIds, array $scheduleDays = [], $scheduleTime = '')
+    public function moveToContacts($companyId, $campaignId, array $contactIds, $scheduleDate = '', $scheduleTime = '')
     {
         $companyId = intval($companyId);
         $campaignId = intval($campaignId);
@@ -307,15 +402,16 @@ class Notdialed_modal {
             return ['success' => false, 'message' => 'Please select at least one number.'];
         }
 
-        $scheduleDays = $this->normalizeScheduleDays($scheduleDays);
-        if ($scheduleTime !== '' && !preg_match('/^\d{2}:\d{2}$/', $scheduleTime)) {
-            $scheduleTime = '09:00';
+        $scheduleBuild = $this->buildScheduledDateTime($companyId, $campaignId, $scheduleDate, $scheduleTime);
+        if (empty($scheduleBuild['success'])) {
+            return ['success' => false, 'message' => $scheduleBuild['message'] ?? 'Could not validate the selected schedule.'];
         }
 
-        $nextCallAt = !empty($scheduleDays)
-            ? $this->buildNextScheduleDateTime($companyId, $scheduleDays, $scheduleTime)
-            : (new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())))->format('Y-m-d H:i:s');
-        $state = !empty($scheduleDays) ? 'SCHEDULED' : 'READY';
+        $nextCallAt = $scheduleBuild['next_call_at'] ?? null;
+        $state = $scheduleBuild['state'] ?? 'READY';
+        $scheduleDate = $scheduleBuild['scheduled_date'] ?? '';
+        $scheduleTime = $scheduleBuild['scheduled_time'] ?? '';
+
         $idsSql = implode(',', $contactIds);
         $campaignClause = $campaignId > 0 ? " AND campaignid = {$campaignId}" : '';
         $query = "SELECT id, exdata FROM campaignnumbers WHERE company_id = {$companyId}{$campaignClause} AND id IN ({$idsSql})";
@@ -328,7 +424,7 @@ class Notdialed_modal {
         $updated = 0;
         foreach ($rows as $row) {
             $contactId = intval($row['id']);
-            $exdataJson = $this->buildScheduledExdata($row['exdata'] ?? '', $scheduleDays, $scheduleTime, $nextCallAt);
+            $exdataJson = $this->buildScheduledExdata($row['exdata'] ?? '', $scheduleDate, $scheduleTime, $nextCallAt);
             $nextCallAtSql = $nextCallAt ? "'" . mysqli_real_escape_string($this->conn, $nextCallAt) . "'" : 'NOW()';
             $sql = "UPDATE campaignnumbers
                     SET state = '" . mysqli_real_escape_string($this->conn, $state) . "',
@@ -351,8 +447,8 @@ class Notdialed_modal {
         }
 
         $message = $updated . ' number(s) moved to Contacts.';
-        if (!empty($scheduleDays)) {
-            $message .= ' Next dial slot: ' . $nextCallAt . ' (' . implode(', ', $scheduleDays) . ').';
+        if ($state === 'SCHEDULED') {
+            $message .= ' Scheduled for ' . ($scheduleBuild['display_time'] ?? $nextCallAt) . ' (' . ($scheduleBuild['settings']['timezone'] ?? 'PBX timezone') . ').';
         } else {
             $message .= ' They are ready for dialing now.';
         }
@@ -362,6 +458,7 @@ class Notdialed_modal {
             'message' => $message,
             'state' => $state,
             'next_call_at' => $nextCallAt,
+            'timezone' => $scheduleBuild['settings']['timezone'] ?? '',
         ];
     }
 }

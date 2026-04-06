@@ -46,24 +46,23 @@
 
         <div class="form-group mb-2">
           <label class="d-block mb-2">Schedule the selected numbers for dialing</label>
-          <div class="d-flex flex-wrap schedule-days-group mb-2">
-            <?php foreach (['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day): ?>
-              <div class="form-check mr-3 mb-2">
-                <input class="form-check-input notdialed-schedule-day" type="checkbox" name="schedule_days[]" value="<?php echo $day; ?>" id="day_<?php echo strtolower($day); ?>">
-                <label class="form-check-label" for="day_<?php echo strtolower($day); ?>"><?php echo $day; ?></label>
-              </div>
-            <?php endforeach; ?>
-          </div>
           <div class="form-row align-items-end">
             <div class="form-group col-md-3 mb-2">
-              <label for="notDialedScheduleTime">Preferred Time</label>
-              <input type="time" class="form-control" id="notDialedScheduleTime" value="09:00">
+              <label for="notDialedScheduleDate">Schedule Date</label>
+              <input type="date" class="form-control" id="notDialedScheduleDate">
             </div>
             <div class="form-group col-md-3 mb-2">
+              <label for="notDialedScheduleTime">Preferred Time</label>
+              <input type="time" class="form-control" id="notDialedScheduleTime" value="09:00" min="09:00" max="18:00" step="1800">
+            </div>
+            <div class="form-group col-md-4 mb-2">
+              <small class="text-muted d-block" id="notDialedScheduleMeta">Pick a future date using the campaign's allowed weekdays. Time must stay between 09:00 and 18:00 in the PBX timezone.</small>
+            </div>
+            <div class="form-group col-md-2 mb-2">
               <button type="button" class="btn btn-primary btn-block" id="moveNotDialedBtn">Move Selected To Contacts</button>
             </div>
           </div>
-          <small class="text-muted">If you select weekday(s), the earliest upcoming selected day/time becomes the next dial slot. If no day is selected, the numbers are moved as <strong>READY</strong> for immediate dialing.</small>
+          <small class="text-muted">Leave the schedule date empty to move the numbers as <strong>READY</strong> for immediate dialing.</small>
         </div>
 
         <div class="alert alert-info py-2 px-3 mb-0" id="notDialedStatus">
@@ -120,8 +119,8 @@
   text-decoration: none;
   box-shadow: none !important;
 }
-.schedule-days-group .form-check {
-  min-width: 110px;
+#notDialedScheduleMeta {
+  line-height: 1.45;
 }
 </style>
 
@@ -143,6 +142,86 @@ $(document).ready(function() {
 
   function selectedCampaignId() {
     return $('#notDialedCampaignSelect').val() || '';
+  }
+
+  function selectedCampaignMeta() {
+    const $selected = $('#notDialedCampaignSelect option:selected');
+    let weekdays = [];
+
+    try {
+      weekdays = JSON.parse($selected.attr('data-weekdays') || '[]');
+    } catch (error) {
+      weekdays = [];
+    }
+
+    if (!Array.isArray(weekdays)) {
+      weekdays = [];
+    }
+
+    return {
+      timezone: $selected.attr('data-timezone') || 'PBX timezone',
+      today: $selected.attr('data-today') || '',
+      minTime: $selected.attr('data-min-time') || '09:00',
+      maxTime: $selected.attr('data-max-time') || '18:00',
+      weekdays: weekdays
+    };
+  }
+
+  function applyScheduleConstraints() {
+    const meta = selectedCampaignMeta();
+    const $date = $('#notDialedScheduleDate');
+    const $time = $('#notDialedScheduleTime');
+    const allowedDaysText = meta.weekdays.length ? meta.weekdays.join(', ') : 'All days';
+
+    if (meta.today) {
+      $date.attr('min', meta.today);
+    }
+
+    $time.attr('min', meta.minTime).attr('max', meta.maxTime);
+    if (!$time.val() || $time.val() < meta.minTime || $time.val() > meta.maxTime) {
+      $time.val(meta.minTime);
+    }
+
+    $('#notDialedScheduleMeta').html(
+      'PBX timezone: <strong>' + escapeHtml(meta.timezone) + '</strong><br>' +
+      'Allowed weekdays: <strong>' + escapeHtml(allowedDaysText) + '</strong><br>' +
+      'Allowed time: <strong>' + escapeHtml(meta.minTime) + ' to ' + escapeHtml(meta.maxTime) + '</strong>'
+    );
+  }
+
+  function validateScheduleInputs(showMessage) {
+    const meta = selectedCampaignMeta();
+    const scheduleDate = $('#notDialedScheduleDate').val() || '';
+    const scheduleTime = $('#notDialedScheduleTime').val() || meta.minTime || '09:00';
+
+    if (!scheduleDate) {
+      return true;
+    }
+
+    if (scheduleTime < meta.minTime || scheduleTime > meta.maxTime) {
+      if (showMessage !== false) {
+        updateStatus('Please select a time between ' + meta.minTime + ' and ' + meta.maxTime + ' in the PBX timezone.', 'warning');
+      }
+      return false;
+    }
+
+    const selectedDate = new Date(scheduleDate + 'T12:00:00');
+    if (isNaN(selectedDate.getTime())) {
+      if (showMessage !== false) {
+        updateStatus('Please select a valid schedule date.', 'warning');
+      }
+      return false;
+    }
+
+    const weekdayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][selectedDate.getDay()];
+    if (meta.weekdays.length && meta.weekdays.indexOf(weekdayName) === -1) {
+      if (showMessage !== false) {
+        updateStatus('The selected date falls on ' + weekdayName + '. Allowed campaign weekdays: ' + meta.weekdays.join(', ') + '.', 'warning');
+      }
+      return false;
+    }
+
+    return true;
   }
 
   function refreshDpdSelect(selectedValues) {
@@ -208,14 +287,23 @@ $(document).ready(function() {
       rows = Array.isArray(rows) ? rows : [];
 
       rows.forEach(function(row) {
-        html += '<option value="' + escapeHtml(row.id) + '">' + escapeHtml(row.name) + '</option>';
+        const weekdaysJson = escapeHtml(JSON.stringify(Array.isArray(row.weekdays) ? row.weekdays : []));
+        html += '<option value="' + escapeHtml(row.id) + '"' +
+          ' data-weekdays="' + weekdaysJson + '"' +
+          ' data-timezone="' + escapeHtml(row.timezone || '') + '"' +
+          ' data-today="' + escapeHtml(row.today_label || '') + '"' +
+          ' data-min-time="' + escapeHtml(row.min_time || '09:00') + '"' +
+          ' data-max-time="' + escapeHtml(row.max_time || '18:00') + '">' +
+          escapeHtml(row.name) + '</option>';
       });
 
       $('#notDialedCampaignSelect').html(html);
+      applyScheduleConstraints();
 
       if (autoSelectFirst && rows.length > 0) {
         $('#notDialedCampaignSelect').val(String(rows[0].id));
-        updateStatus('Campaign selected. You can now filter by one or more Days Past Due values.', 'info');
+        applyScheduleConstraints();
+        updateStatus('Campaign selected. You can now filter by DPD and choose a valid schedule date/time.', 'info');
         loadDpdValues();
       } else if (rows.length === 0) {
         updateStatus('No campaigns were found for the selected company.', 'warning');
@@ -313,7 +401,19 @@ $(document).ready(function() {
   });
 
   $('#notDialedCampaignSelect').on('change', function() {
+    applyScheduleConstraints();
     loadDpdValues();
+  });
+
+  $('#notDialedScheduleDate, #notDialedScheduleTime').on('change', function() {
+    const isValid = validateScheduleInputs(true);
+    if (!isValid) {
+      if (this.id === 'notDialedScheduleDate') {
+        $('#notDialedScheduleDate').val('');
+      } else {
+        $('#notDialedScheduleTime').val(selectedCampaignMeta().minTime || '09:00');
+      }
+    }
   });
 
   $('#notDialedDpdSelect').on('change', function() {
@@ -323,7 +423,7 @@ $(document).ready(function() {
   $('#clearNotDialedFilters').on('click', function() {
     $('#notDialedDpdSelect').val([]);
     refreshDpdSelect([]);
-    $('.notdialed-schedule-day').prop('checked', false);
+    $('#notDialedScheduleDate').val('');
     $('#notDialedScheduleTime').val('09:00');
     loadCampaigns(true);
   });
@@ -340,10 +440,8 @@ $(document).ready(function() {
     const selectedIds = $('.notdialed-row:checked').map(function() {
       return $(this).val();
     }).get();
-    const scheduleDays = $('.notdialed-schedule-day:checked').map(function() {
-      return $(this).val();
-    }).get();
-    const scheduleTime = $('#notDialedScheduleTime').val() || '09:00';
+    const scheduleDate = $('#notDialedScheduleDate').val() || '';
+    const scheduleTime = $('#notDialedScheduleTime').val() || (selectedCampaignMeta().minTime || '09:00');
     const companyId = selectedCompanyId();
     const campaignId = selectedCampaignId();
 
@@ -357,6 +455,10 @@ $(document).ready(function() {
       return;
     }
 
+    if (scheduleDate && !validateScheduleInputs(true)) {
+      return;
+    }
+
     $.ajax({
       url: 'notdialed/move_to_contacts',
       type: 'POST',
@@ -365,7 +467,7 @@ $(document).ready(function() {
         company_id: companyId,
         campaign_id: campaignId,
         contact_ids: selectedIds,
-        schedule_days: scheduleDays,
+        schedule_date: scheduleDate,
         schedule_time: scheduleTime
       }
     }).done(function(response) {
@@ -376,7 +478,7 @@ $(document).ready(function() {
 
       updateStatus(response.message || 'Selected numbers moved to Contacts.', 'success');
       $('#selectAllNotDialed').prop('checked', false);
-      $('.notdialed-schedule-day').prop('checked', false);
+      $('#notDialedScheduleDate').val('');
       reloadTable();
     }).fail(function() {
       updateStatus('Failed to move the selected numbers right now.', 'warning');

@@ -96,10 +96,10 @@ class Dialednumbers {
         $companyId = $this->resolveCompanyIdFromRequest();
         $campaignId = isset($_POST['campaign_id']) ? intval($_POST['campaign_id']) : 0;
         $contactIds = isset($_POST['contact_ids']) ? (array) $_POST['contact_ids'] : [];
-        $scheduleDays = isset($_POST['schedule_days']) ? (array) $_POST['schedule_days'] : [];
+        $scheduleDate = isset($_POST['schedule_date']) ? (string) $_POST['schedule_date'] : '';
         $scheduleTime = isset($_POST['schedule_time']) ? (string) $_POST['schedule_time'] : '';
 
-        $this->json($this->modal->moveToContacts($companyId, $campaignId, $contactIds, $scheduleDays, $scheduleTime));
+        $this->json($this->modal->moveToContacts($companyId, $campaignId, $contactIds, $scheduleDate, $scheduleTime));
     }
 }
 ?>
