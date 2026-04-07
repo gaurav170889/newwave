@@ -132,7 +132,6 @@
 			<table id="campaignTable" class="table table-striped table-bordered" style="width:100%">
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Number</th>
                   <th>Name</th>
                   <th>Days Past Due</th>
@@ -143,6 +142,7 @@
                   <th>Last Attempt</th>
                   <th>Agent</th>
                   <th>Disposition</th>
+                  <th>Scheduled At</th>
                   <th>Action</th>
                 </tr>
               </thead>

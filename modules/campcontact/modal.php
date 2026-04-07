@@ -259,12 +259,13 @@ Class Campcontact_modal{
                      c.last_call_status, c.last_call_started_at,
                      c.agent_connected, c.notes, c.last_disposition,
                      c.next_call_at,
+                     COALESCE(c.next_call_at, c.created_at) AS scheduled_at,
                      a.agent_name, d.color_code
                   FROM campaignnumbers c
                   LEFT JOIN agent a ON c.agent_connected = a.agent_id
                   LEFT JOIN dialer_disposition_master d ON c.last_disposition = d.label AND c.company_id = d.company_id
                   {$where}
-                  ORDER BY c.id DESC LIMIT 2000";
+                  ORDER BY COALESCE(c.next_call_at, c.created_at) ASC, c.id ASC LIMIT 2000";
 
         $result = mysqli_query($this->conn, $query);
 
@@ -294,7 +295,8 @@ Class Campcontact_modal{
                 'disposition'   => $row['last_disposition'],
                 'color_code'    => $row['color_code'] ?? '#808080',
                 'notes'         => $row['notes'],
-                'next_call_at'  => $row['next_call_at']
+                'next_call_at'  => $row['next_call_at'],
+                'scheduled_at'  => $row['scheduled_at']
             ];
         }
 

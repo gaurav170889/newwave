@@ -230,7 +230,6 @@ $(document).ready(function () {
             }
         },
         columns: [
-            { data: 'id' },
             { data: 'number' },
             { data: 'name' },
             { data: 'days_past_due' },
@@ -248,6 +247,12 @@ $(document).ready(function () {
                         return '<span class="badge badge-pill" style="background-color: '+color+'; color: #fff; font-size: 100%;">'+data+'</span>';
                     }
                     return data || '';
+                }
+            },
+            {
+                data: 'scheduled_at',
+                render: function(data, type, row) {
+                    return data || row.next_call_at || '';
                 }
             },
             {
@@ -307,7 +312,7 @@ $(document).ready(function () {
             search: '_INPUT_',
             searchPlaceholder: 'Search all columns'
         },
-        order: [[0, 'desc']]
+        order: [[10, 'asc']]
     });
 
     $('#contactCompanySelect').on('change', function() {

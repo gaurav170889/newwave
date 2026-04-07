@@ -468,8 +468,9 @@ async function makeCall({ pbxurl, token, destination, dialerDn }) {
     return resp.data?.result?.callid || resp.data?.callid; // Handle 3CX version diffs
 }
 
-async function waitThenTransfer({ pbxurl, token, callid, destination, queueDn, dialerDn }) {
+async function waitThenTransfer({ pbxurl, token, callid, destination, transferTarget, dialerDn, transferLabel = '' }) {
     const deadline = Date.now() + 45000; // 45s Timeout
+    const routeLabel = String(transferLabel || transferTarget || '').trim();
     log(`[Call ${callid}] Dialing ${destination} using Extension ${dialerDn}...`);
 
     while (Date.now() < deadline) {
@@ -478,14 +479,13 @@ async function waitThenTransfer({ pbxurl, token, callid, destination, queueDn, d
             const resp = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
             const list = Array.isArray(resp.data) ? resp.data : [];
-            // Find participant for this call
             const p = list.find(x => String(x.callid) === String(callid) && x.status === 'Connected');
 
             if (p) {
-                log(`[Call ${callid}] Answered! Transferring to ${queueDn}`);
+                log(`[Call ${callid}] Answered! Transferring to ${routeLabel || transferTarget}`);
                 await axios.post(
                     `${pbxurl}/callcontrol/${dialerDn}/participants/${p.id}/transferto`,
-                    { destination: queueDn },
+                    { destination: transferTarget },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 return true;
@@ -498,6 +498,219 @@ async function waitThenTransfer({ pbxurl, token, callid, destination, queueDn, d
         await sleep(1000);
     }
     return false;
+}
+
+async function pickScheduledCallback() {
+    const lockToken = uuidv4();
+
+    try {
+        const [rows] = await db.execute(
+            `SELECT sc.id, sc.company_id, sc.campaign_id, sc.campaignnumber_id, sc.route_type,
+                    sc.queue_dn, sc.agent_id, sc.agent_ext, sc.scheduled_for,
+                    cn.phone_e164, cn.phone_raw, cn.attempts_used, cn.max_attempts,
+                    c.dn_number, c.routeto, COALESCE(p.outbound_prefix, 'No') AS outbound_prefix
+             FROM scheduled_calls sc
+             INNER JOIN campaignnumbers cn
+                ON cn.id = sc.campaignnumber_id AND cn.company_id = sc.company_id
+             INNER JOIN campaign c
+                ON c.id = sc.campaign_id AND c.company_id = sc.company_id
+             LEFT JOIN pbxdetail p ON p.company_id = sc.company_id
+             WHERE sc.route_type = 'Agent'
+               AND sc.status IN ('pending', 'pending_agent')
+               AND sc.scheduled_for <= NOW()
+               AND c.status = 'Running'
+               AND c.is_deleted = 0
+               AND COALESCE(cn.is_dnc, 0) = 0
+               AND cn.attempts_used < cn.max_attempts
+             ORDER BY sc.scheduled_for ASC, sc.id ASC
+             LIMIT 1`
+        );
+
+        if (!rows.length) return null;
+        const scheduled = rows[0];
+
+        if (Number(scheduled.agent_id || 0) > 0) {
+            const [busyRows] = await db.execute(
+                `SELECT COUNT(*) AS count
+                 FROM scheduled_calls
+                 WHERE company_id = ?
+                   AND agent_id = ?
+                   AND status IN ('dialing', 'connected')`,
+                [scheduled.company_id, scheduled.agent_id]
+            );
+
+            if (Number(busyRows?.[0]?.count || 0) > 0) {
+                return null;
+            }
+        }
+
+        const [res] = await db.execute(
+            `UPDATE scheduled_calls
+             SET status = 'dialing', last_attempt_at = NOW(), updated_at = NOW()
+             WHERE id = ? AND status IN ('pending', 'pending_agent')`,
+            [scheduled.id]
+        );
+
+        if (Number(res?.affectedRows || 0) === 0) {
+            return null;
+        }
+
+        return { ...scheduled, lockToken };
+    } catch (e) {
+        if (e && e.code === 'ER_NO_SUCH_TABLE') {
+            return null;
+        }
+        log(`[Scheduled] Pick error: ${e.message}`);
+        return null;
+    }
+}
+
+async function spawnScheduledCallFlow(scheduled) {
+    let phoneLockAcquired = false;
+
+    try {
+        const companyId = Number(scheduled.company_id || 0);
+        const campaignId = Number(scheduled.campaign_id || 0);
+        const leadId = Number(scheduled.campaignnumber_id || 0);
+        const destination = scheduled.phone_e164 || scheduled.phone_raw;
+        const dialerDn = String(scheduled.dn_number || '').trim();
+        const transferTarget = String(scheduled.agent_ext || '').trim();
+        const transferLabel = transferTarget ? `agent ${transferTarget}` : 'assigned agent';
+
+        if (!dialerDn) throw new Error(`Campaign ${campaignId} dn_number is empty for scheduled callback ${scheduled.id}`);
+        if (!destination) throw new Error(`Scheduled callback ${scheduled.id} has no customer number`);
+        if (!transferTarget) throw new Error(`Scheduled callback ${scheduled.id} has no agent extension`);
+
+        const phoneLock = await tryAcquirePhoneLock(companyId, campaignId, leadId, scheduled.phone_e164, scheduled.phone_raw, scheduled.lockToken);
+        if (!phoneLock.ok) {
+            if (phoneLock.reason === 'invalid_phone') {
+                await db.execute(
+                    `UPDATE scheduled_calls
+                     SET status = 'failed', completed_at = NOW(), updated_at = NOW()
+                     WHERE id = ?`,
+                    [scheduled.id]
+                );
+                await unlockLead(companyId, leadId, 'INVALID');
+            } else {
+                await db.execute(
+                    `UPDATE scheduled_calls
+                     SET status = 'pending_agent', updated_at = NOW()
+                     WHERE id = ?`,
+                    [scheduled.id]
+                );
+            }
+            return;
+        }
+        phoneLockAcquired = true;
+
+        await db.execute(
+            `UPDATE campaignnumbers
+             SET locked_at = NOW(), locked_by = ?, lock_token = ?, state = 'DIALING'
+             WHERE id = ? AND company_id = ?`,
+            [WORKER_ID, scheduled.lockToken, leadId, companyId]
+        );
+
+        const { pbxurl, token } = await getPbxTokenByCompany(companyId);
+
+        if (String(scheduled.outbound_prefix || '').toLowerCase() === 'yes') {
+            try {
+                const rotatedDid = await rotateDidForCampaignIfConfigured({
+                    companyId,
+                    campaignId,
+                    pbxurl,
+                    token
+                });
+                if (rotatedDid) {
+                    log(`[Scheduled ${scheduled.id}] Rotated outbound CallerID to ${rotatedDid}`);
+                }
+            } catch (e) {
+                log(`[Scheduled ${scheduled.id}] DID rotation skipped: ${e.message}`);
+            }
+        }
+
+        const callid = await makeCall({ pbxurl, token, destination, dialerDn });
+        const connected = await waitThenTransfer({
+            pbxurl,
+            token,
+            callid,
+            destination,
+            transferTarget,
+            transferLabel,
+            dialerDn
+        });
+
+        if (connected) {
+            await logCallAttemptV2(
+                companyId,
+                campaignId,
+                leadId,
+                callid,
+                'ANSWERED',
+                'SCHEDULED_CALLBACK',
+                scheduled.agent_id || null,
+                Number(scheduled.attempts_used || 0) + 1
+            );
+
+            await db.execute(
+                `UPDATE scheduled_calls
+                 SET status = 'connected', started_at = COALESCE(started_at, NOW()), updated_at = NOW()
+                 WHERE id = ?`,
+                [scheduled.id]
+            );
+
+            await unlockLead(companyId, leadId, 'DISPO_PENDING');
+            return;
+        }
+
+        await logCallAttemptV2(
+            companyId,
+            campaignId,
+            leadId,
+            callid,
+            'NO_ANSWER',
+            'SCHEDULED_CALLBACK_NO_ANSWER',
+            scheduled.agent_id || null,
+            Number(scheduled.attempts_used || 0) + 1
+        );
+
+        const used = Number(scheduled.attempts_used || 0) + 1;
+        const maxAttempts = Number(scheduled.max_attempts || 0);
+
+        if (maxAttempts > 0 && used >= maxAttempts) {
+            await unlockLead(companyId, leadId, 'CLOSED');
+        } else {
+            await db.execute(
+                `UPDATE campaignnumbers
+                 SET next_call_at = DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+                 WHERE id = ? AND company_id = ?`,
+                [leadId, companyId]
+            );
+            await unlockLead(companyId, leadId, 'READY');
+        }
+
+        await db.execute(
+            `UPDATE scheduled_calls
+             SET status = 'no_answer', completed_at = NOW(), updated_at = NOW()
+             WHERE id = ?`,
+            [scheduled.id]
+        );
+        await releasePhoneLock(scheduled.lockToken).catch(() => { });
+    } catch (e) {
+        log(`[Scheduled ${scheduled.id}] Call flow error: ${e.message}`);
+
+        await db.execute(
+            `UPDATE scheduled_calls
+             SET status = 'failed', completed_at = NOW(), updated_at = NOW(),
+                 note_text = CONCAT(COALESCE(note_text, ''), ?)
+             WHERE id = ?`,
+            [`\n[${new Date().toISOString()}] ${e.message}`, scheduled.id]
+        ).catch(() => { });
+
+        await unlockLead(Number(scheduled.company_id || 0), Number(scheduled.campaignnumber_id || 0), 'AGENT_SCHEDULED').catch(() => { });
+        if (phoneLockAcquired) {
+            await releasePhoneLock(scheduled.lockToken).catch(() => { });
+        }
+    }
 }
 
 // ------------ Global ActiveCalls Monitor ------------
@@ -558,6 +771,12 @@ async function globalMonitorTick() {
                         `UPDATE dialer_call_log SET ended_at=NOW(), duration_sec=? WHERE call_id=? AND company_id=?`,
                         [durationSec, originalCallId, companyId]
                     );
+                    await db.execute(
+                        `UPDATE scheduled_calls
+                         SET status='completed', completed_at=NOW(), updated_at=NOW()
+                         WHERE company_id=? AND campaignnumber_id=? AND route_type='Agent' AND status IN ('dialing','connected')`,
+                        [companyId, lead.id]
+                    ).catch(() => { });
                     log(`[GlobalMonitor] Lead ${lead.id} call ${originalCallId} ended. Lock Released.`);
                     await releasePhoneLock(lead.lock_token).catch(() => { });
 
@@ -583,6 +802,12 @@ async function globalMonitorTick() {
                                     `UPDATE dialer_call_log SET agent_id=? WHERE call_id=? AND company_id=?`,
                                     [agentId, originalCallId, companyId]
                                 );
+                                await db.execute(
+                                    `UPDATE scheduled_calls
+                                     SET status='connected', updated_at=NOW()
+                                     WHERE company_id=? AND campaignnumber_id=? AND route_type='Agent' AND status='dialing'`,
+                                    [companyId, lead.id]
+                                ).catch(() => { });
                             }
                         }
                     }
@@ -647,7 +872,15 @@ async function spawnCallFlow(c, lead, queueDn, dialerDn) {
         const callid = await makeCall({ pbxurl, token, destination, dialerDn });
 
         // Monitor Answer
-        const connected = await waitThenTransfer({ pbxurl, token, callid, destination, queueDn, dialerDn });
+        const connected = await waitThenTransfer({
+            pbxurl,
+            token,
+            callid,
+            destination,
+            transferTarget: queueDn,
+            transferLabel: `queue ${queueDn}`,
+            dialerDn
+        });
 
         if (connected) {
             await logCallAttemptV2(c.company_id, c.id, lead.id, callid, 'ANSWERED', null, null, lead.attempts_used + 1);
@@ -694,6 +927,13 @@ async function tick() {
         if (Date.now() - lastPhoneLockCleanupAt > PHONE_LOCK_CLEANUP_MS) {
             await cleanupExpiredPhoneLocks().catch(() => { });
             lastPhoneLockCleanupAt = Date.now();
+        }
+
+        const scheduled = await pickScheduledCallback();
+        if (scheduled) {
+            spawnScheduledCallFlow(scheduled).catch(e => {
+                log(`[Scheduled ${scheduled.id}] Unhandled scheduled callback error: ${e.message}`);
+            });
         }
 
         const [campaigns] = await db.execute(

@@ -147,10 +147,10 @@ class Notdialed_modal {
             $campaignStart = substr(trim((string) ($campaignRow['starttime'] ?? '')), 0, 5);
             $campaignStop = substr(trim((string) ($campaignRow['stoptime'] ?? '')), 0, 5);
 
-            if (preg_match('/^\d{2}:\d{2}$/', $campaignStart) && $campaignStart > $minTime) {
+            if (preg_match('/^\d{2}:\d{2}$/', $campaignStart)) {
                 $minTime = $campaignStart;
             }
-            if (preg_match('/^\d{2}:\d{2}$/', $campaignStop) && $campaignStop < $maxTime) {
+            if (preg_match('/^\d{2}:\d{2}$/', $campaignStop)) {
                 $maxTime = $campaignStop;
             }
             if ($minTime > $maxTime) {
@@ -393,13 +393,23 @@ class Notdialed_modal {
         $contactIds = array_values(array_unique(array_filter(array_map('intval', $contactIds), function ($value) {
             return $value > 0;
         })));
+        $scheduleDate = trim((string) $scheduleDate);
+        $scheduleTime = trim((string) $scheduleTime);
 
         if ($companyId <= 0) {
             return ['success' => false, 'message' => 'Please select a company first.'];
         }
 
+        if ($campaignId <= 0) {
+            return ['success' => false, 'message' => 'Please select a campaign first.'];
+        }
+
         if (empty($contactIds)) {
             return ['success' => false, 'message' => 'Please select at least one number.'];
+        }
+
+        if (($scheduleDate !== '' && $scheduleTime === '') || ($scheduleDate === '' && $scheduleTime !== '')) {
+            return ['success' => false, 'message' => 'Please select both schedule date and time, or leave both empty.'];
         }
 
         $scheduleBuild = $this->buildScheduledDateTime($companyId, $campaignId, $scheduleDate, $scheduleTime);

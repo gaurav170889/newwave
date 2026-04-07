@@ -56,7 +56,7 @@
               <input type="time" class="form-control" id="notDialedScheduleTime" value="09:00" min="09:00" max="18:00" step="1800">
             </div>
             <div class="form-group col-md-4 mb-2">
-              <small class="text-muted d-block" id="notDialedScheduleMeta">Pick a future date using the campaign's allowed weekdays. Time must stay between 09:00 and 18:00 in the PBX timezone.</small>
+              <small class="text-muted d-block" id="notDialedScheduleMeta">Pick a future date using the selected campaign's weekdays. Time must stay within that campaign's start/stop window in the PBX timezone.</small>
             </div>
             <div class="form-group col-md-2 mb-2">
               <button type="button" class="btn btn-primary btn-block" id="moveNotDialedBtn">Move Selected To Contacts</button>
@@ -147,11 +147,16 @@ $(document).ready(function() {
   function selectedCampaignMeta() {
     const $selected = $('#notDialedCampaignSelect option:selected');
     let weekdays = [];
+    const rawWeekdays = $selected.attr('data-weekdays') || '%5B%5D';
 
     try {
-      weekdays = JSON.parse($selected.attr('data-weekdays') || '[]');
+      weekdays = JSON.parse(decodeURIComponent(rawWeekdays));
     } catch (error) {
-      weekdays = [];
+      try {
+        weekdays = JSON.parse(rawWeekdays || '[]');
+      } catch (innerError) {
+        weekdays = [];
+      }
     }
 
     if (!Array.isArray(weekdays)) {
@@ -192,10 +197,18 @@ $(document).ready(function() {
   function validateScheduleInputs(showMessage) {
     const meta = selectedCampaignMeta();
     const scheduleDate = $('#notDialedScheduleDate').val() || '';
-    const scheduleTime = $('#notDialedScheduleTime').val() || meta.minTime || '09:00';
+    const rawScheduleTime = $('#notDialedScheduleTime').val() || '';
+    const scheduleTime = rawScheduleTime || meta.minTime || '09:00';
 
-    if (!scheduleDate) {
+    if (!scheduleDate && !rawScheduleTime) {
       return true;
+    }
+
+    if (!scheduleDate || !rawScheduleTime) {
+      if (showMessage !== false) {
+        updateStatus('Please select both schedule date and time, or leave both empty.', 'warning');
+      }
+      return false;
     }
 
     if (scheduleTime < meta.minTime || scheduleTime > meta.maxTime) {
@@ -287,7 +300,7 @@ $(document).ready(function() {
       rows = Array.isArray(rows) ? rows : [];
 
       rows.forEach(function(row) {
-        const weekdaysJson = escapeHtml(JSON.stringify(Array.isArray(row.weekdays) ? row.weekdays : []));
+        const weekdaysJson = encodeURIComponent(JSON.stringify(Array.isArray(row.weekdays) ? row.weekdays : []));
         html += '<option value="' + escapeHtml(row.id) + '"' +
           ' data-weekdays="' + weekdaysJson + '"' +
           ' data-timezone="' + escapeHtml(row.timezone || '') + '"' +
@@ -406,14 +419,7 @@ $(document).ready(function() {
   });
 
   $('#notDialedScheduleDate, #notDialedScheduleTime').on('change', function() {
-    const isValid = validateScheduleInputs(true);
-    if (!isValid) {
-      if (this.id === 'notDialedScheduleDate') {
-        $('#notDialedScheduleDate').val('');
-      } else {
-        $('#notDialedScheduleTime').val(selectedCampaignMeta().minTime || '09:00');
-      }
-    }
+    validateScheduleInputs(true);
   });
 
   $('#notDialedDpdSelect').on('change', function() {

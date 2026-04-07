@@ -140,7 +140,12 @@
                             <li class="sidebar-item Campcontact Contacts"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=campcontact/index">Contacts</a></li>
                             <?php if($isAdmin): ?>
                             <li class="sidebar-item Notdialed"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=notdialed/index">Not Dialed</a></li>
+                            <?php endif; ?>
+                            <?php if($isAdmin || (isset($_SESSION['prole']) && $_SESSION['prole'] == 'uagent')): ?>
                             <li class="sidebar-item Dialednumbers"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=dialednumbers/index">Dialed Numbers</a></li>
+                            <?php endif; ?>
+                            <?php if($isAdmin): ?>
+                            <li class="sidebar-item Scheduledcalls"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=scheduledcalls/index">Scheduled Calls</a></li>
                             <?php endif; ?>
                             <li class="sidebar-item Disposition"><a class="sidebar-link" href="<?php echo BASE_URL; ?>?route=disposition/index">Disposition</a></li>
 						</ul>

@@ -34,13 +34,15 @@ class Dialednumbers {
         $_SESSION['navurl'] = 'Dialednumbers';
 
         $sessionRole = $this->getSessionRole();
-        $isAllowed = in_array($sessionRole, ['super_admin', 'company_admin'], true);
+        $isAllowed = in_array($sessionRole, ['super_admin', 'company_admin', 'uagent'], true);
         if (!$isAllowed) {
             echo "<script>window.location.href='" . BASE_URL . "?route=dashboard/index';</script>";
             exit;
         }
 
         $isSuperAdmin = ($sessionRole === 'super_admin');
+        $isAgentUser = ($sessionRole === 'uagent');
+        $canManageDialedContacts = in_array($sessionRole, ['super_admin', 'company_admin'], true);
         $selectedCompanyId = $this->resolveCompanyIdFromRequest();
         $companies = $this->modal->getCompanies($isSuperAdmin ? 0 : $selectedCompanyId);
 
@@ -63,6 +65,12 @@ class Dialednumbers {
         $filterType = isset($_REQUEST['filter_type']) ? (string) $_REQUEST['filter_type'] : '';
 
         $this->json($this->modal->getFilterValues($companyId, $campaignId, $filterType));
+    }
+
+    public function getagents()
+    {
+        $companyId = $this->resolveCompanyIdFromRequest();
+        $this->json($companyId > 0 ? $this->modal->getAgentsByCompany($companyId) : []);
     }
 
     public function getdpdvalues()
@@ -93,6 +101,11 @@ class Dialednumbers {
             return;
         }
 
+        if (!in_array($this->getSessionRole(), ['super_admin', 'company_admin'], true)) {
+            $this->json(['success' => false, 'message' => 'You are not allowed to move dialed numbers back to Contacts.']);
+            return;
+        }
+
         $companyId = $this->resolveCompanyIdFromRequest();
         $campaignId = isset($_POST['campaign_id']) ? intval($_POST['campaign_id']) : 0;
         $contactIds = isset($_POST['contact_ids']) ? (array) $_POST['contact_ids'] : [];
@@ -100,6 +113,19 @@ class Dialednumbers {
         $scheduleTime = isset($_POST['schedule_time']) ? (string) $_POST['schedule_time'] : '';
 
         $this->json($this->modal->moveToContacts($companyId, $campaignId, $contactIds, $scheduleDate, $scheduleTime));
+    }
+
+    public function updateDispositionSql()
+    {
+        $id = $_POST['contact_id'] ?? 0;
+        $disposition = $_POST['disposition'] ?? '';
+        $notes = $_POST['notes'] ?? '';
+        $date = $_POST['callback_date'] ?? '';
+        $time = $_POST['callback_time'] ?? '';
+        $routeType = $_POST['route_type'] ?? 'Agent';
+        $agentId = $_POST['agent_id'] ?? 0;
+
+        $this->json($this->modal->updateDispositionSql($id, $disposition, $notes, $date, $time, $routeType, $agentId));
     }
 }
 ?>

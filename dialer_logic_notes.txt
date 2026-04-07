@@ -1,0 +1,72 @@
+DIALER.JS STATE LOGIC NOTES
+===========================
+
+File:
+- services/dialer.js
+
+Main lead selection rule
+------------------------
+The dialer picks records from `campaignnumbers` when:
+- `state` is `READY` or `SCHEDULED`
+- `next_call_at` is NULL or already reached (`<= NOW()`)
+- `attempts_used < max_attempts`
+- `is_dnc = 0`
+- record is not currently locked (or lock is stale)
+
+Relevant SQL from `pickLead()`:
+- `state IN ('READY','SCHEDULED')`
+- `AND (next_call_at IS NULL OR next_call_at <= NOW())`
+
+Meaning of READY
+----------------
+`READY` means the number can be dialed immediately if:
+- the campaign is running
+- queue status allows dialing
+- an agent slot is available
+- the record passes the dial filters
+
+Meaning of SCHEDULED
+--------------------
+`SCHEDULED` means the number is waiting for its `next_call_at` time.
+Once `next_call_at <= NOW()`, the dialer treats it like a normal dialable lead and picks it.
+
+State flow in dialer.js
+-----------------------
+1. `READY` / `SCHEDULED`
+   -> eligible for pickup when due
+
+2. after lock success in `pickLead()`
+   -> state becomes `DIALING`
+
+3. if call is answered in `spawnCallFlow()`
+   -> state becomes `DISPO_PENDING`
+   -> then later global monitor updates it to `DISPO_REQUIRED` when the call ends
+
+4. if call is not answered
+   -> `attempts_used` increases
+   -> if max attempts reached: state becomes `CLOSED`
+   -> otherwise `next_call_at` is pushed by 15 minutes and state goes back to `READY`
+
+Important note
+--------------
+Current retry logic after a no-answer returns the lead to `READY` with a future `next_call_at`.
+Even though the state is `READY`, the dialer still waits because it also checks:
+- `next_call_at IS NULL OR next_call_at <= NOW()`
+
+So the effective scheduling is controlled by both:
+- `state`
+- `next_call_at`
+
+Other related states
+--------------------
+- `DIALING` = currently being dialed
+- `DISPO_PENDING` = active call / waiting for completion monitoring
+- `DISPO_REQUIRED` = call ended, waiting for disposition
+- `CLOSED` = no more attempts left or finished
+- `INVALID` = bad phone / invalid record
+
+Summary
+-------
+- `READY` = dial now if due
+- `SCHEDULED` = dial later when `next_call_at` is reached
+- `next_call_at` is the real time gate used by the service
