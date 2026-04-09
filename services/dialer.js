@@ -51,8 +51,46 @@ function log(msg, data = null) {
     fs.appendFileSync(LOG_FILE, entry + "\n");
 }
 
+function getAxiosErrorDetails(error) {
+    const status = error?.response?.status ?? null;
+    const statusText = error?.response?.statusText ?? null;
+    let data = error?.response?.data ?? null;
+
+    if (data && typeof data !== 'string') {
+        try {
+            data = JSON.stringify(data);
+        } catch (_) {
+            data = '[unserializable-response-data]';
+        }
+    }
+
+    if (typeof data === 'string' && data.length > 700) {
+        data = data.slice(0, 700) + '...';
+    }
+
+    return {
+        message: error?.message || 'Unknown axios error',
+        code: error?.code || null,
+        status,
+        statusText,
+        data
+    };
+}
+
 const logCallAttemptV2 = async (companyId, campaignId, leadId, callId, status, disposition, agentId, attemptNo) => {
-    if (!companyId || !campaignId || !leadId) return;
+    if (!companyId || !campaignId || !leadId) {
+        log(`[logCallAttemptV2] Skipped because required IDs are missing.`, {
+            companyId,
+            campaignId,
+            leadId,
+            callId,
+            status,
+            disposition,
+            agentId,
+            attemptNo
+        });
+        return;
+    }
     try {
         await db.execute(
             `INSERT INTO dialer_call_log 
@@ -69,6 +107,31 @@ const logCallAttemptV2 = async (companyId, campaignId, leadId, callId, status, d
             [status, disposition, agentId, callId, leadId, companyId]
         );
     } catch (e) {
+        let leadSnapshot = null;
+        try {
+            const [leadRows] = await db.execute(
+                `SELECT id, company_id, campaignid, state, locked_by, lock_token, attempts_used, max_attempts
+                 FROM campaignnumbers
+                 WHERE id=? AND company_id=?
+                 LIMIT 1`,
+                [leadId, companyId]
+            );
+            leadSnapshot = leadRows?.[0] || null;
+        } catch (lookupErr) {
+            leadSnapshot = { lookupError: lookupErr.message };
+        }
+
+        log(`[logCallAttemptV2] Insert/update failed: ${e.message}`, {
+            companyId,
+            campaignId,
+            leadId,
+            callId,
+            status,
+            disposition,
+            agentId,
+            attemptNo,
+            leadSnapshot
+        });
         console.error("Error in logCallAttemptV2:", e.message);
     }
 };
@@ -99,10 +162,31 @@ async function getPbxTokenByCompany(companyId) {
 
     if (pbx.auth_token && pbx.auth_updated_at) {
         const ageSec = Math.floor((new Date() - new Date(pbx.auth_updated_at)) / 1000);
-        if (ageSec < TOKEN_REUSE_SEC) return { pbxurl: safeUrl, token: pbx.auth_token };
+        if (ageSec < TOKEN_REUSE_SEC) {
+            log(`[Company ${companyId}] Reusing cached 3CX token.`, {
+                pbxurl: safeUrl,
+                authUpdatedAt: pbx.auth_updated_at,
+                ageSec,
+                reuseWindowSec: TOKEN_REUSE_SEC
+            });
+            return { pbxurl: safeUrl, token: pbx.auth_token };
+        }
+
+        log(`[Company ${companyId}] Cached 3CX token too old; refreshing.`, {
+            pbxurl: safeUrl,
+            authUpdatedAt: pbx.auth_updated_at,
+            ageSec,
+            reuseWindowSec: TOKEN_REUSE_SEC
+        });
+    } else {
+        log(`[Company ${companyId}] No cached 3CX token found; refreshing.`, {
+            pbxurl: safeUrl,
+            hasToken: Boolean(pbx.auth_token),
+            authUpdatedAt: pbx.auth_updated_at || null
+        });
     }
 
-    log(`[Company ${companyId}] Refreshing 3CX Token...`);
+    log(`[Company ${companyId}] Refreshing 3CX Token...`, { pbxurl: safeUrl });
     const tokenUrl = `${safeUrl}/connect/token`;
     const body = qs.stringify({
         client_id: pbx.pbxclientid,
@@ -110,10 +194,20 @@ async function getPbxTokenByCompany(companyId) {
         grant_type: "client_credentials"
     });
 
-    const resp = await axios.post(tokenUrl, body, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        timeout: 10000
-    });
+    let resp;
+    try {
+        resp = await axios.post(tokenUrl, body, {
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            timeout: 10000
+        });
+    } catch (e) {
+        log(`[Company ${companyId}] 3CX token refresh failed.`, {
+            pbxurl: safeUrl,
+            tokenUrl,
+            ...getAxiosErrorDetails(e)
+        });
+        throw e;
+    }
 
     const token = resp.data?.access_token;
     if (!token) throw new Error("No access_token from 3CX");
@@ -122,6 +216,11 @@ async function getPbxTokenByCompany(companyId) {
         `UPDATE pbxdetail SET auth_token=?, auth_updated_at=NOW() WHERE id=? AND company_id=?`,
         [token, pbx.pbx_id, companyId]
     );
+
+    log(`[Company ${companyId}] 3CX token refreshed successfully.`, {
+        pbxurl: safeUrl,
+        authUpdatedAt: new Date().toISOString()
+    });
 
     return { pbxurl: safeUrl, token };
 }
@@ -471,10 +570,18 @@ async function makeCall({ pbxurl, token, destination, dialerDn }) {
 async function waitThenTransfer({ pbxurl, token, callid, destination, transferTarget, dialerDn, transferLabel = '' }) {
     const deadline = Date.now() + 45000; // 45s Timeout
     const routeLabel = String(transferLabel || transferTarget || '').trim();
-    log(`[Call ${callid}] Dialing ${destination} using Extension ${dialerDn}...`);
+    let pollAttempt = 0;
+    let logged401Details = false;
+    log(`[Call ${callid}] Dialing ${destination} using Extension ${dialerDn}...`, {
+        pbxurl,
+        dialerDn,
+        transferTarget,
+        transferLabel: routeLabel || null
+    });
 
     while (Date.now() < deadline) {
         try {
+            pollAttempt += 1;
             const url = `${pbxurl}/callcontrol/${dialerDn}/participants`;
             const resp = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
@@ -482,7 +589,11 @@ async function waitThenTransfer({ pbxurl, token, callid, destination, transferTa
             const p = list.find(x => String(x.callid) === String(callid) && x.status === 'Connected');
 
             if (p) {
-                log(`[Call ${callid}] Answered! Transferring to ${routeLabel || transferTarget}`);
+                log(`[Call ${callid}] Answered! Transferring to ${routeLabel || transferTarget}`, {
+                    participantId: p.id,
+                    participantStatus: p.status,
+                    pollAttempt
+                });
                 await axios.post(
                     `${pbxurl}/callcontrol/${dialerDn}/participants/${p.id}/transferto`,
                     { destination: transferTarget },
@@ -491,8 +602,27 @@ async function waitThenTransfer({ pbxurl, token, callid, destination, transferTa
                 return true;
             }
         } catch (e) {
-            if (e.response && e.response.status !== 404) {
-                log(`[Call ${callid}] participant poll error: ${e.message}`);
+            const err = getAxiosErrorDetails(e);
+            if (err.status === 401) {
+                if (!logged401Details) {
+                    logged401Details = true;
+                    log(`[Call ${callid}] participant poll returned 401 Unauthorized.`, {
+                        pbxurl,
+                        dialerDn,
+                        destination,
+                        transferTarget,
+                        transferLabel: routeLabel || null,
+                        pollAttempt,
+                        ...err
+                    });
+                }
+            } else if (err.status !== 404) {
+                log(`[Call ${callid}] participant poll error: ${e.message}`, {
+                    pbxurl,
+                    dialerDn,
+                    pollAttempt,
+                    ...err
+                });
             }
         }
         await sleep(1000);
@@ -736,7 +866,11 @@ async function globalMonitorTick() {
                 const resp = await axios.get(url, { headers: { Authorization: `Bearer ${creds.token}` } });
                 activeCalls = resp.data?.value || [];
             } catch (e) {
-                log(`[GlobalMonitor] Error fetching active calls for company ${companyId}: ${e.message}`);
+                log(`[GlobalMonitor] Error fetching active calls for company ${companyId}: ${e.message}`, {
+                    companyId,
+                    url,
+                    ...getAxiosErrorDetails(e)
+                });
                 continue;
             }
 
