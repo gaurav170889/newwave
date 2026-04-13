@@ -19,6 +19,17 @@ $avgTalkTime = $outboundSummary['avg_talk_time'] ?? '00:00:00';
     <small class="text-muted mt-2 mt-md-0">Default filter: Today</small>
 </div>
 
+<?php if (!empty($timezoneDebug) && is_array($timezoneDebug)): ?>
+    <div class="alert alert-secondary border mb-3">
+        <strong>Timezone Debug:</strong>
+        Company ID <?php echo intval($timezoneDebug['company_id'] ?? 0); ?> |
+        PBX timezone <?php echo htmlspecialchars((string) ($timezoneDebug['timezone'] ?? ''), ENT_QUOTES, 'UTF-8'); ?> |
+        Company now <?php echo htmlspecialchars((string) ($timezoneDebug['company_now'] ?? ''), ENT_QUOTES, 'UTF-8'); ?> |
+        Server now <?php echo htmlspecialchars((string) ($timezoneDebug['server_now'] ?? ''), ENT_QUOTES, 'UTF-8'); ?> |
+        Server TZ <?php echo htmlspecialchars((string) ($timezoneDebug['server_timezone'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>
+    </div>
+<?php endif; ?>
+
 <?php if (!empty($fallbackNotice) || ($totalCalls === 0 && !empty($latestActivityAt))): ?>
     <div class="alert alert-warning border mb-4">
         <strong><?php echo htmlspecialchars($fallbackNotice ?: 'No outbound calls were found for the selected period.', ENT_QUOTES, 'UTF-8'); ?></strong>

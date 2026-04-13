@@ -371,14 +371,14 @@ Class Dashboard_modal{
         return $values;
     }
 
-    public function resolveDateRange($rangeKey = 'today')
+    public function resolveDateRange($rangeKey = 'today', $companyId = 0)
     {
         $allowedRanges = ['today', 'this_week', 'last_week', 'this_month', 'last_month'];
         if (!in_array($rangeKey, $allowedRanges, true)) {
             $rangeKey = 'today';
         }
 
-        $range = $this->buildUtcDateRange(null, null, 0, $rangeKey);
+        $range = $this->buildUtcDateRange(null, null, $companyId, $rangeKey);
         $start = new DateTimeImmutable($range['start_date']);
         $end = new DateTimeImmutable($range['end_date']);
         $label = ucwords(str_replace('_', ' ', $rangeKey));
@@ -396,6 +396,23 @@ Class Dashboard_modal{
             'sql_start' => $range['sql_start'],
             'sql_end' => $range['sql_end'],
             'display' => $range['display'],
+            'timezone' => $range['timezone'] ?? $this->getCompanyTimezone($companyId),
+        ];
+    }
+
+    public function getTimezoneDebugInfo($companyId = 0)
+    {
+        $companyId = intval($companyId);
+        $timezone = $this->getCompanyTimezone($companyId);
+        $companyNow = new DateTimeImmutable('now', new DateTimeZone($timezone));
+        $serverNow = new DateTimeImmutable('now');
+
+        return [
+            'company_id' => $companyId,
+            'timezone' => $timezone,
+            'company_now' => $companyNow->format('Y-m-d H:i:s'),
+            'server_now' => $serverNow->format('Y-m-d H:i:s'),
+            'server_timezone' => date_default_timezone_get(),
         ];
     }
 	

@@ -47,9 +47,9 @@ Class Dashboard{
         ];
     }
 
-    private function buildStaticDashboardViewData($requestedRange)
+    private function buildStaticDashboardViewData($requestedRange, $companyId = 0)
     {
-        $rangeInfo = $this->name->resolveDateRange($requestedRange);
+        $rangeInfo = $this->name->resolveDateRange($requestedRange, $companyId);
 
         return [
             'selectedRange' => $rangeInfo['key'],
@@ -73,9 +73,9 @@ Class Dashboard{
         ];
     }
 
-    private function buildStaticRateViewData($requestedRange)
+    private function buildStaticRateViewData($requestedRange, $companyId = 0)
     {
-        $rangeInfo = $this->name->resolveDateRange($requestedRange);
+        $rangeInfo = $this->name->resolveDateRange($requestedRange, $companyId);
 
         return [
             'selectedRange' => $rangeInfo['key'],
@@ -93,7 +93,7 @@ Class Dashboard{
 
     private function buildDashboardViewData($requestedRange, $companyId)
     {
-        $rangeInfo = $this->name->resolveDateRange($requestedRange);
+        $rangeInfo = $this->name->resolveDateRange($requestedRange, $companyId);
         $selectedRange = $rangeInfo['key'];
         $fallbackNotice = '';
         $defaultSummary = [
@@ -149,6 +149,7 @@ Class Dashboard{
         return [
             'selectedRange' => $selectedRange,
             'rangeInfo' => $rangeInfo,
+            'timezoneDebug' => $this->name->getTimezoneDebugInfo($companyId),
             'fallbackNotice' => $fallbackNotice,
             'outboundSummary' => $outboundSummary,
             'statusBreakdown' => $statusBreakdown,
@@ -161,7 +162,7 @@ Class Dashboard{
 
     private function buildRateViewData($requestedRange, $companyId)
     {
-        $rangeInfo = $this->name->resolveDateRange($requestedRange);
+        $rangeInfo = $this->name->resolveDateRange($requestedRange, $companyId);
         $selectedRange = $rangeInfo['key'];
         $fallbackNotice = '';
 
@@ -207,6 +208,7 @@ Class Dashboard{
         return [
             'selectedRange' => $selectedRange,
             'rangeInfo' => $rangeInfo,
+            'timezoneDebug' => $this->name->getTimezoneDebugInfo($companyId),
             'fallbackNotice' => $fallbackNotice,
             'point_1' => $point1,
             'point_3' => $point3,
@@ -226,7 +228,7 @@ Class Dashboard{
             error_log('Dashboard AJAX error: ' . $exception->getMessage());
         }
 
-        $viewData = $this->buildStaticDashboardViewData($requestedRange);
+        $viewData = $this->buildStaticDashboardViewData($requestedRange, $companyId);
         $viewData['fallbackNotice'] = 'Live dashboard data could not be loaded right now, so 0 values are being shown.';
 
         return $viewData;
@@ -240,7 +242,7 @@ Class Dashboard{
             error_log('Rate dashboard AJAX error: ' . $exception->getMessage());
         }
 
-        $viewData = $this->buildStaticRateViewData($requestedRange);
+        $viewData = $this->buildStaticRateViewData($requestedRange, $companyId);
         $viewData['fallbackNotice'] = 'Live rate data could not be loaded right now, so 0 values are being shown.';
 
         return $viewData;
@@ -268,7 +270,7 @@ Class Dashboard{
 		include(INCLUDEPATH.'modules/common/header.php');
 		include(INCLUDEPATH.'modules/common/navbar_1.php');
 
-        extract($this->buildStaticDashboardViewData($this->getSelectedRange()));
+        extract($this->buildStaticDashboardViewData($this->getSelectedRange(), $this->getCompanyId()));
 		include(__DIR__ . "/view/index.php");
 	}
 
@@ -285,7 +287,7 @@ Class Dashboard{
         include(INCLUDEPATH.'modules/common/header.php');
         include(INCLUDEPATH.'modules/common/navbar_1.php');
 
-        extract($this->buildStaticRateViewData($this->getSelectedRange()));
+        extract($this->buildStaticRateViewData($this->getSelectedRange(), $this->getCompanyId()));
         include(__DIR__ . "/view/rates.php");
     }
 
