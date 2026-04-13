@@ -149,7 +149,6 @@ Class Dashboard{
         return [
             'selectedRange' => $selectedRange,
             'rangeInfo' => $rangeInfo,
-            'timezoneDebug' => $this->name->getTimezoneDebugInfo($companyId),
             'fallbackNotice' => $fallbackNotice,
             'outboundSummary' => $outboundSummary,
             'statusBreakdown' => $statusBreakdown,
@@ -208,7 +207,6 @@ Class Dashboard{
         return [
             'selectedRange' => $selectedRange,
             'rangeInfo' => $rangeInfo,
-            'timezoneDebug' => $this->name->getTimezoneDebugInfo($companyId),
             'fallbackNotice' => $fallbackNotice,
             'point_1' => $point1,
             'point_3' => $point3,

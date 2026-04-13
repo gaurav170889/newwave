@@ -400,21 +400,6 @@ Class Dashboard_modal{
         ];
     }
 
-    public function getTimezoneDebugInfo($companyId = 0)
-    {
-        $companyId = intval($companyId);
-        $timezone = $this->getCompanyTimezone($companyId);
-        $companyNow = new DateTimeImmutable('now', new DateTimeZone($timezone));
-        $serverNow = new DateTimeImmutable('now');
-
-        return [
-            'company_id' => $companyId,
-            'timezone' => $timezone,
-            'company_now' => $companyNow->format('Y-m-d H:i:s'),
-            'server_now' => $serverNow->format('Y-m-d H:i:s'),
-            'server_timezone' => date_default_timezone_get(),
-        ];
-    }
 	
 	public function insert($tblname, $filed_data){
 
