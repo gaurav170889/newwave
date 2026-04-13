@@ -18,7 +18,7 @@ Class Campaign_modal{
 	public function updatestatus($id, $status, $dpd_from = null, $dpd_to = null) 
 	{
         $statusText = ($status == '1') ? 'Running' : 'Stop';
-        $now = date('Y-m-d H:i:s');
+        $now = gmdate('Y-m-d H:i:s');
     
         // Escape values to prevent SQL injection (use only if you control input)
         $id = intval($id);
@@ -44,6 +44,136 @@ Class Campaign_modal{
         }
     
         return mysqli_query($this->conn, $sql) ? true : false;
+    }
+
+    private function hasDialerQueueStatusCampaignColumn()
+    {
+        $query = mysqli_query(
+            $this->conn,
+            "SELECT COLUMN_NAME
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'dialer_queue_status'
+               AND COLUMN_NAME = 'campaign_id'
+             LIMIT 1"
+        );
+
+        return $query && mysqli_num_rows($query) > 0;
+    }
+
+    private function getDialerQueueStatusJoinSql($campaignAlias = 'c', $queueAlias = 'qs')
+    {
+        if ($this->hasDialerQueueStatusCampaignColumn()) {
+            return "LEFT JOIN dialer_queue_status {$queueAlias}
+                      ON {$queueAlias}.company_id = {$campaignAlias}.company_id
+                     AND {$queueAlias}.campaign_id = {$campaignAlias}.id
+                     AND CAST({$queueAlias}.queue_dn AS CHAR) = CAST({$campaignAlias}.routeto AS CHAR)";
+        }
+
+        return "LEFT JOIN dialer_queue_status {$queueAlias}
+                  ON {$queueAlias}.company_id = {$campaignAlias}.company_id
+                 AND CAST({$queueAlias}.queue_dn AS CHAR) = CAST({$campaignAlias}.routeto AS CHAR)";
+    }
+
+    private function formatElapsedSeconds($seconds)
+    {
+        $seconds = max(0, intval($seconds));
+        if ($seconds < 60) {
+            return $seconds . ' second' . ($seconds === 1 ? '' : 's');
+        }
+
+        $minutes = floor($seconds / 60);
+        if ($minutes < 60) {
+            return $minutes . ' minute' . ($minutes === 1 ? '' : 's');
+        }
+
+        $days = floor($minutes / 1440);
+        if ($days >= 1) {
+            $remainingHours = floor(($minutes % 1440) / 60);
+            if ($remainingHours > 0) {
+                return $days . ' day' . ($days === 1 ? '' : 's') . ' ' . $remainingHours . ' hour' . ($remainingHours === 1 ? '' : 's');
+            }
+
+            return $days . ' day' . ($days === 1 ? '' : 's');
+        }
+
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+        if ($remainingMinutes > 0) {
+            return $hours . ' hour' . ($hours === 1 ? '' : 's') . ' ' . $remainingMinutes . ' minute' . ($remainingMinutes === 1 ? '' : 's');
+        }
+
+        return $hours . ' hour' . ($hours === 1 ? '' : 's');
+    }
+
+    public function validateCampaignCanStart($campaignId, $freshSeconds = 10)
+    {
+        $campaignId = intval($campaignId);
+        $freshSeconds = max(1, intval($freshSeconds));
+
+        if ($campaignId <= 0) {
+            return ['success' => false, 'message' => 'Campaign not found.'];
+        }
+
+        $query = mysqli_query(
+            $this->conn,
+            "SELECT c.id, c.company_id, c.name, c.routeto, c.dialer_mode, COALESCE(c.route_type, 'Queue') AS route_type,
+                    qs.available_agents, qs.updated_at
+             FROM campaign c
+             {$this->getDialerQueueStatusJoinSql('c', 'qs')}
+             WHERE c.id = {$campaignId}
+             LIMIT 1"
+        );
+
+        if (!$query || mysqli_num_rows($query) === 0) {
+            return ['success' => false, 'message' => 'Campaign not found.'];
+        }
+
+        $row = mysqli_fetch_assoc($query);
+        $dialerMode = trim((string) ($row['dialer_mode'] ?? ''));
+        $routeType = trim((string) ($row['route_type'] ?? 'Queue'));
+        $queueDn = trim((string) ($row['routeto'] ?? ''));
+        $companyId = intval($row['company_id'] ?? 0);
+        $campaignName = trim((string) ($row['name'] ?? ('Campaign #' . $campaignId)));
+        $updatedAtUtc = trim((string) ($row['updated_at'] ?? ''));
+
+        if ($dialerMode !== 'Predictive Dialer' || strcasecmp($routeType, 'Queue') !== 0) {
+            return ['success' => true];
+        }
+
+        if ($queueDn === '') {
+            return ['success' => false, 'message' => 'This predictive campaign cannot start because the queue number is missing.'];
+        }
+
+        if ($updatedAtUtc === '' || $updatedAtUtc === '0000-00-00 00:00:00') {
+            return [
+                'success' => false,
+                'message' => "Queue {$queueDn} has not sent any available-agent update yet. Predictive dialing for {$campaignName} will stay stopped until the queue status starts updating."
+            ];
+        }
+
+        try {
+            $nowUtc = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $updatedAt = new DateTimeImmutable($updatedAtUtc, new DateTimeZone('UTC'));
+            $ageSeconds = max(0, $nowUtc->getTimestamp() - $updatedAt->getTimestamp());
+
+            if ($ageSeconds > $freshSeconds) {
+                return [
+                    'success' => false,
+                    'message' => "Queue {$queueDn} last updated {$this->formatElapsedSeconds($ageSeconds)} ago. Predictive dialing for {$campaignName} will stay stopped until the queue status is refreshed.",
+                    'age_seconds' => $ageSeconds,
+                    'updated_at_local' => $this->formatUtcForCompany($updatedAtUtc, $companyId),
+                    'timezone' => $this->getCompanyTimezone($companyId)
+                ];
+            }
+        } catch (Exception $exception) {
+            return [
+                'success' => false,
+                'message' => "Queue {$queueDn} returned an invalid available-agent update. Predictive dialing for {$campaignName} will stay stopped until the queue status is refreshed."
+            ];
+        }
+
+        return ['success' => true];
     }
 	
 	public function getcampaign($company_id = null)
@@ -130,13 +260,260 @@ Class Campaign_modal{
     
         return  ['success' => true];
     }
+    private function countCsvDataRows($filePath)
+    {
+        $count = 0;
+        if (($handle = fopen($filePath, "r")) === FALSE) {
+            return 0;
+        }
 
+        fgetcsv($handle); // Skip header
+        while (fgetcsv($handle, 1000, ",") !== FALSE) {
+            $count++;
+        }
 
-    public function importnumbersql($campaignId, $filePath)
+        fclose($handle);
+        return $count;
+    }
+
+    private function updateImportProgress($jobId, array $payload)
+    {
+        if ($jobId === '') {
+            return;
+        }
+
+        $safeJobId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $jobId);
+        if ($safeJobId === '') {
+            return;
+        }
+
+        $path = rtrim(UPLOAD, '\\/') . DIRECTORY_SEPARATOR . 'import_progress_' . $safeJobId . '.json';
+        file_put_contents($path, json_encode($payload, JSON_PRETTY_PRINT));
+    }
+
+    private function getCompanyTimezone($companyId)
+    {
+        $companyId = intval($companyId);
+        $defaultTimezone = date_default_timezone_get();
+
+        if ($companyId <= 0) {
+            return $defaultTimezone;
+        }
+
+        $query = mysqli_query($this->conn, "SELECT timezone FROM pbxdetail WHERE company_id = {$companyId} LIMIT 1");
+        if ($query && ($row = mysqli_fetch_assoc($query))) {
+            $timezone = trim((string) ($row['timezone'] ?? ''));
+            if ($timezone !== '') {
+                try {
+                    new DateTimeZone($timezone);
+                    return $timezone;
+                } catch (Exception $exception) {
+                    // Fall through to default timezone.
+                }
+            }
+        }
+
+        return $defaultTimezone;
+    }
+
+    private function formatUtcForCompany($utcDateTime, $companyId)
+    {
+        $utcDateTime = trim((string) $utcDateTime);
+        if ($utcDateTime === '' || $utcDateTime === '0000-00-00 00:00:00') {
+            return '';
+        }
+
+        try {
+            $utcTimezone = new DateTimeZone('UTC');
+            $companyTimezone = new DateTimeZone($this->getCompanyTimezone($companyId));
+            $dateTime = new DateTimeImmutable($utcDateTime, $utcTimezone);
+            return $dateTime->setTimezone($companyTimezone)->format('M j, Y g:i:s A');
+        } catch (Exception $exception) {
+            return $utcDateTime;
+        }
+    }
+
+    public function getQueueStatusAlerts($companyId = null, $freshSeconds = 10)
+    {
+        $freshSeconds = max(1, intval($freshSeconds));
+        $where = "WHERE c.is_deleted = 0
+                  AND c.status = 'Running'
+                  AND c.dialer_mode = 'Predictive Dialer'
+                  AND COALESCE(c.route_type, 'Queue') = 'Queue'";
+
+        if ($companyId !== null) {
+            $companyId = intval($companyId);
+            if ($companyId > 0) {
+                $where .= " AND c.company_id = {$companyId}";
+            }
+        }
+
+        $query = "SELECT c.id AS campaign_id,
+                         c.company_id,
+                         c.name AS campaign_name,
+                         c.routeto AS queue_dn,
+                         qs.available_agents,
+                         qs.updated_at
+                  FROM campaign c
+                  {$this->getDialerQueueStatusJoinSql('c', 'qs')}
+                  {$where}
+                  ORDER BY c.company_id ASC, c.name ASC";
+
+        $result = mysqli_query($this->conn, $query);
+        $alerts = [];
+        if (!$result) {
+            return $alerts;
+        }
+
+        $nowUtc = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $campaignId = intval($row['campaign_id'] ?? 0);
+            $companyIdValue = intval($row['company_id'] ?? 0);
+            $queueDn = trim((string) ($row['queue_dn'] ?? ''));
+            $updatedAtUtc = trim((string) ($row['updated_at'] ?? ''));
+            $availableAgents = intval($row['available_agents'] ?? 0);
+            $reason = '';
+            $ageSeconds = null;
+
+            if ($queueDn === '') {
+                continue;
+            }
+
+            if ($updatedAtUtc === '' || $updatedAtUtc === '0000-00-00 00:00:00') {
+                $reason = 'missing';
+            } else {
+                try {
+                    $updatedAt = new DateTimeImmutable($updatedAtUtc, new DateTimeZone('UTC'));
+                    $ageSeconds = max(0, $nowUtc->getTimestamp() - $updatedAt->getTimestamp());
+                    if ($ageSeconds > $freshSeconds) {
+                        $reason = 'stale';
+                    }
+                } catch (Exception $exception) {
+                    $reason = 'invalid';
+                }
+            }
+
+            if ($reason === '') {
+                continue;
+            }
+
+            $campaignName = trim((string) ($row['campaign_name'] ?? ('Campaign #' . $campaignId)));
+            if ($reason === 'missing') {
+                $message = "Queue {$queueDn} has not sent any available-agent update yet, so predictive dialing is paused for {$campaignName}.";
+            } elseif ($reason === 'stale') {
+                $message = "Queue {$queueDn} has not updated available-agent status for {$this->formatElapsedSeconds($ageSeconds)}, so predictive dialing is paused for {$campaignName}.";
+            } else {
+                $message = "Queue {$queueDn} returned an invalid available-agent update, so predictive dialing is paused for {$campaignName}.";
+            }
+
+            $alerts[] = [
+                'campaign_id' => $campaignId,
+                'company_id' => $companyIdValue,
+                'campaign_name' => $campaignName,
+                'queue_dn' => $queueDn,
+                'reason' => $reason,
+                'available_agents' => $availableAgents,
+                'age_seconds' => $ageSeconds,
+                'updated_at_utc' => $updatedAtUtc,
+                'updated_at_local' => $this->formatUtcForCompany($updatedAtUtc, $companyIdValue),
+                'timezone' => $this->getCompanyTimezone($companyIdValue),
+                'message' => $message
+            ];
+        }
+
+        return $alerts;
+    }
+
+    private function normalizePhoneDigits($number)
+    {
+        return preg_replace('/\D+/', '', (string) $number);
+    }
+
+    private function getPhoneDuplicateKey($number)
+    {
+        $digits = $this->normalizePhoneDigits($number);
+        if ($digits === '') {
+            return strtolower(trim((string) $number));
+        }
+
+        return strlen($digits) >= 10 ? substr($digits, -10) : $digits;
+    }
+
+    private function sanitizePhoneForStorage($number)
+    {
+        $trimmed = trim((string) $number);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        $hasPlus = strpos($trimmed, '+') === 0;
+        $digits = $this->normalizePhoneDigits($trimmed);
+        if ($digits === '') {
+            return $trimmed;
+        }
+
+        return $hasPlus ? '+' . $digits : $digits;
+    }
+
+    private function convertCompanyLocalToUtc($companyId, $datePart, $timePart = '09:00:00')
+    {
+        $datePart = trim((string) $datePart);
+        $timePart = trim((string) $timePart);
+        if ($datePart === '') {
+            return null;
+        }
+
+        if ($timePart === '') {
+            $timePart = '09:00:00';
+        } elseif (strlen($timePart) === 5) {
+            $timePart .= ':00';
+        }
+
+        try {
+            $companyTimezone = new DateTimeZone($this->getCompanyTimezone($companyId));
+            $utcTimezone = new DateTimeZone('UTC');
+            $localDateTime = new DateTimeImmutable($datePart . ' ' . $timePart, $companyTimezone);
+            return $localDateTime->setTimezone($utcTimezone)->format('Y-m-d H:i:s');
+        } catch (Exception $exception) {
+            return null;
+        }
+    }
+
+    private function ensureCampaignImportBatchSchema()
+    {
+        $columnCheck = mysqli_query(
+            $this->conn,
+            "SELECT COLUMN_NAME
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'campaignnumbers'
+               AND COLUMN_NAME = 'import_batch_id'
+             LIMIT 1"
+        );
+
+        if ($columnCheck && mysqli_num_rows($columnCheck) > 0) {
+            return true;
+        }
+
+        $alterAddColumn = "ALTER TABLE campaignnumbers
+                           ADD COLUMN import_batch_id INT(11) NULL DEFAULT NULL
+                           AFTER days_past_due";
+        if (!mysqli_query($this->conn, $alterAddColumn)) {
+            error_log("Failed to add import_batch_id column: " . mysqli_error($this->conn));
+            return false;
+        }
+
+        @mysqli_query($this->conn, "ALTER TABLE campaignnumbers ADD KEY idx_import_batch (company_id, campaignid, import_batch_id, state, next_call_at)");
+        return true;
+    }
+
+    public function importnumbersql($campaignId, $filePath, $jobId = '', $importBatchId = 0)
     {
         $insertCount = 0;
         $skippedCount = 0;
         $campaignId = intval($campaignId);
+        $importBatchId = intval($importBatchId);
         
         // Fetch Campaign Info (Max Attempts & Company ID)
         $campQuery = mysqli_query($this->conn, "SELECT company_id, returncall, created_by, updated_by FROM campaign WHERE id = $campaignId");
@@ -149,9 +526,30 @@ Class Campaign_modal{
         $companyId = $campaignData['company_id'];
         $returnCall = intval($campaignData['returncall']);
         $maxAttempts = ($returnCall > 0) ? $returnCall : 3;
+        $totalRows = $this->countCsvDataRows($filePath);
+        $seenPhonesInCurrentFile = [];
         
         $createdBy = $_SESSION['pid'] ?? 0;
         $activeUser = $_SESSION['pid'] ?? 0;
+        $processedCount = 0;
+
+        if (!$this->ensureCampaignImportBatchSchema()) {
+            return ['success' => false, 'message' => 'Could not prepare import batch tracking in campaignnumbers.'];
+        }
+
+        $this->updateImportProgress($jobId, [
+            'success' => true,
+            'job_id' => $jobId,
+            'status' => 'processing',
+            'message' => 'Import is going on. Please wait...',
+            'phase' => 'import',
+            'percent' => ($totalRows > 0 ? 8 : 80),
+            'processed' => 0,
+            'total' => $totalRows,
+            'inserted' => 0,
+            'skipped' => 0,
+            'deduplicated' => 0
+        ]);
 
         if (($handle = fopen($filePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle); // First line is header
@@ -172,7 +570,9 @@ Class Campaign_modal{
                 }
 
                 // Extract fixed fields
-                $number = mysqli_real_escape_string($this->conn, $row['home phone'] ?? $row['number'] ?? '');
+                $rawNumber = $row['home phone'] ?? $row['number'] ?? '';
+                $normalizedStoredNumber = $this->sanitizePhoneForStorage($rawNumber);
+                $number = mysqli_real_escape_string($this->conn, $normalizedStoredNumber);
                 $fname  = mysqli_real_escape_string($this->conn, $row['first name'] ?? $row['fname'] ?? '');
                 $lname  = mysqli_real_escape_string($this->conn, $row['last name'] ?? $row['lname'] ?? '');
                 $email  = mysqli_real_escape_string($this->conn, $row['email address'] ?? $row['email'] ?? '');
@@ -185,7 +585,7 @@ Class Campaign_modal{
                 $schTime = isset($row['scheduled_time']) ? trim($row['scheduled_time']) : '';
                 
                 $state = 'READY';
-                $nextCallAt = "NOW()";
+                $nextCallAt = "UTC_TIMESTAMP()";
                 
                 // Detect DD-MM-YYYY format and convert to YYYY-MM-DD
                 if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $schDate, $matches)) {
@@ -200,8 +600,10 @@ Class Campaign_modal{
                          
                          $state = 'SCHEDULED';
                          // Escape the datetime string
-                         $dtStr = $schDate . " " . $fullTime;
-                         $nextCallAt = "'" . mysqli_real_escape_string($this->conn, $dtStr) . "'";
+                         $dtStr = $this->convertCompanyLocalToUtc($companyId, $schDate, $fullTime);
+                         if ($dtStr !== null) {
+                             $nextCallAt = "'" . mysqli_real_escape_string($this->conn, $dtStr) . "'";
+                         }
                     }
                 } elseif (!empty($schDate)) {
                     // Only date? Default to 9am? Or treat as READY? 
@@ -210,8 +612,10 @@ Class Campaign_modal{
                     // User said: "If either is provided -> schedule using next_call_at".
                     // If time missing, maybe default to 09:00:00?
                     $state = 'SCHEDULED';
-                    $dtStr = $schDate . " 09:00:00";
-                     $nextCallAt = "'" . mysqli_real_escape_string($this->conn, $dtStr) . "'";
+                    $dtStr = $this->convertCompanyLocalToUtc($companyId, $schDate, '09:00:00');
+                    if ($dtStr !== null) {
+                        $nextCallAt = "'" . mysqli_real_escape_string($this->conn, $dtStr) . "'";
+                    }
                 }
 
                 // Extract Extra Data
@@ -225,6 +629,8 @@ Class Campaign_modal{
                 $exdataJson = mysqli_real_escape_string($this->conn, json_encode($exdata));
 
                 if (!empty($number)) {
+                    $phoneKey = $this->getPhoneDuplicateKey($rawNumber);
+
                     // Check DNC
                     $isDnc = 0;
                     $dncCheck = "SELECT id FROM dialer_dnc WHERE phone_raw='$number' AND company_id='$companyId' LIMIT 1";
@@ -234,32 +640,19 @@ Class Campaign_modal{
                         $state = 'DNC';
                         $nextCallAt = "NULL";
                     }
-                    
-                    // Unique Check: Last 8 digits match + same email + same days past due + same day
-                    // The user wants: same number, email, and days past due on the same day = duplicate.
-                    $last8 = substr($number, -8);
-                    $daysCheck = ($days_past_due === 'NULL') ? "days_past_due IS NULL" : "days_past_due = $days_past_due";
-                    
-                    $checkQuery = "SELECT id FROM campaignnumbers 
-                                   WHERE campaignid = $campaignId 
-                                   AND RIGHT(phone_e164, 8) = '$last8' 
-                                   AND email_address = '$email'
-                                   AND $daysCheck
-                                   AND DATE(created_at) = CURDATE()";
-                    $checkResult = mysqli_query($this->conn, $checkQuery);
 
-                    if (mysqli_num_rows($checkResult) > 0) {
-                        // Duplicate FOUND -> Insert to Skipped
+                    if (isset($seenPhonesInCurrentFile[$phoneKey])) {
                         $skippedQuery = "INSERT INTO campaign_skipped_numbers 
                                         (company_id, campaignid, number, fname, lname, type, feedback, exdata)
                                         VALUES ($companyId, $campaignId, '$number', '$fname', '$lname', '$type', '$feedback', '$exdataJson')";
                         mysqli_query($this->conn, $skippedQuery);
                         $skippedCount++;
                     } else {
-                        // Valid -> Insert to Campaign Numbers
+                        $seenPhonesInCurrentFile[$phoneKey] = true;
+
                         $mainQuery = "INSERT INTO campaignnumbers 
-                                     (company_id, campaignid, phone_e164, phone_raw, first_name, last_name, email_address, days_past_due, exdata, state, next_call_at, max_attempts, is_dnc, created_by, updated_by)
-                                     VALUES ($companyId, $campaignId, '$number', '$number', '$fname', '$lname', '$email', $days_past_due, '$exdataJson', '$state', $nextCallAt, $maxAttempts, $isDnc, $createdBy, $activeUser)";
+                                     (company_id, campaignid, phone_e164, phone_raw, first_name, last_name, email_address, days_past_due, exdata, state, next_call_at, max_attempts, is_dnc, created_by, updated_by, import_batch_id, created_at)
+                                     VALUES ($companyId, $campaignId, '$number', '$number', '$fname', '$lname', '$email', $days_past_due, '$exdataJson', '$state', $nextCallAt, $maxAttempts, $isDnc, $createdBy, $activeUser, " . ($importBatchId > 0 ? $importBatchId : "NULL") . ", UTC_TIMESTAMP())";
                         
                         if (mysqli_query($this->conn, $mainQuery)) {
                             $insertCount++;
@@ -269,11 +662,68 @@ Class Campaign_modal{
                         }
                     }
                 }
+
+                $processedCount++;
+                if ($jobId !== '' && ($processedCount % 50 === 0 || $processedCount === $totalRows)) {
+                    $percent = $totalRows > 0 ? min(90, 8 + (int) floor(($processedCount / $totalRows) * 82)) : 90;
+                    $this->updateImportProgress($jobId, [
+                        'success' => true,
+                        'job_id' => $jobId,
+                        'status' => 'processing',
+                        'message' => 'Import is going on. Please wait...',
+                        'phase' => 'import',
+                        'percent' => $percent,
+                        'processed' => $processedCount,
+                        'total' => $totalRows,
+                        'inserted' => $insertCount,
+                        'skipped' => $skippedCount,
+                        'deduplicated' => 0
+                    ]);
+                }
             }
             fclose($handle);
         }
+
+        $this->updateImportProgress($jobId, [
+            'success' => true,
+            'job_id' => $jobId,
+            'status' => 'processing',
+            'message' => 'Import finished. Latest import batch is ready for dialing.',
+            'phase' => 'finalize',
+            'percent' => 95,
+            'processed' => $processedCount,
+            'total' => $totalRows,
+            'inserted' => $insertCount,
+            'skipped' => $skippedCount,
+            'deduplicated' => 0
+        ]);
         
-        return ['success' => true, 'message' => "$insertCount numbers imported. $skippedCount duplicates skipped."];
+        $result = [
+            'success' => true,
+            'message' => "$insertCount numbers imported from the latest file. $skippedCount duplicate numbers from this same file were skipped. Dialer will prefer this latest import batch.",
+            'inserted' => $insertCount,
+            'skipped' => $skippedCount,
+            'deduplicated' => $skippedCount,
+            'processed' => $processedCount,
+            'total' => $totalRows,
+            'import_batch_id' => $importBatchId
+        ];
+
+        $this->updateImportProgress($jobId, [
+            'success' => true,
+            'job_id' => $jobId,
+            'status' => 'completed',
+            'message' => $result['message'],
+            'phase' => 'done',
+            'percent' => 100,
+            'processed' => $processedCount,
+            'total' => $totalRows,
+            'inserted' => $insertCount,
+            'skipped' => $skippedCount,
+            'deduplicated' => $skippedCount
+        ]);
+
+        return $result;
     }
 
 
@@ -430,8 +880,12 @@ public function getImportLogs($company_id = null)
             $query = "INSERT INTO importnum (company_id, campaign_id, importfilename, tempname, import_by) 
                       VALUES ($companyId, $campaignId, '$originalName', '$tempName', $userId)";
             
-            mysqli_query($this->conn, $query);
+            if (mysqli_query($this->conn, $query)) {
+                return intval(mysqli_insert_id($this->conn));
+            }
         }
+
+        return 0;
     }
 	
 

@@ -66,6 +66,8 @@ if (!function_exists('envValue')) {
 $projectRoot = dirname(__DIR__);
 loadSimpleEnvFile($projectRoot . '/.env.local');
 loadSimpleEnvFile($projectRoot . '/.env');
+loadSimpleEnvFile($projectRoot . '/services/.env.local');
+loadSimpleEnvFile($projectRoot . '/services/.env');
 
 $localConfigFile = __DIR__ . '/variables.local.php';
 if (file_exists($localConfigFile)) {

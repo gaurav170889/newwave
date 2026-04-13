@@ -91,6 +91,77 @@ Class Dashboard_modal{
         }
     }
 
+    private function getCompanyTimezone($companyId = 0)
+    {
+        $companyId = intval($companyId);
+        $defaultTimezone = date_default_timezone_get();
+
+        if ($companyId <= 0 || !$this->tableExists('pbxdetail') || !$this->hasColumn('pbxdetail', 'timezone')) {
+            return $defaultTimezone;
+        }
+
+        $query = $this->conn->query("SELECT timezone FROM pbxdetail WHERE company_id = {$companyId} LIMIT 1");
+        if ($query && ($row = mysqli_fetch_assoc($query))) {
+            $timezone = trim((string) ($row['timezone'] ?? ''));
+            if ($timezone !== '') {
+                try {
+                    new DateTimeZone($timezone);
+                    return $timezone;
+                } catch (\Throwable $exception) {
+                    error_log('Dashboard timezone parse error: ' . $exception->getMessage());
+                }
+            }
+        }
+
+        return $defaultTimezone;
+    }
+
+    private function buildUtcDateRange($startDate = null, $endDate = null, $companyId = 0, $rangeKey = 'today')
+    {
+        $timezoneName = $this->getCompanyTimezone($companyId);
+        $companyTimezone = new DateTimeZone($timezoneName);
+        $utcTimezone = new DateTimeZone('UTC');
+
+        if (!$startDate || !$endDate) {
+            $base = new DateTimeImmutable('now', $companyTimezone);
+            switch ($rangeKey) {
+                case 'this_week':
+                    $start = $base->modify('monday this week')->setTime(0, 0, 0);
+                    $end = $base->modify('sunday this week')->setTime(23, 59, 59);
+                    break;
+                case 'last_week':
+                    $start = $base->modify('monday last week')->setTime(0, 0, 0);
+                    $end = $base->modify('sunday last week')->setTime(23, 59, 59);
+                    break;
+                case 'this_month':
+                    $start = $base->modify('first day of this month')->setTime(0, 0, 0);
+                    $end = $base->modify('last day of this month')->setTime(23, 59, 59);
+                    break;
+                case 'last_month':
+                    $start = $base->modify('first day of last month')->setTime(0, 0, 0);
+                    $end = $base->modify('last day of last month')->setTime(23, 59, 59);
+                    break;
+                case 'today':
+                default:
+                    $start = $base->setTime(0, 0, 0);
+                    $end = $base->setTime(23, 59, 59);
+                    break;
+            }
+        } else {
+            $start = new DateTimeImmutable(trim((string) $startDate) . ' 00:00:00', $companyTimezone);
+            $end = new DateTimeImmutable(trim((string) $endDate) . ' 23:59:59', $companyTimezone);
+        }
+
+        return [
+            'timezone' => $timezoneName,
+            'start_date' => $start->format('Y-m-d'),
+            'end_date' => $end->format('Y-m-d'),
+            'sql_start' => $start->setTimezone($utcTimezone)->format('Y-m-d H:i:s'),
+            'sql_end' => $end->setTimezone($utcTimezone)->format('Y-m-d H:i:s'),
+            'display' => $start->format('M d, Y') . ($start->format('Y-m-d') !== $end->format('Y-m-d') ? ' - ' . $end->format('M d, Y') : ''),
+        ];
+    }
+
     private function buildDateExpression($tableName, $primaryColumn, $fallbackColumn = null, $alias = '')
     {
         $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
@@ -150,6 +221,40 @@ Class Dashboard_modal{
         return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
     }
 
+    private function getDurationSecondsExpression($alias = 'd', $tableName = 'dialer_call_log')
+    {
+        $prefix = $alias !== '' ? rtrim($alias, '.') . '.' : '';
+        $hasDurationSeconds = $this->hasColumn($tableName, 'duration_sec');
+        $hasStartedAt = $this->hasColumn($tableName, 'started_at');
+        $hasEndedAt = $this->hasColumn($tableName, 'ended_at');
+
+        if ($hasStartedAt && $hasEndedAt) {
+            $timestampDiff = "CASE
+                WHEN {$prefix}started_at IS NOT NULL
+                 AND {$prefix}ended_at IS NOT NULL
+                 AND {$prefix}ended_at >= {$prefix}started_at
+                THEN TIMESTAMPDIFF(SECOND, {$prefix}started_at, {$prefix}ended_at)
+                ELSE NULL
+            END";
+
+            if ($hasDurationSeconds) {
+                return "CASE
+                    WHEN {$timestampDiff} IS NOT NULL THEN {$timestampDiff}
+                    WHEN {$prefix}duration_sec > 0 THEN {$prefix}duration_sec
+                    ELSE 0
+                END";
+            }
+
+            return "COALESCE({$timestampDiff}, 0)";
+        }
+
+        if ($hasDurationSeconds) {
+            return "CASE WHEN {$prefix}duration_sec > 0 THEN {$prefix}duration_sec ELSE 0 END";
+        }
+
+        return '0';
+    }
+
     private function tableExists($tableName)
     {
         $tableName = $this->escape($tableName);
@@ -169,8 +274,9 @@ Class Dashboard_modal{
             return [];
         }
 
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId);
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('r', $companyId, 'rate', true);
         $dateExpression = $this->buildDateExpression('rate', 'created_at', 'start_date', 'r');
         $hasAgentTable = $this->tableExists('agent');
@@ -193,8 +299,8 @@ Class Dashboard_modal{
                        COALESCE({$agentExtExpression}, r.agentno, 'Unassigned') AS agent_ext,
                        COALESCE({$agentNameExpression}, '') AS agent_name
                 FROM rate r{$agentJoin}
-                WHERE {$dateExpression} >= '{$startDate} 00:00:00'
-                  AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                WHERE {$dateExpression} >= '{$sqlStart}'
+                  AND {$dateExpression} <= '{$sqlEnd}'{$companyFilter}
                 ORDER BY {$dateExpression} DESC";
 
         return $this->fetchAll($sql);
@@ -272,45 +378,24 @@ Class Dashboard_modal{
             $rangeKey = 'today';
         }
 
-        $today = new DateTimeImmutable('today');
-
-        switch ($rangeKey) {
-            case 'this_week':
-                $label = 'This Week';
-                $start = $today->modify('monday this week');
-                $end = $today->modify('sunday this week');
-                break;
-            case 'last_week':
-                $label = 'Last Week';
-                $start = $today->modify('monday last week');
-                $end = $today->modify('sunday last week');
-                break;
-            case 'this_month':
-                $label = 'This Month';
-                $start = $today->modify('first day of this month');
-                $end = $today->modify('last day of this month');
-                break;
-            case 'last_month':
-                $label = 'Last Month';
-                $start = $today->modify('first day of last month');
-                $end = $today->modify('last day of last month');
-                break;
-            case 'today':
-            default:
-                $label = 'Today';
-                $start = $today;
-                $end = $today;
-                break;
-        }
+        $range = $this->buildUtcDateRange(null, null, 0, $rangeKey);
+        $start = new DateTimeImmutable($range['start_date']);
+        $end = new DateTimeImmutable($range['end_date']);
+        $label = ucwords(str_replace('_', ' ', $rangeKey));
+        if ($rangeKey === 'today') $label = 'Today';
+        if ($rangeKey === 'this_week') $label = 'This Week';
+        if ($rangeKey === 'last_week') $label = 'Last Week';
+        if ($rangeKey === 'this_month') $label = 'This Month';
+        if ($rangeKey === 'last_month') $label = 'Last Month';
 
         return [
             'key' => $rangeKey,
             'label' => $label,
-            'start_date' => $start->format('Y-m-d'),
-            'end_date' => $end->format('Y-m-d'),
-            'sql_start' => $start->format('Y-m-d 00:00:00'),
-            'sql_end' => $end->format('Y-m-d 23:59:59'),
-            'display' => $start->format('M d, Y') . ($start != $end ? ' - ' . $end->format('M d, Y') : ''),
+            'start_date' => $range['start_date'],
+            'end_date' => $range['end_date'],
+            'sql_start' => $range['sql_start'],
+            'sql_end' => $range['sql_end'],
+            'display' => $range['display'],
         ];
     }
 	
@@ -336,9 +421,9 @@ Class Dashboard_modal{
 
 	public function agentoutcall($tblname,$column, $startDate = null, $endDate = null, $companyId = 0)
 	{
-        $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
-        $startDate = $this->escape($range['start_date']);
-        $endDate = $this->escape($range['end_date']);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId, 'today');
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('d', $companyId);
 
 		$sql = "SELECT COALESCE(NULLIF(d.agent_id, ''), 'Unassigned') AS `$column`,
@@ -346,7 +431,7 @@ Class Dashboard_modal{
                        COUNT(CASE WHEN d.call_status = 'ANSWERED' THEN 1 END) AS `Outbound`,
                        COUNT(CASE WHEN d.call_status <> 'ANSWERED' OR d.call_status IS NULL THEN 1 END) AS `Notanswered`
                 FROM dialer_call_log d
-                WHERE d.started_at >= '{$startDate} 00:00:00' AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}
+                WHERE d.started_at >= '{$sqlStart}' AND d.started_at <= '{$sqlEnd}'{$companyFilter}
                 GROUP BY d.agent_id
                 ORDER BY COUNT(*) DESC";
 
@@ -359,9 +444,9 @@ Class Dashboard_modal{
 	}
 	
 	public function calltotal($tblname,$countattr1,$countattr2, $startDate = null, $endDate = null, $companyId = 0){
-        $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
-        $startDate = $this->escape($range['start_date']);
-        $endDate = $this->escape($range['end_date']);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId, 'today');
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $countattr1 = $this->escape($countattr1);
         $countattr2 = $this->escape($countattr2);
         $companyFilter = $this->companyCondition('d', $companyId);
@@ -369,8 +454,8 @@ Class Dashboard_modal{
 		$search = "SELECT COUNT(call_status) AS total
                    FROM dialer_call_log d
                    WHERE (d.call_status='$countattr1' OR d.call_status='$countattr2')
-                     AND d.started_at >= '{$startDate} 00:00:00'
-                     AND d.started_at <= '{$endDate} 23:59:59'{$companyFilter}";
+                     AND d.started_at >= '{$sqlStart}'
+                     AND d.started_at <= '{$sqlEnd}'{$companyFilter}";
 		$search_query = mysqli_query($this->conn, $search);
 		if($search_query && mysqli_num_rows($search_query) > 0){
 			$search_fetch = mysqli_fetch_array($search_query);
@@ -382,7 +467,7 @@ Class Dashboard_modal{
 
     private function pointCount($tablename, $point, $startDate = null, $endDate = null, $companyId = 0)
     {
-        $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId, 'today');
         $targetPoint = (int) $point;
         $count = 0;
 
@@ -418,7 +503,7 @@ Class Dashboard_modal{
 
 	public function totalcallpoint($tablename, $startDate = null, $endDate = null, $companyId = 0)
 	{
-        $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId, 'today');
         $total = 0;
 
         foreach ($this->getRateRows($range['start_date'], $range['end_date'], $companyId) as $row) {
@@ -434,7 +519,7 @@ Class Dashboard_modal{
 	{
 		$data = [];
 		$id = 1;
-        $range = (!$startDate || !$endDate) ? $this->resolveDateRange('today') : ['start_date' => $startDate, 'end_date' => $endDate];
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId, 'today');
         $agentStats = [];
 
         foreach ($this->getRateRows($range['start_date'], $range['end_date'], $companyId) as $row) {
@@ -503,10 +588,9 @@ Class Dashboard_modal{
             return $summary;
         }
 
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
-        $sqlStart = $startDate . ' 00:00:00';
-        $sqlEnd = $endDate . ' 23:59:59';
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId);
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
         $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
         $uniqueExpression = $this->getUniqueNumberExpression('d');
@@ -520,12 +604,9 @@ Class Dashboard_modal{
         $dispositionExpression = $this->hasColumn('dialer_call_log', 'disposition')
             ? "SUM(CASE WHEN d.disposition IS NOT NULL AND d.disposition <> '' THEN 1 ELSE 0 END)"
             : '0';
-        $durationSumExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
-            ? "COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0)"
-            : '0';
-        $durationAvgExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
-            ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
-            : '0';
+        $durationExpression = $this->getDurationSecondsExpression('d', 'dialer_call_log');
+        $durationSumExpression = "COALESCE(SUM({$durationExpression}), 0)";
+        $durationAvgExpression = "COALESCE(AVG(NULLIF({$durationExpression}, 0)), 0)";
 
         $query = "SELECT COUNT(*) AS total_calls,
                          COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
@@ -559,8 +640,9 @@ Class Dashboard_modal{
             return [];
         }
 
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId);
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
         $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
         $statusExpression = $this->hasColumn('dialer_call_log', 'call_status')
@@ -569,7 +651,7 @@ Class Dashboard_modal{
 
         $query = "SELECT {$statusExpression} AS status, COUNT(*) AS total
                   FROM dialer_call_log d
-                  WHERE {$dateExpression} >= '{$startDate} 00:00:00' AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  WHERE {$dateExpression} >= '{$sqlStart}' AND {$dateExpression} <= '{$sqlEnd}'{$companyFilter}
                   GROUP BY {$statusExpression}
                   ORDER BY total DESC, status ASC
                   LIMIT 6";
@@ -583,8 +665,9 @@ Class Dashboard_modal{
             return [];
         }
 
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId);
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
         $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
         $uniqueExpression = $this->getUniqueNumberExpression('d');
@@ -607,7 +690,7 @@ Class Dashboard_modal{
                          COUNT(DISTINCT {$uniqueExpression}) AS unique_numbers,
                          MAX({$dateExpression}) AS last_call_at
                   FROM dialer_call_log d{$campaignJoin}
-                  WHERE {$dateExpression} >= '{$startDate} 00:00:00' AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  WHERE {$dateExpression} >= '{$sqlStart}' AND {$dateExpression} <= '{$sqlEnd}'{$companyFilter}
                   GROUP BY {$groupBy}
                   ORDER BY total_calls DESC, unique_numbers DESC, campaign_name ASC
                   LIMIT 5";
@@ -621,18 +704,16 @@ Class Dashboard_modal{
             return [];
         }
 
-        $startDate = $this->escape($startDate);
-        $endDate = $this->escape($endDate);
+        $range = $this->buildUtcDateRange($startDate, $endDate, $companyId);
+        $sqlStart = $this->escape($range['sql_start']);
+        $sqlEnd = $this->escape($range['sql_end']);
         $companyFilter = $this->companyCondition('d', $companyId, 'dialer_call_log', true);
         $dateExpression = $this->buildDateExpression('dialer_call_log', 'started_at', 'created_at', 'd');
         $uniqueExpression = $this->getUniqueNumberExpression('d');
         $answeredCondition = $this->buildAnsweredCondition('d', 'dialer_call_log');
-        $durationSumExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
-            ? "COALESCE(SUM(CASE WHEN d.duration_sec > 0 THEN d.duration_sec ELSE 0 END), 0)"
-            : '0';
-        $durationAvgExpression = $this->hasColumn('dialer_call_log', 'duration_sec')
-            ? "COALESCE(AVG(CASE WHEN d.duration_sec > 0 THEN d.duration_sec END), 0)"
-            : '0';
+        $durationExpression = $this->getDurationSecondsExpression('d', 'dialer_call_log');
+        $durationSumExpression = "COALESCE(SUM({$durationExpression}), 0)";
+        $durationAvgExpression = "COALESCE(AVG(NULLIF({$durationExpression}, 0)), 0)";
         $agentKeyExpression = "COALESCE(NULLIF(TRIM(d.agent_id), ''), 'Unassigned')";
 
         $query = "SELECT {$agentKeyExpression} AS agent_key,
@@ -641,8 +722,8 @@ Class Dashboard_modal{
                          {$durationSumExpression} AS total_talk_seconds,
                          {$durationAvgExpression} AS avg_talk_seconds
                   FROM dialer_call_log d
-                  WHERE {$dateExpression} >= '{$startDate} 00:00:00'
-                    AND {$dateExpression} <= '{$endDate} 23:59:59'{$companyFilter}
+                  WHERE {$dateExpression} >= '{$sqlStart}'
+                    AND {$dateExpression} <= '{$sqlEnd}'{$companyFilter}
                   GROUP BY {$agentKeyExpression}
                   HAVING connected_calls > 0 OR unique_numbers > 0
                   ORDER BY connected_calls DESC, unique_numbers DESC, agent_key ASC";

@@ -149,7 +149,7 @@ if ($existing) {
     $status_map = [$key_name => $current_status];
     $status_json = json_encode($status_map);
     
-    $ins_sql = "INSERT INTO `rate` (company_id, callid, agentid, agentno, queue, callerno, ratings_json, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    $ins_sql = "INSERT INTO `rate` (company_id, callid, agentid, agentno, queue, callerno, ratings_json, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())";
     $ins_stmt = mysqli_prepare($conn, $ins_sql);
     // types: i s i s s s s s
     mysqli_stmt_bind_param($ins_stmt, "isisssss", $company_id, $callid, $agentid, $agentno, $queue, $callerno, $json_str, $status_json);

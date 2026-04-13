@@ -8,6 +8,39 @@ Class Campaign{
 	public function __construct() {
       $this->modal = loadmodal("campaign");
     }
+
+    private function getImportProgressFilePath($jobId)
+    {
+        $safeJobId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $jobId);
+        if ($safeJobId === '') {
+            return '';
+        }
+
+        return rtrim(UPLOAD, '\\/') . DIRECTORY_SEPARATOR . 'import_progress_' . $safeJobId . '.json';
+    }
+
+    private function writeImportProgress($jobId, array $payload)
+    {
+        $path = $this->getImportProgressFilePath($jobId);
+        if ($path === '') {
+            return;
+        }
+
+        file_put_contents($path, json_encode($payload, JSON_PRETTY_PRINT));
+    }
+
+    private function readImportProgress($jobId)
+    {
+        $path = $this->getImportProgressFilePath($jobId);
+        if ($path === '' || !file_exists($path)) {
+            return null;
+        }
+
+        $raw = file_get_contents($path);
+        $decoded = json_decode((string) $raw, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
 	public function index(){
         $_SESSION['navurl'] = 'Module';
 	    //echo "abcd";
@@ -55,11 +88,22 @@ Class Campaign{
         if (isset($input['id'], $input['status'])) {
             $dpd_from = isset($input['dpd_from']) && $input['dpd_from'] !== '' ? intval($input['dpd_from']) : null;
             $dpd_to = isset($input['dpd_to']) && $input['dpd_to'] !== '' ? intval($input['dpd_to']) : null;
+
+            if ((string) $input['status'] === '1') {
+                $validation = $this->modal->validateCampaignCanStart($input['id']);
+                if (empty($validation['success'])) {
+                    echo json_encode($validation);
+                    return;
+                }
+            }
             
             $success = $this->modal->updatestatus($input['id'], $input['status'], $dpd_from, $dpd_to);
-            echo json_encode(['success' => $success]);
+            echo json_encode([
+                'success' => $success,
+                'message' => $success ? null : 'Failed to update campaign status.'
+            ]);
         } else {
-            echo json_encode(['success' => false]);
+            echo json_encode(['success' => false, 'message' => 'Campaign status request is incomplete.']);
         }
 	}
 	
@@ -83,6 +127,25 @@ Class Campaign{
 	    $data = $this->modal->getcampaign($company_id);
 	    echo $data;
 	}
+
+    public function get_queue_alerts()
+    {
+        header('Content-Type: application/json');
+
+        $companyId = null;
+        if (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') {
+            if (isset($_GET['company_id']) && $_GET['company_id'] !== '') {
+                $companyId = intval($_GET['company_id']);
+            }
+        } elseif (isset($_SESSION['company_id'])) {
+            $companyId = intval($_SESSION['company_id']);
+        }
+
+        echo json_encode([
+            'success' => true,
+            'alerts' => $this->modal->getQueueStatusAlerts($companyId)
+        ]);
+    }
 	
 	public function addcampaign()
 	{
@@ -157,8 +220,39 @@ Class Campaign{
 	
 	public function import_numbers()
     {
+        header('Content-Type: application/json');
+
+        $jobId = isset($_POST['import_job_id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $_POST['import_job_id']) : '';
+        if ($jobId === '') {
+            $jobId = 'job_' . time() . '_' . mt_rand(1000, 9999);
+        }
+
+        if (!is_dir(UPLOAD)) {
+            mkdir(UPLOAD, 0777, true);
+        }
+
+        $this->writeImportProgress($jobId, [
+            'success' => true,
+            'job_id' => $jobId,
+            'status' => 'starting',
+            'message' => 'Import is going on. Please wait...',
+            'phase' => 'upload',
+            'percent' => 2,
+            'processed' => 0,
+            'total' => 0,
+            'inserted' => 0,
+            'skipped' => 0,
+            'deduplicated' => 0
+        ]);
+
         if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] !== 0) {
-            echo json_encode(['success' => false, 'message' => 'File upload failed.']);
+            $result = ['success' => false, 'job_id' => $jobId, 'message' => 'File upload failed.'];
+            $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'upload',
+                'percent' => 100
+            ]));
+            echo json_encode($result);
             return;
         }
     
@@ -168,7 +262,13 @@ Class Campaign{
         // Validate CSV extension
         $ext = strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION));
         if ($ext !== 'csv') {
-            echo json_encode(['success' => false, 'message' => 'Only CSV files are allowed.']);
+            $result = ['success' => false, 'job_id' => $jobId, 'message' => 'Only CSV files are allowed.'];
+            $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'validation',
+                'percent' => 100
+            ]));
+            echo json_encode($result);
             return;
         }
     
@@ -176,12 +276,24 @@ Class Campaign{
         $campaignStatus = $this->modal->getCampaignStatus($campaignId);
         
         if ($campaignStatus === false) {
-             echo json_encode(['success' => false, 'message' => 'Campaign or Company not found.']);
+             $result = ['success' => false, 'job_id' => $jobId, 'message' => 'Campaign or Company not found.'];
+             $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'validation',
+                'percent' => 100
+             ]));
+             echo json_encode($result);
              return;
         }
         
         if ($campaignStatus === 'Running') {
-             echo json_encode(['success' => false, 'message' => 'Cannot import numbers to a running campaign. Please stop it first.']);
+             $result = ['success' => false, 'job_id' => $jobId, 'message' => 'Cannot import numbers to a running campaign. Please stop it first.'];
+             $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'validation',
+                'percent' => 100
+             ]));
+             echo json_encode($result);
              return;
         }
         
@@ -190,40 +302,85 @@ Class Campaign{
         $fileExt = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
         
         if ($fileExt !== 'csv') {
-             echo json_encode(['success' => false, 'message' => 'Only CSV files are allowed.']);
+             $result = ['success' => false, 'job_id' => $jobId, 'message' => 'Only CSV files are allowed.'];
+             $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'validation',
+                'percent' => 100
+             ]));
+             echo json_encode($result);
              return;
         }
 
         $tempFileName = 'import_' . time() . '_' . rand(1000, 9999) . '.csv';
         // Ensure UPLOAD constant is used (defined in variables.php as absolute path)
         $targetPath = UPLOAD . $tempFileName;
-        
-        // Log to Database (importnum)
-        // Need Company ID. Fetch it again or assume modal does it? 
-        // Best to fetch it here to log it correctly.
-        // We can reuse getCampaignStatus if it returned array, but it returns string status.
-        // Let's do a quick query via modal or just assume modal function handles extraction?
-        // User wants log table populated. Let's add a helper in modal to log this.
-        
-        if (!is_dir(UPLOAD)) {
-            mkdir(UPLOAD, 0777, true);
-        }
     
         // Move uploaded file
         if (!move_uploaded_file($fileInfo['tmp_name'], $targetPath)) {
-            echo json_encode(['success' => false, 'message' => 'Failed to save uploaded file. Permission denied or path error. Path: ' . $targetPath]);
+            $result = ['success' => false, 'job_id' => $jobId, 'message' => 'Failed to save uploaded file. Permission denied or path error.'];
+            $this->writeImportProgress($jobId, array_merge($result, [
+                'status' => 'failed',
+                'phase' => 'upload',
+                'percent' => 100
+            ]));
+            echo json_encode($result);
             return;
         }
         
         $userId = $_SESSION['pid'] ?? 0;
         
         // Log Import
-        $this->modal->logImport($campaignId, $originalFileName, $tempFileName, $userId);
+        $importBatchId = $this->modal->logImport($campaignId, $originalFileName, $tempFileName, $userId);
     
+        $this->writeImportProgress($jobId, [
+            'success' => true,
+            'job_id' => $jobId,
+            'status' => 'processing',
+            'message' => 'Import is going on. Please wait...',
+            'phase' => 'import',
+            'percent' => 5,
+            'processed' => 0,
+            'total' => 0,
+            'inserted' => 0,
+            'skipped' => 0,
+            'deduplicated' => 0,
+            'import_batch_id' => $importBatchId
+        ]);
+
+        ignore_user_abort(true);
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
         // Call model function to import
-        $result = $this->modal->importnumbersql($campaignId, $targetPath);
+        $result = $this->modal->importnumbersql($campaignId, $targetPath, $jobId, $importBatchId);
+        $result['job_id'] = $jobId;
     
         echo json_encode($result);
+    }
+
+    public function get_import_progress()
+    {
+        header('Content-Type: application/json');
+
+        $jobId = isset($_GET['job_id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $_GET['job_id']) : '';
+        if ($jobId === '') {
+            echo json_encode(['success' => false, 'message' => 'Missing import job id.']);
+            return;
+        }
+
+        $progress = $this->readImportProgress($jobId);
+        if (!$progress) {
+            echo json_encode(['success' => false, 'message' => 'Import progress not found.']);
+            return;
+        }
+
+        echo json_encode($progress);
     }
     
     public function delete_campaign()

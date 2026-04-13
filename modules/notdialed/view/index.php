@@ -66,7 +66,7 @@
         </div>
 
         <div class="alert alert-info py-2 px-3 mb-0" id="notDialedStatus">
-          This table shows numbers with <strong>0 attempts</strong> and <strong>no dialer attempt log</strong> that are not already part of today's Contacts batch.
+          This table shows numbers the system already attempted but that were <strong>not received by an agent</strong>, including current-date records, ordered by the latest system call first.
         </div>
       </div>
     </div>
@@ -398,7 +398,7 @@ $(document).ready(function() {
       { data: 'next_call_at' },
       { data: 'created_at' }
     ],
-    order: [[1, 'desc']],
+    order: [[8, 'desc'], [1, 'desc']],
     responsive: true,
     search: {
       return: true

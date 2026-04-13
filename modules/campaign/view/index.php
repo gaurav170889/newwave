@@ -201,11 +201,56 @@
               <a href="campaign/download_sample" target="_blank" class="ml-2"><i class="fas fa-file-csv"></i> Download Sample CSV</a>
           </small>
         </div>
+        <input type="hidden" id="importJobId" name="import_job_id" value="">
+        <div id="importProgressPanel" class="border rounded p-3 bg-light" style="display:none;">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>Import Status</strong>
+            <span id="importProgressPercent">0%</span>
+          </div>
+          <div class="progress mb-2" style="height: 22px;">
+            <div id="importProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+          </div>
+          <div id="importProgressMessage" class="small text-muted mb-2">Import is going on. Please wait...</div>
+          <div id="importProgressStats" class="small text-muted">
+            Processed: <span id="importProcessedCount">0</span> / <span id="importTotalCount">0</span>
+            | Inserted: <span id="importInsertedCount">0</span>
+            | Skipped: <span id="importSkippedCount">0</span>
+            | Duplicate phones removed: <span id="importDeduplicatedCount">0</span>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Import</button>
+        <button type="submit" class="btn btn-primary" id="importNumbersSubmitBtn">Import</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal fade" id="webhookInfoModal" tabindex="-1" role="dialog" aria-labelledby="webhookInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="webhookInfoModalLabel">Campaign Webhook</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group mb-3">
+          <label for="webhookUrlField">Webhook URL</label>
+          <input type="text" class="form-control" id="webhookUrlField" readonly>
+        </div>
+        <div class="form-group mb-0">
+          <label for="webhookExampleField">Example URL</label>
+          <textarea class="form-control" id="webhookExampleField" rows="3" readonly></textarea>
+          <small class="form-text text-muted">Use this webhook from your queue status updater so the predictive dialer can read available agents.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="copyWebhookFromModal">Copy Example URL</button>
+      </div>
+    </div>
   </div>
 </div>
 <style>
@@ -216,9 +261,26 @@
 .select2-dropdown {
     z-index: 100001 !important; /* Higher than Container */
 }
+
+#importToastMessage {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1065;
+    min-width: 280px;
+    max-width: 420px;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+#queueStatusAlertContainer .alert {
+    margin: 0 0 18px 0;
+}
 </style>
+<div id="importToastMessage" class="alert alert-success" role="alert"></div>
 <main class="content">
 	<div class="container-fluid p-0">
+		<div id="queueStatusAlertContainer" style="display:none;"></div>
 		<div class="container-fluid" style="margin-top:30px;margin-bottom:20px;">
 			<div class="container">
 			
@@ -283,6 +345,7 @@
       </div>
 
       <div class="modal-body">
+        <div id="startCampaignErrorBox" class="alert alert-danger" style="display:none;" role="alert"></div>
         <p>Optionally filter which numbers to dial based on Days Past Due.</p>
         <div class="row">
             <div class="col-md-6 form-group">
@@ -312,6 +375,8 @@ $(document).ready(function() {
     
     const isSuperAdmin = <?php echo (isset($_SESSION['prole']) && $_SESSION['prole'] == 'super_admin') ? 'true' : 'false'; ?>;
     const QUEUE_WEBHOOK_URL = "<?php echo QUEUE_WEBHOOK_URL; ?>";
+    const queueStatusAlertContainer = $('#queueStatusAlertContainer');
+    let activeWebhookExample = '';
     
     const columns = [
           { data: 'id' },
@@ -378,10 +443,98 @@ $(document).ready(function() {
             // feather.replace(); // If using feather icons
         }
     });
+
+    function escapeHtml(value) {
+        return $('<div>').text(value == null ? '' : String(value)).html();
+    }
+
+    function renderQueueAlerts(alerts) {
+        if (!Array.isArray(alerts) || alerts.length === 0) {
+            queueStatusAlertContainer.hide().empty();
+            return;
+        }
+
+        const items = alerts.map(function(alert) {
+            let detail = '';
+            if (alert.updated_at_local) {
+                detail = ` <small class="d-block mt-1">Last queue update: ${escapeHtml(alert.updated_at_local)} (${escapeHtml(alert.timezone || 'UTC')})</small>`;
+            }
+            return `<li>${escapeHtml(alert.message || '')}${detail}</li>`;
+        }).join('');
+
+        queueStatusAlertContainer.html(
+            `<div class="alert alert-danger" role="alert">
+                <strong>Predictive Dialer Queue Warning</strong>
+                <ul class="mb-0 pl-3">${items}</ul>
+            </div>`
+        ).show();
+    }
+
+    function loadQueueAlerts() {
+        $.ajax({
+            url: 'campaign/get_queue_alerts',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                company_id: $('#companyFilter').val() || ''
+            }
+        }).done(function(response) {
+            renderQueueAlerts(response && response.success ? response.alerts : []);
+        }).fail(function() {
+            queueStatusAlertContainer.hide().empty();
+        });
+    }
+
+    function buildStartCampaignErrorMessage(response) {
+        if (!response) {
+            return 'The campaign could not be started.';
+        }
+
+        let message = response.message || response.error || 'The campaign could not be started.';
+        if (response.updated_at_local) {
+            message += `\n\nLast queue update: ${response.updated_at_local} (${response.timezone || 'UTC'})`;
+        }
+
+        return message;
+    }
+
+    function hideStartCampaignError() {
+        $('#startCampaignErrorBox').hide().empty();
+    }
+
+    function showStartCampaignError(response) {
+        const message = buildStartCampaignErrorMessage(response);
+        $('#startCampaignErrorBox')
+            .html(escapeHtml(message).replace(/\n/g, '<br>'))
+            .show();
+    }
+
+    function normalizeAjaxJsonResponse(responseText) {
+        if (responseText && typeof responseText === 'object') {
+            return responseText;
+        }
+
+        if (typeof responseText === 'string' && $.trim(responseText) !== '') {
+            try {
+                return JSON.parse(responseText);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    loadQueueAlerts();
     
     // Reload table on filter change
     $('#companyFilter').on('change', function() {
         table.ajax.reload();
+        loadQueueAlerts();
+    });
+
+    table.on('xhr.dt', function() {
+        loadQueueAlerts();
     });
 
     // --- Add/Edit Campaign Logic ---
@@ -494,6 +647,7 @@ $(document).ready(function() {
             alert(isEdit ? 'Campaign updated successfully!' : 'Campaign added successfully!');
             $('#addCampaignModal').modal('hide');
             table.ajax.reload();
+            loadQueueAlerts();
           } else {
             alert('Error: ' + response.error);
           }
@@ -515,14 +669,16 @@ $(document).ready(function() {
             $('#startCampaignId').val(id);
             $('#dpdFrom').val('');
             $('#dpdTo').val('');
+            hideStartCampaignError();
             $('#startCampaignDpdModal').modal('show');
         } else {
             // Stopping campaign: Send immediately
             $.post('campaign/toggle_campaign_status', { id: id, status: newStatus }, function (response) {
               if (response.success) {
                 table.ajax.reload(null, false);
+                loadQueueAlerts();
               } else {
-                alert('Failed to update status');
+                alert(buildStartCampaignErrorMessage(response));
               }
             }, 'json');
         }
@@ -533,20 +689,32 @@ $(document).ready(function() {
         e.preventDefault();
         const formData = $(this).serialize();
         const btn = $('#confirmStartCampaignBtn');
+        hideStartCampaignError();
         btn.prop('disabled', true).text('Starting...');
 
         $.post('campaign/toggle_campaign_status', formData, function(response) {
+            response = normalizeAjaxJsonResponse(response) || response;
             btn.prop('disabled', false).text('Start Campaign');
             if (response.success) {
                 $('#startCampaignDpdModal').modal('hide');
                 table.ajax.reload(null, false);
+                loadQueueAlerts();
             } else {
-                alert('Failed to start campaign');
+                showStartCampaignError(response);
             }
-        }, 'json').fail(function() {
+        }, 'json').fail(function(xhr) {
             btn.prop('disabled', false).text('Start Campaign');
-            alert('Server error.');
+            const response = normalizeAjaxJsonResponse(xhr && (xhr.responseJSON || xhr.responseText));
+            if (response) {
+                showStartCampaignError(response);
+            } else {
+                showStartCampaignError({ message: 'Server error.' });
+            }
         });
+    });
+
+    $('#startCampaignDpdModal').on('hidden.bs.modal', function() {
+        hideStartCampaignError();
     });
 
     // --- Delete Campaign ---
@@ -563,6 +731,7 @@ $(document).ready(function() {
                 if (response.success) {
                     alert('Campaign deleted.');
                     table.ajax.reload();
+                    loadQueueAlerts();
                 } else {
                     alert('Error deleting campaign: ' + (response.error || 'Unknown error'));
                 }
@@ -570,17 +739,27 @@ $(document).ready(function() {
         });
     });
 
-    // --- Copy Webhook Logic ---
+    // --- Webhook Modal Logic ---
     $('#campaignTable tbody').on('click', '.copy-webhook', function() {
         const url = $(this).data('url');
         const example = url + '&queue_dn=800&availableagent=5';
-        
-        // Copy to clipboard
-        navigator.clipboard.writeText(example).then(function() {
-            alert('Webhook URL copied to clipboard!\n\nExample:\n' + example);
+        activeWebhookExample = example;
+
+        $('#webhookUrlField').val(url);
+        $('#webhookExampleField').val(example);
+        $('#webhookInfoModal').modal('show');
+    });
+
+    $('#copyWebhookFromModal').on('click', function() {
+        if (!activeWebhookExample) {
+            return;
+        }
+
+        navigator.clipboard.writeText(activeWebhookExample).then(function() {
+            alert('Webhook example URL copied to clipboard.');
         }, function(err) {
-            alert('Could not copy text: ', err);
-            prompt("Copy this URL:", example);
+            alert('Could not copy text: ' + err);
+            prompt("Copy this URL:", activeWebhookExample);
         });
     });
 
@@ -649,6 +828,125 @@ $(document).ready(function() {
           $('#campaignSelect').html(options).trigger('change');
         });
     }
+
+    let importProgressTimer = null;
+    let activeImportJobId = null;
+    let importInProgress = false;
+    let importCompletionHandled = false;
+
+    function generateImportJobId() {
+        return 'job_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    }
+
+    function setImportUiState(isBusy) {
+        importInProgress = isBusy;
+        $('#importNumbersSubmitBtn').prop('disabled', isBusy).text(isBusy ? 'Importing...' : 'Import');
+        $('#csvFile, #campaignSelect, #importCompanySelect').prop('disabled', isBusy);
+        $('#importNumbersModal .close').prop('disabled', isBusy);
+        if (isBusy) {
+            $('#importProgressPanel').show();
+        }
+    }
+
+    function updateImportProgressUi(progress) {
+        const percent = Math.max(0, Math.min(100, parseInt(progress.percent || 0, 10)));
+        $('#importProgressBar')
+            .css('width', percent + '%')
+            .attr('aria-valuenow', percent)
+            .text(percent + '%');
+        $('#importProgressPercent').text(percent + '%');
+        $('#importProgressMessage').text(progress.message || 'Import is going on. Please wait...');
+        $('#importProcessedCount').text(progress.processed || 0);
+        $('#importTotalCount').text(progress.total || 0);
+        $('#importInsertedCount').text(progress.inserted || 0);
+        $('#importSkippedCount').text(progress.skipped || 0);
+        $('#importDeduplicatedCount').text(progress.deduplicated || 0);
+
+        $('#importProgressBar')
+            .toggleClass('bg-success', progress.status === 'completed')
+            .toggleClass('bg-danger', progress.status === 'failed');
+    }
+
+    function stopImportProgressPolling() {
+        if (importProgressTimer) {
+            clearInterval(importProgressTimer);
+            importProgressTimer = null;
+        }
+    }
+
+    function showImportToast(message, type) {
+        const $toast = $('#importToastMessage');
+        $toast
+            .removeClass('alert-success alert-danger alert-info')
+            .addClass(type === 'error' ? 'alert-danger' : 'alert-success')
+            .text(message || 'Import complete.')
+            .stop(true, true)
+            .fadeIn(150);
+
+        setTimeout(function () {
+            $toast.fadeOut(250);
+        }, 2500);
+    }
+
+    function handleImportCompleted(progress) {
+        if (importCompletionHandled) {
+            return;
+        }
+
+        importCompletionHandled = true;
+        stopImportProgressPolling();
+        setImportUiState(false);
+        updateImportProgressUi(progress || {
+            percent: 100,
+            status: 'completed',
+            message: 'Import complete!'
+        });
+
+        setTimeout(function () {
+            $('#importNumbersModal').modal('hide');
+        }, 300);
+    }
+
+    function startImportProgressPolling(jobId) {
+        stopImportProgressPolling();
+        activeImportJobId = jobId;
+
+        importProgressTimer = setInterval(function () {
+            $.getJSON('campaign/get_import_progress', { job_id: jobId })
+                .done(function (response) {
+                    if (!response || response.success === false) {
+                        return;
+                    }
+
+                    updateImportProgressUi(response);
+
+                    if (response.status === 'completed') {
+                        handleImportCompleted(response);
+                    } else if (response.status === 'failed') {
+                        setImportUiState(false);
+                        stopImportProgressPolling();
+                    }
+                });
+        }, 1000);
+    }
+
+    function resetImportProgressUi() {
+        stopImportProgressPolling();
+        activeImportJobId = null;
+        importInProgress = false;
+        importCompletionHandled = false;
+        $('#importJobId').val('');
+        $('#importProgressPanel').hide();
+        $('#importProgressBar')
+            .css('width', '0%')
+            .attr('aria-valuenow', 0)
+            .text('0%')
+            .removeClass('bg-success bg-danger');
+        $('#importProgressPercent').text('0%');
+        $('#importProgressMessage').text('Import is going on. Please wait...');
+        $('#importProcessedCount, #importTotalCount, #importInsertedCount, #importSkippedCount, #importDeduplicatedCount').text('0');
+        setImportUiState(false);
+    }
     
     $('#importNumbersForm').on('submit', function (e) {
         e.preventDefault();
@@ -663,7 +961,23 @@ $(document).ready(function() {
              return;
         }
 
+        const jobId = generateImportJobId();
+        $('#importJobId').val(jobId);
         const formData = new FormData(this);
+        formData.set('import_job_id', jobId);
+        setImportUiState(true);
+        updateImportProgressUi({
+            percent: 1,
+            processed: 0,
+            total: 0,
+            inserted: 0,
+            skipped: 0,
+            deduplicated: 0,
+            message: 'Import is going on. Please wait...',
+            status: 'processing'
+        });
+        startImportProgressPolling(jobId);
+
         $.ajax({
           url: 'campaign/import_numbers',
           type: 'POST',
@@ -673,19 +987,57 @@ $(document).ready(function() {
           dataType: 'json',
           success: function (response) {
             if(response.success){
-                 alert(response.message || 'Import complete!');
-                 $('#importNumbersModal').modal('hide');
+                 handleImportCompleted({
+                     percent: 100,
+                     processed: response.processed || 0,
+                     total: response.total || 0,
+                     inserted: response.inserted || 0,
+                     skipped: response.skipped || 0,
+                     deduplicated: response.deduplicated || 0,
+                     message: response.message || 'Import complete!',
+                     status: 'completed'
+                 });
+                 showImportToast(response.message || 'Import complete.');
                  $('#importNumbersForm')[0].reset();
                  $('#campaignSelect').val(null).trigger('change');
                  if(isSuperAdmin) $('#importCompanySelect').val(null).trigger('change');
             } else {
-                 alert('Import failed: ' + response.message);
+                 updateImportProgressUi({
+                     percent: 100,
+                     message: response.message || 'Import failed.',
+                     status: 'failed'
+                 });
+                 stopImportProgressPolling();
+                 showImportToast(response.message || 'Import failed.', 'error');
+                 setImportUiState(false);
             }
           },
           error: function () {
-            alert('Error uploading numbers.');
+            updateImportProgressUi({
+                percent: 100,
+                message: 'Error uploading numbers.',
+                status: 'failed'
+            });
+            stopImportProgressPolling();
+            showImportToast('Error uploading numbers.', 'error');
+            setImportUiState(false);
           }
         });
+    });
+
+    $('#importNumbersModal').on('hide.bs.modal', function (e) {
+        if (importInProgress) {
+            e.preventDefault();
+        }
+    });
+
+    $('#importNumbersModal').on('hidden.bs.modal', function () {
+        resetImportProgressUi();
+        $('#importNumbersForm')[0].reset();
+        $('#campaignSelect').val(null).trigger('change');
+        if (isSuperAdmin) {
+            $('#importCompanySelect').val(null).trigger('change');
+        }
     });
 
     function syncEmptyDialNotifyUi() {

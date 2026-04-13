@@ -80,7 +80,7 @@ class Dialednumbers_modal {
     {
         $companyTimezoneName = $this->getCompanyTimezone($companyId);
         $companyTimezone = new DateTimeZone($companyTimezoneName);
-        $appTimezone = new DateTimeZone(date_default_timezone_get());
+        $appTimezone = new DateTimeZone('UTC');
         $now = new DateTimeImmutable('now', $companyTimezone);
         $start = $now->setTime(0, 0, 0)->setTimezone($appTimezone);
         $end = $now->setTime(23, 59, 59)->setTimezone($appTimezone);
@@ -91,6 +91,30 @@ class Dialednumbers_modal {
             'start' => $start->format('Y-m-d H:i:s'),
             'end' => $end->format('Y-m-d H:i:s'),
         ];
+    }
+
+    private function convertCompanyLocalToUtc($companyId, $datePart = '', $timePart = '')
+    {
+        $datePart = trim((string) $datePart);
+        $timePart = trim((string) $timePart);
+        if ($datePart === '') {
+            return null;
+        }
+
+        if ($timePart === '') {
+            $timePart = '09:00:00';
+        } elseif (preg_match('/^\d{2}:\d{2}$/', $timePart)) {
+            $timePart .= ':00';
+        }
+
+        try {
+            $companyTimezone = new DateTimeZone($this->getCompanyTimezone($companyId));
+            $utcTimezone = new DateTimeZone('UTC');
+            $scheduledAt = new DateTimeImmutable($datePart . ' ' . $timePart, $companyTimezone);
+            return $scheduledAt->setTimezone($utcTimezone)->format('Y-m-d H:i:s');
+        } catch (Exception $exception) {
+            return null;
+        }
     }
 
     public function getCompanies($companyId = 0)
@@ -218,16 +242,15 @@ class Dialednumbers_modal {
     {
         $companyId = intval($companyId);
         $campaignId = intval($campaignId);
-        $todayWindow = $this->getTodayWindowForCompany($companyId);
 
         $whereClauses = [
             "c.company_id = {$companyId}",
             "COALESCE(c.is_dnc, 0) = 0",
             "COALESCE(c.state, 'READY') NOT IN ('DNC', 'CLOSED')",
-            "(c.created_at < '{$todayWindow['start']}' OR c.created_at > '{$todayWindow['end']}')",
+            "NULLIF(TRIM(COALESCE(c.agent_connected, '')), '') IS NOT NULL",
+            "UPPER(COALESCE(c.last_call_status, '')) = 'ANSWERED'",
             "(
-                COALESCE(c.attempts_used, 0) > 0
-                OR NULLIF(TRIM(COALESCE(c.last_call_status, '')), '') IS NOT NULL
+                NULLIF(TRIM(COALESCE(c.last_call_started_at, '')), '') IS NOT NULL
                 OR EXISTS (
                     SELECT 1
                     FROM dialer_call_log dl
@@ -240,7 +263,7 @@ class Dialednumbers_modal {
                               AND (dl.caller_id = c.phone_e164 OR dl.caller_id = c.phone_raw)
                           )
                       )
-                      AND UPPER(COALESCE(dl.call_status, '')) <> 'MANUAL_DISPO'
+                      AND UPPER(COALESCE(dl.call_status, '')) = 'ANSWERED'
                 )
             )",
         ];
@@ -361,24 +384,7 @@ class Dialednumbers_modal {
         }
 
         if ($filterType === 'not_answered') {
-            $rows = $this->fetchRows("SELECT DISTINCT COALESCE(NULLIF(TRIM(c.last_call_status), ''), 'DIALED_NO_STATUS') AS status_value
-                                      FROM campaignnumbers c
-                                      {$baseWhere}
-                                        AND (NULLIF(TRIM(COALESCE(c.last_call_status, '')), '') IS NULL OR UPPER(COALESCE(c.last_call_status, '')) <> 'ANSWERED')
-                                      ORDER BY status_value ASC");
-            $options = [['value' => '__all__', 'label' => 'All Not Answered']];
-
-            foreach ($rows as $row) {
-                $statusValue = trim((string) ($row['status_value'] ?? ''));
-                if ($statusValue === '') {
-                    continue;
-                }
-
-                $label = $statusValue === 'DIALED_NO_STATUS' ? 'Dialed (No Status)' : $statusValue;
-                $options[] = ['value' => $statusValue, 'label' => $label];
-            }
-
-            return $options;
+            return [];
         }
 
         return [];
@@ -705,7 +711,7 @@ class Dialednumbers_modal {
                       SET last_disposition='$disposition',
                           state='$state',
                           next_call_at=$nextCallAt$notesUpdate,
-                          last_call_ended_at=NOW()
+                          last_call_ended_at=UTC_TIMESTAMP()
                       WHERE id='$id'";
 
             if (!mysqli_query($this->conn, $query)) {
@@ -724,7 +730,7 @@ class Dialednumbers_modal {
                      call_status = 'MANUAL_DISPO',
                      disposition = '$logDisposition',
                      notes = '$logNotes',
-                     started_at = NOW()";
+                     started_at = UTC_TIMESTAMP()";
             mysqli_query($this->conn, $logQ);
 
             mysqli_commit($this->conn);
@@ -762,7 +768,7 @@ class Dialednumbers_modal {
             return [
                 'success' => true,
                 'state' => 'READY',
-                'next_call_at' => (new DateTimeImmutable('now', new DateTimeZone(date_default_timezone_get())))->format('Y-m-d H:i:s'),
+                'next_call_at' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                 'display_time' => 'immediate',
                 'settings' => $settings,
                 'scheduled_date' => '',
@@ -780,7 +786,7 @@ class Dialednumbers_modal {
         }
 
         $companyTimezone = new DateTimeZone($settings['timezone']);
-        $appTimezone = new DateTimeZone(date_default_timezone_get());
+        $appTimezone = new DateTimeZone('UTC');
         $scheduledAt = DateTimeImmutable::createFromFormat('Y-m-d H:i', $scheduleDate . ' ' . $scheduleTime, $companyTimezone);
 
         if (!$scheduledAt instanceof DateTimeImmutable) {
@@ -880,12 +886,12 @@ class Dialednumbers_modal {
         foreach ($rows as $row) {
             $contactId = intval($row['id']);
             $exdataJson = $this->buildScheduledExdata($row['exdata'] ?? '', $scheduleDate, $scheduleTime, $nextCallAt);
-            $nextCallAtSql = $nextCallAt ? "'" . mysqli_real_escape_string($this->conn, $nextCallAt) . "'" : 'NOW()';
+            $nextCallAtSql = $nextCallAt ? "'" . mysqli_real_escape_string($this->conn, $nextCallAt) . "'" : 'UTC_TIMESTAMP()';
             $sql = "UPDATE campaignnumbers
                     SET state = '" . mysqli_real_escape_string($this->conn, $state) . "',
                         next_call_at = {$nextCallAtSql},
-                        created_at = NOW(),
-                        updated_at = NOW(),
+                        created_at = UTC_TIMESTAMP(),
+                        updated_at = UTC_TIMESTAMP(),
                         locked_at = NULL,
                         locked_by = NULL,
                         lock_token = NULL,

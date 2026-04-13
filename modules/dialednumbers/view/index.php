@@ -91,10 +91,9 @@
           <div class="form-group col-lg-2 col-md-4">
             <label for="dialedFilterTypeSelect">Type</label>
             <select class="form-control form-control-sm" id="dialedFilterTypeSelect">
-              <option value="">All Dialed</option>
+              <option value="">All Connected</option>
               <option value="agent">Agent</option>
               <option value="answered">Answered</option>
-              <option value="not_answered">Not Answered</option>
             </select>
           </div>
           <div class="form-group col-lg-2 col-md-4">
@@ -153,7 +152,7 @@
         <?php endif; ?>
 
         <div class="alert alert-info py-2 px-3 mb-0" id="dialedStatus">
-          This table shows numbers that already have a <strong>dialer attempt</strong> or <strong>call status history</strong> and are not already part of today's Contacts batch.
+          This table shows all numbers whose calls were <strong>connected to agents</strong>, including <strong>today's calls</strong>, sorted by the latest system call first.
         </div>
       </div>
     </div>

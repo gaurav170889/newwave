@@ -79,7 +79,7 @@ Class Campcontact_modal{
     {
         $companyTimezoneName = $this->getCompanyTimezone($companyId);
         $companyTimezone = new DateTimeZone($companyTimezoneName);
-        $appTimezone = new DateTimeZone(date_default_timezone_get());
+        $appTimezone = new DateTimeZone('UTC');
         $now = new DateTimeImmutable('now', $companyTimezone);
         $start = $now->setTime(0, 0, 0)->setTimezone($appTimezone);
         $end = $now->setTime(23, 59, 59)->setTimezone($appTimezone);
@@ -90,6 +90,30 @@ Class Campcontact_modal{
             'start' => $start->format('Y-m-d H:i:s'),
             'end' => $end->format('Y-m-d H:i:s'),
         ];
+    }
+
+    private function convertCompanyLocalToUtc($companyId, $datePart = '', $timePart = '')
+    {
+        $datePart = trim((string) $datePart);
+        $timePart = trim((string) $timePart);
+        if ($datePart === '') {
+            return null;
+        }
+
+        if ($timePart === '') {
+            $timePart = '09:00:00';
+        } elseif (preg_match('/^\d{2}:\d{2}$/', $timePart)) {
+            $timePart .= ':00';
+        }
+
+        try {
+            $companyTimezone = new DateTimeZone($this->getCompanyTimezone($companyId));
+            $utcTimezone = new DateTimeZone('UTC');
+            $scheduledAt = new DateTimeImmutable($datePart . ' ' . $timePart, $companyTimezone);
+            return $scheduledAt->setTimezone($utcTimezone)->format('Y-m-d H:i:s');
+        } catch (Exception $exception) {
+            return null;
+        }
     }
 
     public function getCompanies($companyId = 0)
@@ -385,7 +409,7 @@ Class Campcontact_modal{
                 // DNC Check
                 $isDnc = 0;
                 $state = 'READY';
-                $nextCallAt = "NOW()";
+                $nextCallAt = "UTC_TIMESTAMP()";
                 
                 // Check if in DNC
                 $dncCheck = "SELECT id FROM dialer_dnc WHERE phone_raw='$phone' AND company_id='$companyId' LIMIT 1";
@@ -400,7 +424,7 @@ Class Campcontact_modal{
                           (company_id, campaignid, phone_e164, phone_raw, first_name, last_name, state, max_attempts, is_dnc, next_call_at)
                           VALUES 
                           ('$companyId', '$campaignId', '$phone', '$phone', '$fname', '$lname', '$state', '$maxAttempts', '$isDnc', $nextCallAt)
-                          ON DUPLICATE KEY UPDATE updated_at=NOW()"; 
+                          ON DUPLICATE KEY UPDATE updated_at=UTC_TIMESTAMP()"; 
 
                 if (mysqli_query($this->conn, $query)) {
                     $insertCount++;
@@ -439,6 +463,12 @@ Class Campcontact_modal{
         $id = intval($id);
         $disposition = mysqli_real_escape_string($this->conn, $disposition);
         $notes = mysqli_real_escape_string($this->conn, $notes);
+        $cnRow = null;
+
+        $cnInfoQ = mysqli_query($this->conn, "SELECT notes, company_id, campaignid FROM campaignnumbers WHERE id='$id'");
+        if ($cnInfoQ && mysqli_num_rows($cnInfoQ) > 0) {
+            $cnRow = mysqli_fetch_assoc($cnInfoQ);
+        }
         
         // Determine State and Next Call
         $state = 'DISPO_SUBMITTED';
@@ -452,9 +482,13 @@ Class Campcontact_modal{
              if($actionType == 'callback' || $actionType == 'retry'){
                  $state = 'SCHEDULED';
                  if($callbackDate && $callbackTime){
-                     $nextCallAt = "'".mysqli_real_escape_string($this->conn, "$callbackDate $callbackTime")."'";
+                     $utcNextCallAt = $this->convertCompanyLocalToUtc($cnRow['company_id'] ?? 0, $callbackDate, $callbackTime);
+                     if ($utcNextCallAt === null) {
+                         return ['success' => false, 'error' => 'Invalid callback date/time.'];
+                     }
+                     $nextCallAt = "'" . mysqli_real_escape_string($this->conn, $utcNextCallAt) . "'";
                  } else {
-                     $nextCallAt = "DATE_ADD(NOW(), INTERVAL 1 HOUR)"; // Default retry
+                     $nextCallAt = "DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR)"; // Default retry
                  }
              } else if($actionType == 'dnc'){
                  $state = 'DNC';
@@ -484,9 +518,7 @@ Class Campcontact_modal{
              
              // Fetch existing notes to append to JSON array
              $currentNotesJson = "[]";
-             $cnQ = mysqli_query($this->conn, "SELECT notes, company_id, campaignid FROM campaignnumbers WHERE id='$id'");
-             if($cnQ && mysqli_num_rows($cnQ) > 0){
-                 $cnRow = mysqli_fetch_assoc($cnQ);
+             if($cnRow){
                  $rawNotes = $cnRow['notes'];
                  
                  // Try decode
@@ -532,7 +564,7 @@ Class Campcontact_modal{
                       state='$state', 
                       next_call_at=$nextCallAt 
                       $notesUpdate,
-                      last_call_ended_at=NOW()
+                      last_call_ended_at=UTC_TIMESTAMP()
                   WHERE id='$id'";
         
         if(mysqli_query($this->conn, $query)){
@@ -555,7 +587,7 @@ Class Campcontact_modal{
                      call_status = 'MANUAL_DISPO',
                      disposition = '$logDisposition',
                      notes = '$logNotes',
-                     started_at = NOW()";
+                     started_at = UTC_TIMESTAMP()";
             
             if(!mysqli_query($this->conn, $logQ)) {
                 // error_log("Dial Log Error: " . mysqli_error($this->conn));
