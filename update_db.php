@@ -10,12 +10,77 @@ if (!$conn) {
 
 echo "<h3>Updating Database Schema</h3>";
 
-$sql1 = "ALTER TABLE campaign ADD COLUMN dpd_filter_from INT DEFAULT NULL, ADD COLUMN dpd_filter_to INT DEFAULT NULL";
-if (mysqli_query($conn, $sql1)) {
-    echo "Columns dpd_filter_from and dpd_filter_to added to campaign successfully.<br>";
-} else {
-    echo "Error adding columns: " . mysqli_error($conn) . "<br>";
+function columnExists($conn, $table, $column)
+{
+    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+    $column = preg_replace('/[^a-zA-Z0-9_]/', '', $column);
+
+    $checkSql = "SHOW COLUMNS FROM `{$table}` LIKE '{$column}'";
+    $checkResult = mysqli_query($conn, $checkSql);
+
+    return ($checkResult && mysqli_num_rows($checkResult) > 0);
 }
+
+function addColumnIfMissing($conn, $table, $column, $definition)
+{
+    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+    $column = preg_replace('/[^a-zA-Z0-9_]/', '', $column);
+
+    if (columnExists($conn, $table, $column)) {
+        echo "Column {$table}.{$column} already exists.<br>";
+        return;
+    }
+
+    $sql = "ALTER TABLE `{$table}` ADD COLUMN `{$column}` {$definition}";
+    if (mysqli_query($conn, $sql)) {
+        echo "Column {$table}.{$column} added successfully.<br>";
+    } else {
+        echo "Error adding {$table}.{$column}: " . mysqli_error($conn) . "<br>";
+    }
+}
+
+function migrateLegacyNotifyEmailColumn($conn)
+{
+    $hasOldColumn = columnExists($conn, 'campaign', 'notify_to_leads_email');
+    $hasNewColumn = columnExists($conn, 'campaign', 'notify_no_leads_email');
+
+    if (!$hasOldColumn) {
+        return;
+    }
+
+    if (!$hasNewColumn) {
+        addColumnIfMissing($conn, 'campaign', 'notify_no_leads_email', 'TINYINT(1) NOT NULL DEFAULT 0');
+        $hasNewColumn = columnExists($conn, 'campaign', 'notify_no_leads_email');
+    }
+
+    if ($hasNewColumn) {
+        $sql = "UPDATE `campaign`
+                SET `notify_no_leads_email` = CASE
+                    WHEN COALESCE(`notify_no_leads_email`, 0) = 0 AND COALESCE(`notify_to_leads_email`, 0) <> 0
+                    THEN `notify_to_leads_email`
+                    ELSE `notify_no_leads_email`
+                END";
+
+        if (mysqli_query($conn, $sql)) {
+            echo "Legacy campaign email flag migrated from notify_to_leads_email to notify_no_leads_email.<br>";
+        } else {
+            echo "Error migrating legacy campaign email flag: " . mysqli_error($conn) . "<br>";
+        }
+    }
+}
+
+addColumnIfMissing($conn, 'campaign', 'dpd_filter_from', 'INT DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'dpd_filter_to', 'INT DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'dn_number', 'VARCHAR(50) DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'dialer_mode', "VARCHAR(50) NOT NULL DEFAULT 'Power Dialer'");
+addColumnIfMissing($conn, 'campaign', 'route_type', "VARCHAR(20) NOT NULL DEFAULT 'Queue'");
+addColumnIfMissing($conn, 'campaign', 'concurrent_calls', 'INT NOT NULL DEFAULT 1');
+addColumnIfMissing($conn, 'campaign', 'webhook_token', 'VARCHAR(255) DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'notify_no_leads_email', 'TINYINT(1) NOT NULL DEFAULT 0');
+addColumnIfMissing($conn, 'campaign', 'notify_email', 'VARCHAR(255) DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'notify_email_sent_at', 'DATETIME DEFAULT NULL');
+addColumnIfMissing($conn, 'campaign', 'updated_by', 'INT DEFAULT NULL');
+migrateLegacyNotifyEmailColumn($conn);
 
 $sql2 = "CREATE TABLE IF NOT EXISTS campaign_run_filters (
     id INT AUTO_INCREMENT PRIMARY KEY,

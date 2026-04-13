@@ -4,6 +4,23 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../includes/variables.php';
 require_once __DIR__ . '/../includes/functions.php';
 
+function writeEmailNotificationLog(array $context): void {
+    $logPath = dirname(__DIR__) . '/email-notification.log';
+    $payload = array_merge([
+        'logged_at_utc' => gmdate('Y-m-d H:i:s'),
+    ], $context);
+
+    $line = json_encode($payload, JSON_UNESCAPED_SLASHES);
+    if ($line === false) {
+        $line = json_encode([
+            'logged_at_utc' => gmdate('Y-m-d H:i:s'),
+            'event' => 'log_encode_failed'
+        ]);
+    }
+
+    @file_put_contents($logPath, $line . PHP_EOL, FILE_APPEND);
+}
+
 function jsonResponse(array $payload, int $code = 200): void {
     http_response_code($code);
     echo json_encode($payload);
@@ -11,10 +28,18 @@ function jsonResponse(array $payload, int $code = 200): void {
 }
 
 function loadMailerLibrary(): bool {
-    $composerAutoload = __DIR__ . '/../vendor/autoload.php';
-    if (file_exists($composerAutoload)) {
-        require_once $composerAutoload;
-        return class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+    $autoloadCandidates = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/vendor/autoload.php'
+    ];
+
+    foreach ($autoloadCandidates as $composerAutoload) {
+        if (file_exists($composerAutoload)) {
+            require_once $composerAutoload;
+            if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+                return true;
+            }
+        }
     }
 
     $phpMailerBase = __DIR__ . '/PHPMailer/src/';
@@ -33,6 +58,11 @@ function loadMailerLibrary(): bool {
 }
 
 if (!loadMailerLibrary()) {
+    writeEmailNotificationLog([
+        'event' => 'mailer_missing',
+        'success' => false,
+        'message' => 'PHPMailer not found.'
+    ]);
     jsonResponse([
         'success' => false,
         'message' => 'PHPMailer not found. Install it in /vendor via Composer or copy it into /api/PHPMailer/.'
@@ -49,6 +79,13 @@ $campaignId = isset($payload['campaign_id']) ? intval($payload['campaign_id']) :
 $companyId = isset($payload['company_id']) ? intval($payload['company_id']) : 0;
 
 if ($campaignId <= 0 || $companyId <= 0) {
+    writeEmailNotificationLog([
+        'event' => 'invalid_request',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'message' => 'Missing campaign_id or company_id.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Missing campaign_id or company_id.'], 400);
 }
 
@@ -63,6 +100,13 @@ $stmt = $conn->prepare(
 );
 
 if (!$stmt) {
+    writeEmailNotificationLog([
+        'event' => 'campaign_lookup_prepare_failed',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'message' => 'Failed to prepare campaign lookup.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Failed to prepare campaign lookup.'], 500);
 }
 
@@ -73,20 +117,44 @@ $campaign = $result ? $result->fetch_assoc() : null;
 $stmt->close();
 
 if (!$campaign) {
+    writeEmailNotificationLog([
+        'event' => 'campaign_not_found',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'message' => 'Campaign not found.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Campaign not found.'], 404);
 }
 
 if (intval($campaign['notify_no_leads_email']) !== 1 || empty($campaign['notify_email'])) {
+    writeEmailNotificationLog([
+        'event' => 'notification_disabled',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => 'Notification disabled or no email configured.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Notification disabled or no email configured.']);
 }
 
 if (!empty($campaign['notify_email_sent_at'])) {
+    writeEmailNotificationLog([
+        'event' => 'notification_already_sent',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => 'Notification already sent.',
+        'notify_email_sent_at' => $campaign['notify_email_sent_at']
+    ]);
     jsonResponse(['success' => false, 'message' => 'Notification already sent.']);
 }
 
 $claimStmt = $conn->prepare(
     "UPDATE campaign
-     SET notify_email_sent_at = NOW()
+     SET notify_email_sent_at = UTC_TIMESTAMP()
      WHERE id = ? AND company_id = ?
        AND notify_no_leads_email = 1
        AND notify_email IS NOT NULL
@@ -95,6 +163,14 @@ $claimStmt = $conn->prepare(
 );
 
 if (!$claimStmt) {
+    writeEmailNotificationLog([
+        'event' => 'notification_claim_prepare_failed',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => 'Failed to reserve notification send.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Failed to reserve notification send.'], 500);
 }
 
@@ -104,6 +180,14 @@ $claimed = $claimStmt->affected_rows > 0;
 $claimStmt->close();
 
 if (!$claimed) {
+    writeEmailNotificationLog([
+        'event' => 'notification_not_claimed',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => 'Notification already claimed or sent.'
+    ]);
     jsonResponse(['success' => false, 'message' => 'Notification already claimed or sent.']);
 }
 
@@ -122,6 +206,21 @@ try {
     $mail->isSMTP();
     $mail->Host = SMTP_HOST;
     $mail->Port = (int) SMTP_PORT;
+    $mail->Timeout = 8;
+    $mail->SMTPKeepAlive = false;
+    $mail->SMTPDebug = 2;
+    $mail->Debugoutput = function ($message, $level) use ($campaignId, $companyId, $campaign) {
+        writeEmailNotificationLog([
+            'event' => 'smtp_debug',
+            'success' => null,
+            'campaign_id' => $campaignId,
+            'company_id' => $companyId,
+            'campaign_name' => $campaign['name'] ?? '',
+            'recipient' => $campaign['notify_email'] ?? '',
+            'debug_level' => $level,
+            'message' => trim((string) $message)
+        ]);
+    };
 
     if (!empty(SMTP_USERNAME)) {
         $mail->SMTPAuth = true;
@@ -156,6 +255,16 @@ try {
 
     $mail->send();
 
+    writeEmailNotificationLog([
+        'event' => 'notification_sent',
+        'success' => true,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'campaign_name' => $campaign['name'] ?? '',
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => 'Notification sent successfully.'
+    ]);
+
     jsonResponse([
         'success' => true,
         'message' => 'Notification sent successfully.',
@@ -168,6 +277,16 @@ try {
         $resetStmt->execute();
         $resetStmt->close();
     }
+
+    writeEmailNotificationLog([
+        'event' => 'notification_failed',
+        'success' => false,
+        'campaign_id' => $campaignId,
+        'company_id' => $companyId,
+        'campaign_name' => $campaign['name'] ?? '',
+        'recipient' => $campaign['notify_email'] ?? '',
+        'message' => $e->getMessage()
+    ]);
 
     jsonResponse([
         'success' => false,

@@ -16,6 +16,7 @@ $sql = "
 CREATE TABLE IF NOT EXISTS dialer_queue_status (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   company_id BIGINT NOT NULL DEFAULT 0,
+  campaign_id BIGINT NOT NULL DEFAULT 0,
   pbx_id BIGINT NOT NULL DEFAULT 0,
   queue_dn VARCHAR(20) NOT NULL,
   available_agents INT NOT NULL DEFAULT 0,
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS dialer_queue_status (
 
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  UNIQUE KEY uq_queue (company_id, pbx_id, queue_dn)
+  UNIQUE KEY uq_campaign_queue (company_id, campaign_id, pbx_id, queue_dn)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ";
 

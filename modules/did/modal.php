@@ -121,7 +121,7 @@ class Did_modal {
                       did = VALUES(did),
                       trunk = VALUES(trunk),
                       rule_name = VALUES(rule_name),
-                      updated_at = NOW()";
+                      updated_at = UTC_TIMESTAMP()";
 
             if (mysqli_query($this->conn, $sql)) {
                 $count++;
@@ -193,7 +193,7 @@ class Did_modal {
         try {
             $sqlRule = "INSERT INTO campaign_outbound_rule (company_id, campaign_id, outbound_rule_id, last_used_map_id)
                         VALUES ($company_id, $campaign_id, $outbound_rule_id, NULL)
-                        ON DUPLICATE KEY UPDATE outbound_rule_id = VALUES(outbound_rule_id), last_used_map_id = NULL, updated_at = NOW()";
+                        ON DUPLICATE KEY UPDATE outbound_rule_id = VALUES(outbound_rule_id), last_used_map_id = NULL, updated_at = UTC_TIMESTAMP()";
             if (!mysqli_query($this->conn, $sqlRule)) {
                 throw new Exception(mysqli_error($this->conn));
             }

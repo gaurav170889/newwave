@@ -44,9 +44,9 @@ class Settings_modal {
         $token_insert_val = "";
         if (isset($data['auth_token'])) {
              $auth_token = mysqli_real_escape_string($this->conn, $data['auth_token']);
-             $token_update = ", auth_token='$auth_token', auth_updated_at=NOW()";
+             $token_update = ", auth_token='$auth_token', auth_updated_at=UTC_TIMESTAMP()";
              $token_insert_col = ", auth_token, auth_updated_at";
-             $token_insert_val = ", '$auth_token', NOW()";
+             $token_insert_val = ", '$auth_token', UTC_TIMESTAMP()";
         }
 
         $prefix_update = "";
@@ -102,13 +102,13 @@ class Settings_modal {
                     enable_rating_recording = " . (isset($data['enable_rating_recording']) ? 1 : 0) . "
                     $count_update,
                     simultaneous_calls=$simultaneous_calls,
-                    updated_at = NOW()
+                    updated_at = UTC_TIMESTAMP()
                     WHERE company_id=$company_id";
         } else {
             // Insert
             $enable_rating_recording = isset($data['enable_rating_recording']) ? 1 : 0;
             $sql = "INSERT INTO pbxdetail (company_id, pbxurl, pbxloginid, pbxloginpass, pbxclientid, pbxsecret, timezone $logo_insert_col $token_insert_col $prefix_insert_col $sentiment_insert_col, enable_rating_recording $count_insert_col, simultaneous_calls, created_at)
-                    VALUES ($company_id, '$pbxurl', '$pbxloginid', '$pbxloginpass', '$pbxclientid', '$pbxsecret', '$timezone' $logo_insert_val $token_insert_val $prefix_insert_val $sentiment_insert_val, $enable_rating_recording $count_insert_val, $simultaneous_calls, NOW())";
+                    VALUES ($company_id, '$pbxurl', '$pbxloginid', '$pbxloginpass', '$pbxclientid', '$pbxsecret', '$timezone' $logo_insert_val $token_insert_val $prefix_insert_val $sentiment_insert_val, $enable_rating_recording $count_insert_val, $simultaneous_calls, UTC_TIMESTAMP())";
         }
 
         if (mysqli_query($this->conn, $sql)) {

@@ -97,13 +97,13 @@ class Admindashboard_modal {
                     enable_rating_recording = $enable_rating_recording,
                     enable_sentiment = $enable_sentiment,
                     rating_questions_count = $rating_questions_count,
-                    updated_at = NOW()
+                    updated_at = UTC_TIMESTAMP()
                     WHERE company_id = $company_id";
         } else {
             // Create record if not exists (unlikely if they set PBX details, but possible for new companies)
             // We initialize empty PBX connection fields
              $sql = "INSERT INTO pbxdetail (company_id, inbound_prefix, outbound_prefix, enable_rating_recording, enable_sentiment, rating_questions_count, created_at)
-                    VALUES ($company_id, 'No', '$outbound_prefix', $enable_rating_recording, $enable_sentiment, $rating_questions_count, NOW())";
+                    VALUES ($company_id, 'No', '$outbound_prefix', $enable_rating_recording, $enable_sentiment, $rating_questions_count, UTC_TIMESTAMP())";
         }
 
         if (mysqli_query($this->conn, $sql)) {

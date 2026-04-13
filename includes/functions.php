@@ -170,7 +170,7 @@ function loadmodal($modulename){
              if ($new_token) {
                  // Update DB
                  $safe_token = mysqli_real_escape_string($conn, $new_token);
-                 $update_sql = "UPDATE pbxdetail SET auth_token = '$safe_token', auth_updated_at = NOW() WHERE company_id = $company_id";
+                 $update_sql = "UPDATE pbxdetail SET auth_token = '$safe_token', auth_updated_at = UTC_TIMESTAMP() WHERE company_id = $company_id";
                  mysqli_query($conn, $update_sql);
                  return $new_token;
              }
