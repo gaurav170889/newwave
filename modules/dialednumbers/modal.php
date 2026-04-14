@@ -50,6 +50,53 @@ class Dialednumbers_modal {
         return $rows;
     }
 
+    private function fetchValue($query, $field = 'aggregate_value')
+    {
+        $result = mysqli_query($this->conn, $query);
+        if ($result && ($row = mysqli_fetch_assoc($result))) {
+            return $row[$field] ?? null;
+        }
+
+        return null;
+    }
+
+    private function escapeLike($value)
+    {
+        return mysqli_real_escape_string($this->conn, str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $value));
+    }
+
+    private function getDataTableInt($key, $default = 0)
+    {
+        return isset($_REQUEST[$key]) ? max(0, intval($_REQUEST[$key])) : $default;
+    }
+
+    private function formatDialedRow(array $row)
+    {
+        $fullName = trim((string) ($row['first_name'] ?? '') . ' ' . (string) ($row['last_name'] ?? ''));
+        $lastStatus = trim((string) ($row['last_call_status'] ?? ''));
+        $isAnswered = strtoupper($lastStatus) === 'ANSWERED';
+
+        return [
+            'id' => $row['id'],
+            'campaign_name' => $row['campaign_name'],
+            'number' => $row['phone_e164'],
+            'name' => $fullName,
+            'days_past_due' => $row['days_past_due'],
+            'type' => $isAnswered ? 'Answered' : 'Not Answered',
+            'feedback' => $lastStatus !== '' ? $lastStatus : 'DIALED_NO_STATUS',
+            'state' => $row['state'],
+            'attempts' => intval($row['attempts_used']) . '/' . intval($row['max_attempts']),
+            'attempts_used' => intval($row['attempts_used']),
+            'last_try_dt' => $row['last_call_started_at'],
+            'agent_name' => $row['agent_name'],
+            'next_call_at' => $row['next_call_at'],
+            'created_at' => $row['created_at'],
+            'disposition' => $row['last_disposition'],
+            'color_code' => $row['color_code'] ?? '#808080',
+            'notes' => $row['notes'] ?? '',
+        ];
+    }
+
     private function getCompanyTimezone($companyId)
     {
         $defaultTimezone = date_default_timezone_get();
@@ -480,6 +527,109 @@ class Dialednumbers_modal {
         }
 
         return $response;
+    }
+
+    public function getDialedDataTableResponse($companyId, $campaignId = 0, $filterType = '', $filterValue = '', array $daysPastDue = [])
+    {
+        $companyId = intval($companyId);
+        $draw = $this->getDataTableInt('draw', 0);
+        $start = $this->getDataTableInt('start', 0);
+        $length = min(200, max(10, $this->getDataTableInt('length', 25)));
+        $searchValue = trim((string) ($_REQUEST['search']['value'] ?? ''));
+
+        if ($companyId <= 0) {
+            return [
+                'draw' => $draw,
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+            ];
+        }
+
+        $where = $this->buildDialedWhereSql($companyId, $campaignId, $filterType, $filterValue, $daysPastDue);
+        $searchSql = '';
+        if ($searchValue !== '') {
+            $like = $this->escapeLike($searchValue);
+            $searchSql = " AND (
+                CAST(c.id AS CHAR) LIKE '%{$like}%'
+                OR COALESCE(cam.name, '') LIKE '%{$like}%'
+                OR c.phone_e164 LIKE '%{$like}%'
+                OR c.phone_raw LIKE '%{$like}%'
+                OR c.first_name LIKE '%{$like}%'
+                OR c.last_name LIKE '%{$like}%'
+                OR CONCAT_WS(' ', COALESCE(c.first_name, ''), COALESCE(c.last_name, '')) LIKE '%{$like}%'
+                OR COALESCE(c.state, '') LIKE '%{$like}%'
+                OR COALESCE(c.last_call_status, '') LIKE '%{$like}%'
+                OR COALESCE(c.last_disposition, '') LIKE '%{$like}%'
+                OR COALESCE(a.agent_name, '') LIKE '%{$like}%'
+                OR CAST(COALESCE(c.days_past_due, '') AS CHAR) LIKE '%{$like}%'
+            )";
+        }
+
+        $orderMap = [
+            1 => 'c.id',
+            2 => 'campaign_name',
+            3 => 'c.phone_e164',
+            4 => "CONCAT_WS(' ', COALESCE(c.first_name, ''), COALESCE(c.last_name, ''))",
+            5 => 'c.days_past_due',
+            6 => "CASE WHEN UPPER(COALESCE(c.last_call_status, '')) = 'ANSWERED' THEN 1 ELSE 0 END",
+            7 => "COALESCE(NULLIF(TRIM(c.last_call_status), ''), 'DIALED_NO_STATUS')",
+            8 => 'c.state',
+            9 => 'c.attempts_used',
+            10 => 'c.last_call_started_at',
+            11 => 'a.agent_name',
+            12 => 'c.last_disposition',
+            13 => 'c.next_call_at',
+            14 => 'c.created_at',
+        ];
+        $orderColumn = intval($_REQUEST['order'][0]['column'] ?? 10);
+        $orderDir = strtolower((string) ($_REQUEST['order'][0]['dir'] ?? 'desc')) === 'asc' ? 'ASC' : 'DESC';
+        $orderBy = $orderMap[$orderColumn] ?? 'c.last_call_started_at';
+
+        $fromSql = "FROM campaignnumbers c
+                  LEFT JOIN campaign cam ON cam.id = c.campaignid
+                  LEFT JOIN agent a ON a.company_id = c.company_id AND CAST(a.agent_id AS CHAR) = CAST(c.agent_connected AS CHAR)
+                  LEFT JOIN dialer_disposition_master d ON d.company_id = c.company_id AND d.label = c.last_disposition
+                  {$where}";
+
+        $recordsTotal = intval($this->fetchValue("SELECT COUNT(*) AS aggregate_value {$fromSql}", 'aggregate_value'));
+        $recordsFiltered = intval($this->fetchValue("SELECT COUNT(*) AS aggregate_value {$fromSql}{$searchSql}", 'aggregate_value'));
+
+        $query = "SELECT c.id,
+                         c.campaignid,
+                         COALESCE(cam.name, CONCAT('Campaign #', c.campaignid)) AS campaign_name,
+                         c.phone_e164,
+                         c.first_name,
+                         c.last_name,
+                         c.days_past_due,
+                         c.state,
+                         c.attempts_used,
+                         c.max_attempts,
+                         c.last_call_status,
+                         c.last_call_started_at,
+                         c.next_call_at,
+                         c.created_at,
+                         c.notes,
+                         c.last_disposition,
+                         COALESCE(a.agent_name, '') AS agent_name,
+                         COALESCE(d.color_code, '#808080') AS color_code
+                  {$fromSql}{$searchSql}
+                  ORDER BY {$orderBy} {$orderDir}, c.id DESC
+                  LIMIT {$start}, {$length}";
+
+        $rows = $this->fetchRows($query);
+        $response = [];
+
+        foreach ($rows as $row) {
+            $response[] = $this->formatDialedRow($row);
+        }
+
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $response,
+        ];
     }
 
     private function ensureScheduledCallsTable()

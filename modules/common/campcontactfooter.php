@@ -218,10 +218,14 @@ $(document).ready(function () {
     });
 
     const contactTable = $('#campaignTable').DataTable({
+        processing: true,
+        serverSide: true,
         ajax: {
             url: 'campcontact/getallcontact',
             type: 'POST',
-            dataSrc: '',
+            dataSrc: function(json) {
+                return (json && Array.isArray(json.data)) ? json.data : [];
+            },
             data: function(payload) {
                 payload.company_id = selectedCompanyId();
                 payload.campaign_id = selectedCampaignId();
@@ -312,6 +316,8 @@ $(document).ready(function () {
             search: '_INPUT_',
             searchPlaceholder: 'Search all columns'
         },
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
         order: [[10, 'asc']]
     });
 
@@ -518,4 +524,3 @@ function deleteAllContacts() {
     });
 }
 </script>
-

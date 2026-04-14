@@ -57,9 +57,8 @@ Class Campcontact{
 	
     public function getallcontact() 
     {
-        $data = $this->modal->getallcontact();
         header('Content-Type: application/json');
-        echo $data;
+        echo json_encode($this->modal->getContactDataTableResponse());
     }
 
     public function getcampaigns()

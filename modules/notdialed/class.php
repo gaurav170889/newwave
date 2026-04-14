@@ -69,7 +69,7 @@ class Notdialed {
         $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
         $daysPastDue = isset($_REQUEST['days_past_due']) ? (array) $_REQUEST['days_past_due'] : [];
 
-        $this->json($this->modal->getNotDialedRows($companyId, $campaignId, $daysPastDue));
+        $this->json($this->modal->getNotDialedDataTableResponse($companyId, $campaignId, $daysPastDue));
     }
 
     public function move_to_contacts()

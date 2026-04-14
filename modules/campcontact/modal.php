@@ -49,6 +49,52 @@ Class Campcontact_modal{
         return $rows;
     }
 
+    private function fetchValue($query, $field = 'aggregate_value')
+    {
+        $result = mysqli_query($this->conn, $query);
+        if ($result && ($row = mysqli_fetch_assoc($result))) {
+            return $row[$field] ?? null;
+        }
+
+        return null;
+    }
+
+    private function escapeLike($value)
+    {
+        return mysqli_real_escape_string($this->conn, str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $value));
+    }
+
+    private function getDataTableInt($key, $default = 0)
+    {
+        return isset($_REQUEST[$key]) ? max(0, intval($_REQUEST[$key])) : $default;
+    }
+
+    private function formatContactRow(array $row)
+    {
+        $fullName = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+        $lastCallStatus = trim((string) ($row['last_call_status'] ?? ''));
+        $isAnswered = strtoupper($lastCallStatus) === 'ANSWERED';
+
+        return [
+            'id'            => $row['id'],
+            'number'        => $row['phone_e164'],
+            'name'          => $fullName,
+            'days_past_due' => $row['days_past_due'],
+            'type'          => $isAnswered ? 'Answered' : 'Not Answered',
+            'feedback'      => $lastCallStatus !== '' ? $lastCallStatus : 'NOT_DIALED',
+            'call_status'   => $row['state'],
+            'last_try'      => intval($row['attempts_used']) . '/' . intval($row['max_attempts']),
+            'attempts_used' => intval($row['attempts_used']),
+            'last_try_dt'   => $row['last_call_started_at'],
+            'agent_name'    => $row['agent_name'] ?? '',
+            'disposition'   => $row['last_disposition'],
+            'color_code'    => $row['color_code'] ?? '#808080',
+            'notes'         => $row['notes'],
+            'next_call_at'  => $row['next_call_at'],
+            'scheduled_at'  => $row['scheduled_at']
+        ];
+    }
+
     private function getCompanyTimezone($companyId)
     {
         $defaultTimezone = date_default_timezone_get();
@@ -219,16 +265,8 @@ Class Campcontact_modal{
         }
 	}
 	
-    public function getallcontact() {
-         $companyId = $this->resolveCompanyIdFromRequest();
-         $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
-         $filterType = strtolower(trim((string) ($_REQUEST['filter_type'] ?? '')));
-         $filterValue = trim((string) ($_REQUEST['filter_value'] ?? ''));
-
-         if ($companyId <= 0 || $campaignId <= 0) {
-             return json_encode([]);
-         }
-
+    private function buildContactBaseWhereClauses($companyId, $campaignId, $filterType, $filterValue)
+    {
          $todayWindow = $this->getTodayWindowForCompany($companyId);
          $whereClauses = [
              "c.company_id = '{$companyId}'",
@@ -237,7 +275,6 @@ Class Campcontact_modal{
              "c.created_at <= '{$todayWindow['end']}'",
          ];
 
-         // Filter for agents only
          if ($this->getSessionRole() === 'uagent') {
              $zid = intval($_SESSION['pid'] ?? 0);
              $u_query = "SELECT agentid FROM users WHERE id = '{$zid}'";
@@ -247,7 +284,7 @@ Class Campcontact_modal{
                  $u_row = mysqli_fetch_assoc($u_res);
                  $agent_id = intval($u_row['agentid'] ?? 0);
              }
-             
+
              if ($agent_id > 0) {
                  $whereClauses[] = "c.agent_connected = '{$agent_id}'";
              } else {
@@ -276,7 +313,80 @@ Class Campcontact_modal{
              }
          }
 
-         $where = 'WHERE ' . implode(' AND ', $whereClauses);
+         return $whereClauses;
+    }
+
+    private function buildContactSearchSql($searchValue)
+    {
+        $searchValue = trim((string) $searchValue);
+        if ($searchValue === '') {
+            return '';
+        }
+
+        $like = $this->escapeLike($searchValue);
+        return " AND (
+            c.phone_e164 LIKE '%{$like}%'
+            OR c.phone_raw LIKE '%{$like}%'
+            OR c.first_name LIKE '%{$like}%'
+            OR c.last_name LIKE '%{$like}%'
+            OR CONCAT_WS(' ', COALESCE(c.first_name, ''), COALESCE(c.last_name, '')) LIKE '%{$like}%'
+            OR COALESCE(c.state, '') LIKE '%{$like}%'
+            OR COALESCE(c.last_call_status, '') LIKE '%{$like}%'
+            OR COALESCE(c.last_disposition, '') LIKE '%{$like}%'
+            OR COALESCE(a.agent_name, '') LIKE '%{$like}%'
+            OR CAST(COALESCE(c.days_past_due, '') AS CHAR) LIKE '%{$like}%'
+        )";
+    }
+
+    public function getContactDataTableResponse()
+    {
+         $companyId = $this->resolveCompanyIdFromRequest();
+         $campaignId = isset($_REQUEST['campaign_id']) ? intval($_REQUEST['campaign_id']) : 0;
+         $filterType = strtolower(trim((string) ($_REQUEST['filter_type'] ?? '')));
+         $filterValue = trim((string) ($_REQUEST['filter_value'] ?? ''));
+         $draw = $this->getDataTableInt('draw', 0);
+         $start = $this->getDataTableInt('start', 0);
+         $length = min(200, max(10, $this->getDataTableInt('length', 25)));
+         $searchValue = trim((string) ($_REQUEST['search']['value'] ?? ''));
+
+         if ($companyId <= 0 || $campaignId <= 0) {
+             return [
+                 'draw' => $draw,
+                 'recordsTotal' => 0,
+                 'recordsFiltered' => 0,
+                 'data' => [],
+             ];
+         }
+
+         $where = 'WHERE ' . implode(' AND ', $this->buildContactBaseWhereClauses($companyId, $campaignId, $filterType, $filterValue));
+         $searchSql = $this->buildContactSearchSql($searchValue);
+
+         $orderMap = [
+             0 => 'c.phone_e164',
+             1 => "CONCAT_WS(' ', COALESCE(c.first_name, ''), COALESCE(c.last_name, ''))",
+             2 => 'c.days_past_due',
+             3 => "CASE WHEN UPPER(COALESCE(c.last_call_status, '')) = 'ANSWERED' THEN 1 ELSE 0 END",
+             4 => "COALESCE(NULLIF(TRIM(c.last_call_status), ''), 'NOT_DIALED')",
+             5 => 'c.state',
+             6 => 'c.attempts_used',
+             7 => 'c.last_call_started_at',
+             8 => 'a.agent_name',
+             9 => 'c.last_disposition',
+             10 => 'COALESCE(c.next_call_at, c.created_at)',
+         ];
+         $orderColumn = intval($_REQUEST['order'][0]['column'] ?? 10);
+         $orderDir = strtolower((string) ($_REQUEST['order'][0]['dir'] ?? 'asc')) === 'desc' ? 'DESC' : 'ASC';
+         $orderBy = $orderMap[$orderColumn] ?? 'COALESCE(c.next_call_at, c.created_at)';
+
+         $recordsTotal = intval($this->fetchValue("SELECT COUNT(*) AS aggregate_value
+                  FROM campaignnumbers c
+                  LEFT JOIN agent a ON c.agent_connected = a.agent_id
+                  {$where}", 'aggregate_value'));
+
+         $recordsFiltered = intval($this->fetchValue("SELECT COUNT(*) AS aggregate_value
+                  FROM campaignnumbers c
+                  LEFT JOIN agent a ON c.agent_connected = a.agent_id
+                  {$where}{$searchSql}", 'aggregate_value'));
 
          $query = "SELECT c.id, c.phone_e164, c.first_name, c.last_name, c.days_past_due,
                      c.state, c.attempts_used, c.max_attempts,
@@ -288,47 +398,33 @@ Class Campcontact_modal{
                   FROM campaignnumbers c
                   LEFT JOIN agent a ON c.agent_connected = a.agent_id
                   LEFT JOIN dialer_disposition_master d ON c.last_disposition = d.label AND c.company_id = d.company_id
-                  {$where}
-                  ORDER BY COALESCE(c.next_call_at, c.created_at) ASC, c.id ASC LIMIT 2000";
+                  {$where}{$searchSql}
+                  ORDER BY {$orderBy} {$orderDir}, c.id ASC LIMIT {$start}, {$length}";
 
         $result = mysqli_query($this->conn, $query);
 
         if (!$result) {
-            return json_encode(['error' => mysqli_error($this->conn)]);
+            return [
+                'draw' => $draw,
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => mysqli_error($this->conn),
+            ];
         }
     
         $response = [];
     
         while ($row = mysqli_fetch_assoc($result)) {
-            $fullName = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
-            $lastCallStatus = trim((string) ($row['last_call_status'] ?? ''));
-            $isAnswered = strtoupper($lastCallStatus) === 'ANSWERED';
-        
-            $response[] = [
-                'id'            => $row['id'],
-                'number'        => $row['phone_e164'],
-                'name'          => $fullName,
-                'days_past_due' => $row['days_past_due'],
-                'type'          => $isAnswered ? 'Answered' : 'Not Answered',
-                'feedback'      => $lastCallStatus !== '' ? $lastCallStatus : 'NOT_DIALED',
-                'call_status'   => $row['state'],
-                'last_try'      => $row['attempts_used'] . '/' . $row['max_attempts'],
-                'attempts_used' => $row['attempts_used'],
-                'last_try_dt'   => $row['last_call_started_at'],
-                'agent_name'    => $row['agent_name'] ?? '',
-                'disposition'   => $row['last_disposition'],
-                'color_code'    => $row['color_code'] ?? '#808080',
-                'notes'         => $row['notes'],
-                'next_call_at'  => $row['next_call_at'],
-                'scheduled_at'  => $row['scheduled_at']
-            ];
+            $response[] = $this->formatContactRow($row);
         }
 
-        $encoded = json_encode($response);
-        if ($encoded === false) {
-             return json_encode(['error' => 'JSON Encode Error: ' . json_last_error_msg()]);
-        }
-        return $encoded;
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $response,
+        ];
     }
 
 	

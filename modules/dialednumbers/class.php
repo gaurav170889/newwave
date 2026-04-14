@@ -91,7 +91,7 @@ class Dialednumbers {
         $filterValue = isset($_REQUEST['filter_value']) ? (string) $_REQUEST['filter_value'] : '';
         $daysPastDue = isset($_REQUEST['days_past_due']) ? (array) $_REQUEST['days_past_due'] : [];
 
-        $this->json($this->modal->getDialedRows($companyId, $campaignId, $filterType, $filterValue, $daysPastDue));
+        $this->json($this->modal->getDialedDataTableResponse($companyId, $campaignId, $filterType, $filterValue, $daysPastDue));
     }
 
     public function move_to_contacts()
