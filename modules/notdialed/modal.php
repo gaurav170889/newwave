@@ -247,20 +247,6 @@ class Notdialed_modal {
                 COALESCE(c.attempts_used, 0) > 0
                 OR NULLIF(TRIM(COALESCE(c.last_call_status, '')), '') IS NOT NULL
                 OR NULLIF(TRIM(COALESCE(c.last_call_started_at, '')), '') IS NOT NULL
-                OR EXISTS (
-                    SELECT 1
-                    FROM dialer_call_log dl
-                    WHERE dl.company_id = c.company_id
-                      AND dl.campaign_id = c.campaignid
-                      AND (
-                          dl.campaignnumber_id = c.id
-                          OR (
-                              NULLIF(TRIM(COALESCE(dl.caller_id, '')), '') IS NOT NULL
-                              AND (dl.caller_id = c.phone_e164 OR dl.caller_id = c.phone_raw)
-                          )
-                      )
-                      AND UPPER(COALESCE(dl.call_status, '')) <> 'MANUAL_DISPO'
-                )
             )",
         ];
 
